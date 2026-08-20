@@ -1,0 +1,58 @@
+/* ──────────────────────────────────────────────
+   Theme · Passion City Church
+   Values taken from passioncitychurch.com as published on 2026-08-19, while
+   their full site is in a limited state: ink #0e1216, paper #f4f4f1,
+   tan #e2e3da, cyan #00b7e3 with deep teal #06222b as the colour that sits
+   on top of it. Buttons are full pills, uppercase, weight 700. Display type
+   is heavy and tight: weight 800, -0.04em, line-height under 1.
+   Load after wishlist.css. Swaps nothing but the visual layer.
+   ────────────────────────────────────────────── */
+
+:root{
+  /* Cyan is the action colour and carries deep teal, never white: cyan with
+     white text is 2.4:1, cyan with #06222b is 7.0:1. Their own pairing. */
+  --brand:#00b7e3; --brand-hover:#00a2c9; --brand-deep:#06687e; --brand-wash:#e4f7fc;
+  --brand-light:#8ae0f4; --brand-edge:#e2e3da; --on-brand:#06222b;
+
+  /* No second brand colour in their palette, so attention is the deep teal
+     on tan rather than an invented accent. */
+  --accent:#06222b; --accent-deep:#06222b; --accent-wash:#e2e3da;
+  --green:#1f7a5c; --green-d:#18614a; --green-bg:#e7f3ee;
+
+  --ink:#0e1216; --body:#2b3138; --soft:#626973; --faint:#8f959d;
+  --line:#dfe0da; --line-soft:#ebece6;
+  --bg:#f4f4f1; --card:#ffffff;
+
+  /* Shape and weight. Their cards are 20px, their buttons are 100px pills. */
+  --r-sm:12px; --r:20px; --r-lg:24px; --r-pill:100px;
+  --btn-radius:100px; --btn-weight:700; --btn-transform:uppercase; --btn-tracking:.09em;
+  --h1-weight:800; --h1-tracking:-.04em; --h1-leading:.98;
+
+  --font-sans:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif;
+
+  /* Avatar swatches drawn from their own range, dark enough for white type. */
+  --av-1:#06222b; --av-2:#075f75; --av-3:#1f7a5c;
+  --av-4:#2b3138; --av-5:#08485c; --av-6:#4a5560;
+
+  --ring:0 0 0 3px rgba(0,183,227,.35);
+  --sh:0 1px 2px rgba(14,18,22,.06), 0 1px 3px rgba(14,18,22,.04);
+  --sh-md:0 10px 30px -12px rgba(14,18,22,.22);
+  --sh-lg:0 30px 70px -24px rgba(14,18,22,.32);
+}
+
+/* Their hero is flat and high contrast, not a warm wash. */
+.hero{background:none; padding:52px 0 26px}
+.hero h1{font-size:clamp(2.4rem,5.6vw,4rem); max-width:16ch}
+
+/* Labels run uppercase with wide tracking throughout their site. */
+.cat-tag,.shelf-kicker,.cat-eyebrow,.brand-name span{letter-spacing:.16em}
+.sec-head h2,.shelf-head h2{letter-spacing:-.02em}
+.season-deadline{background:var(--accent-wash); color:var(--accent-deep); text-transform:uppercase; letter-spacing:.1em; font-weight:700}
+.season-bar i{background:linear-gradient(90deg,var(--brand-light),var(--brand))}
+
+/* Cart badge and needed count carry white on deep teal. */
+.cart-count{background:var(--brand); color:var(--on-brand)}
+.art-wrap .need-tag{background:var(--accent); color:#fff}
+
+.tag{background:var(--accent-wash); color:var(--accent-deep)}
+.trust span{border-color:var(--line)}

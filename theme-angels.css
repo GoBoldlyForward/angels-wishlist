@@ -1,0 +1,26 @@
+/* ──────────────────────────────────────────────
+   Theme · Atlanta Angels
+   Values pulled from atlantaangels.org. Load after wishlist.css.
+   ────────────────────────────────────────────── */
+
+:root{
+  /* Brand. Gold is the primary action colour and the chrome; it carries dark
+     text rather than white, which keeps the real brand value at 5.5:1. */
+  --brand:#a29060; --brand-hover:#93814f; --brand-deep:#7d6d40; --brand-wash:#f5f1e6;
+  --brand-light:#e5be75; --brand-edge:#e1dbcb; --on-brand:var(--ink);
+
+  /* Accents, each with one job: pink for urgency and new, green for funded. */
+  --accent:#ed1566; --accent-deep:#c9104f; --accent-wash:#fdeaf2;
+  --green:#2f7d5d; --green-d:#25664a; --green-bg:#eaf5ef;
+
+  --ink:#1d1b16; --body:#4c4740; --soft:#6f6a5e; --faint:#8c8678;
+  --line:#e9e4d8; --line-soft:#f3efe6;
+  --bg:#fdfbf6; --card:#fff;
+
+  /* Avatar swatches. White initials sit on these, so they stay dark. */
+  --av-1:#a29060; --av-2:#ed1566; --av-3:#2f7d5d;
+  --av-4:#5b6bbf; --av-5:#c2700a; --av-6:#7d5ba6;
+
+  --ring:0 0 0 3px rgba(162,144,96,.28);
+  --font-sans:'Work Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+}

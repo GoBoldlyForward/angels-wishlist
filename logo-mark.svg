@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Atlanta Angels">
+  <g fill="none" stroke="#A29060" stroke-width="3.2" stroke-linecap="round">
+    <path d="M32 4v9M32 51v9M4 32h9M51 32h9M12.2 12.2l6.4 6.4M45.4 45.4l6.4 6.4M51.8 12.2l-6.4 6.4M18.6 45.4l-6.4 6.4"/>
+  </g>
+  <circle cx="32" cy="32" r="14.5" fill="#E5BE75"/>
+  <path d="M32 41.6s-8.2-5-8.2-10.3a4.4 4.4 0 0 1 8.2-2.3 4.4 4.4 0 0 1 8.2 2.3c0 5.3-8.2 10.3-8.2 10.3z" fill="#ED1566"/>
+</svg>

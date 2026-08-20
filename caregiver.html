@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Set up your wish lists | Atlanta Angels</title>
+<meta name="description" content="Foster and kinship caregivers: build a wish list for each child in your home, and get the funds to buy the gifts yourself.">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="wishlist.css" rel="stylesheet">
+<link href="theme-angels.css" rel="stylesheet">
+<link rel="icon" href="logo-mark.svg">
+</head>
+<body>
+
+<header class="hdr">
+  <div class="container hdr-in">
+    <a href="index.html" class="brand">
+      <img src="logo-mark.svg" alt="">
+      <span class="brand-name">Atlanta Angels<span>Wish List</span></span>
+    </a>
+    <nav class="hdr-nav">
+      <a class="hdr-link hide-sm" href="index.html">See the donor view</a>
+      <a class="hdr-link" href="#" id="helpLink"><i class="fa-solid fa-circle-question"></i> &nbsp;Need help?</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Landing -->
+<div id="introView">
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge"><span><i class="fa-solid fa-lock"></i> &nbsp;For approved foster and kinship caregivers</span></div>
+      <h1 class="text-balance">Tell us what they want. You do the shopping.</h1>
+      <p class="text-balance">
+        Build a list for each child in your home. Donors fund the gifts one by one, and the money
+        comes to you, so you buy the right size in the right week. If a child outgrows something
+        or changes their mind, you spend it on what they actually need.
+      </p>
+      <div style="text-align:center; margin-top:28px">
+        <button class="btn btn-primary btn-xl" id="start">Start my lists <i class="fa-solid fa-arrow-right"></i></button>
+        <p class="tiny muted" style="margin-top:12px">Takes about ten minutes. You can come back to it.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="container" style="max-width:900px; padding-bottom:60px">
+    <div class="why-grid" style="margin-top:10px">
+      <div class="why-card"><i class="fa-solid fa-ruler"></i><h4>Sizes stay yours</h4>
+        <p>Donors never see a size, a school, a photo, or a last name. You buy the fit, so nobody else needs it.</p></div>
+      <div class="why-card"><i class="fa-solid fa-shuffle"></i><h4>Change it any time</h4>
+        <p>Swap a gift for something better up until the day you shop. The funds follow the child, not the line item.</p></div>
+      <div class="why-card"><i class="fa-solid fa-building-columns"></i><h4>Paid straight to you</h4>
+        <p>Direct deposit in one to two days through Stripe. No bank? A Visa gift card in the mail instead.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- Flow -->
+<div id="flowView" hidden>
+  <div class="container" style="max-width:1040px">
+    <div class="steps" id="steps"></div>
+  </div>
+  <main class="container" style="max-width:1040px; padding-bottom:20px" id="screen"></main>
+  <div class="sticky-foot" id="foot" hidden>
+    <div class="container sticky-in" style="max-width:1040px" id="footIn"></div>
+  </div>
+</div>
+
+<footer class="ftr">
+  <div class="container ftr-in">
+    <div style="display:flex; align-items:center; gap:10px">
+      <img src="logo-mark.svg" alt="" style="height:28px">
+      <div>
+        <div class="t-base w-700 ink">Atlanta Angels</div>
+        <div class="tiny">Consistent relationships are the solution.</div>
+      </div>
+    </div>
+    <div class="tiny" style="max-width:520px">
+      Anything you enter about a child stays with Atlanta Angels staff. Donors see an alias, an age,
+      and the interests you write. Prototype only, nothing here is submitted or charged.
+    </div>
+  </div>
+</footer>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Details">
+  <div class="scrim on" id="modalScrim" style="position:absolute"></div>
+  <div class="modal-box" id="modalBox"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="caregiver.js"></script>
+</body>
+</html>

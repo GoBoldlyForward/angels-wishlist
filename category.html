@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Category | Atlanta Angels Wish List</title>
+<meta name="description" content="Every gift in this category was added by a caregiver for a child in their home. Fund one, a few, or the whole list.">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="wishlist.css" rel="stylesheet">
+<link href="theme-angels.css" rel="stylesheet">
+<link rel="icon" href="logo-mark.svg">
+</head>
+<body data-page="category">
+
+<header class="hdr">
+  <div class="container hdr-in">
+    <a href="index.html" class="brand">
+      <img src="logo-mark.svg" alt="">
+      <span class="brand-name">Atlanta Angels<span>Wish List</span></span>
+    </a>
+    <nav class="hdr-nav">
+      <a class="hdr-link hide-sm" href="index.html#why">How it works</a>
+      <a class="hdr-link hide-sm" href="index.html#faq">FAQ</a>
+      <a class="hdr-link hide-sm" href="caregiver.html">For caregivers</a>
+      <button class="cart-btn" id="cartBtn">
+        <i class="fa-solid fa-cart-shopping"></i> Cart
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main id="catBody"></main>
+
+<footer class="ftr">
+  <div class="container ftr-in">
+    <div style="display:flex; align-items:center; gap:10px">
+      <img src="logo-mark.svg" alt="" style="height:28px">
+      <div>
+        <div class="t-base w-700 ink">Atlanta Angels</div>
+        <div class="tiny">Consistent relationships are the solution.</div>
+      </div>
+    </div>
+    <div class="tiny" style="max-width:520px">
+      Names shown are aliases chosen by each caregiver. No photographs, last names, schools, or
+      placement details are published. Gifts are designated donations to Atlanta Angels, a 501(c)(3),
+      and are tax deductible. Prototype only, nothing here is a live transaction.
+    </div>
+  </div>
+</footer>
+
+<!-- Cart drawer -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Your cart">
+  <div class="drawer-hd">
+    <h3 class="t-lg">Your cart</h3>
+    <button class="x" id="closeDrawer" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="drawer-bd" id="drawerBody"></div>
+  <div class="drawer-ft" id="drawerFoot"></div>
+</aside>
+
+<!-- Child / item modal -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Details">
+  <div class="scrim on" id="modalScrim" style="position:absolute"></div>
+  <div class="modal-box" id="modalBox"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="shop.js"></script>
+</body>
+</html>

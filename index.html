@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wish List | Atlanta Angels</title>
+<meta name="description" content="Browse gift lists written by caregivers for children navigating foster care in metro Atlanta. Choose what to fund, and Atlanta Angels directs the funds to that verified household.">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="wishlist.css" rel="stylesheet">
+<link href="theme-angels.css" rel="stylesheet">
+<link rel="icon" href="logo-mark.svg">
+</head>
+<body>
+
+<header class="hdr">
+  <div class="container hdr-in">
+    <a href="index.html" class="brand">
+      <img src="logo-mark.svg" alt="">
+      <span class="brand-name">Atlanta Angels<span>Wish List</span></span>
+    </a>
+    <nav class="hdr-nav">
+      <a class="hdr-link hide-sm" href="#why">How it works</a>
+      <a class="hdr-link hide-sm" href="#faq">FAQ</a>
+      <a class="hdr-link hide-sm" href="caregiver.html">For caregivers</a>
+      <button class="cart-btn" id="cartBtn">
+        <i class="fa-solid fa-cart-shopping"></i> Cart
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<!-- ═══ SHOP ═══ -->
+<div id="shopView">
+
+  <section class="hero">
+    <div class="container">
+      <h1 class="text-balance">Choose the types of gifts, situations, and families you want to fund.</h1>
+      <p class="text-balance">
+        Every gift here was added by a caregiver for a specific child in their home. You choose what
+        to fund, and Atlanta Angels gets the money to that family.
+        <a href="#why" class="link">Why we do it this way</a>
+      </p>
+      <div id="seasonPanel"></div>
+    </div>
+  </section>
+
+  <div class="tabs-wrap">
+    <div class="container">
+      <div class="tabs" id="tabs"></div>
+    </div>
+  </div>
+
+  <main class="container" id="tabBody"></main>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq">
+    <div class="container" style="max-width:860px">
+      <span class="tag" style="background:var(--accent-wash); color:var(--accent-deep)">Read this part</span>
+      <h2 style="font-size:clamp(1.7rem,3.4vw,2.2rem); margin:14px 0 10px" class="text-balance">
+        Questions people ask before they give
+      </h2>
+      <p class="t-md" style="margin:0">
+        Short version: you are choosing a gift, and what actually moves is a donation to Atlanta Angels.
+        The long version is below, including the parts that are less flattering to us.
+      </p>
+      <div class="faq-list" id="faqList"></div>
+    </div>
+  </section>
+
+  <!-- Why -->
+  <section class="why" id="why">
+    <div class="container-narrow" style="max-width:1180px; padding:0 22px">
+      <div style="max-width:640px">
+        <span class="tag" style="background:var(--accent-wash); color:var(--accent-deep)">The honest version</span>
+        <h2 style="font-size:clamp(1.7rem,3.4vw,2.3rem); margin:14px 0 14px" class="text-balance">
+          You are choosing a gift. What moves is a donation.
+        </h2>
+        <p class="t-md" style="margin:0">
+          Every family on this site is verified by Atlanta Angels, and every line was added by a
+          caregiver for a child in their home. When you check out, what you chose is recorded against
+          that child's list and the funds go out to their household, so you are empowering that
+          caregiver to shop the specific items and sizes the kids in their care actually need.
+        </p>
+      </div>
+
+      <div class="why-grid" id="whyGrid"></div>
+
+      <h3 class="t-lg" style="margin:52px 0 0">What actually happens after you check out</h3>
+      <div class="flow">
+        <div class="flow-step"><b>You check out</b><span>Your card is charged by Atlanta Angels. You get an itemized receipt naming each gift and each child.</span></div>
+        <div class="flow-step"><b>The list closes</b><span>On December 8 we total what each household raised, line by line, and mark the list funded.</span></div>
+        <div class="flow-step"><b>The household is paid</b><span>Funds land in their bank account in one to two days through Stripe, or on a Visa gift card if they cannot use a bank.</span></div>
+        <div class="flow-step"><b>They shop</b><span>The caregiver shops for their kids in the sizes that fit by then, and sends receipts back to us.</span></div>
+        <div class="flow-step"><b>You hear back</b><span>A thank-you note from the household in January. No child photos, ever, and no last names.</span></div>
+      </div>
+
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ CHECKOUT ═══ -->
+<div id="checkoutView" hidden>
+  <main class="container" style="max-width:960px; padding-top:30px; padding-bottom:60px">
+    <button class="btn-plain" id="backToShop"><i class="fa-solid fa-arrow-left"></i> &nbsp;Keep shopping</button>
+    <h1 style="font-size:clamp(1.7rem,3.6vw,2.2rem); margin:16px 0 6px">Review your cart</h1>
+    <p class="muted" style="margin:0 0 26px">Each line is funded at the price the caregiver listed.</p>
+    <div id="checkoutBody"></div>
+  </main>
+</div>
+
+<!-- ═══ DONE ═══ -->
+<div id="doneView" hidden>
+  <main class="container" style="max-width:760px; padding-top:50px; padding-bottom:70px" id="doneBody"></main>
+</div>
+
+<footer class="ftr">
+  <div class="container ftr-in">
+    <div style="display:flex; align-items:center; gap:10px">
+      <img src="logo-mark.svg" alt="" style="height:28px">
+      <div>
+        <div class="t-base w-700 ink">Atlanta Angels</div>
+        <div class="tiny">Consistent relationships are the solution.</div>
+      </div>
+    </div>
+    <div class="tiny" style="max-width:520px">
+      Names shown are aliases chosen by each caregiver. No photographs, last names, schools, or
+      placement details are published. Gifts are designated donations to Atlanta Angels, a 501(c)(3),
+      and are tax deductible. Prototype only, nothing here is a live transaction.
+    </div>
+  </div>
+</footer>
+
+<!-- Cart drawer -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Your cart">
+  <div class="drawer-hd">
+    <h3 class="t-lg">Your cart</h3>
+    <button class="x" id="closeDrawer" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="drawer-bd" id="drawerBody"></div>
+  <div class="drawer-ft" id="drawerFoot"></div>
+</aside>
+
+<!-- Child / item modal -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Details">
+  <div class="scrim on" id="modalScrim" style="position:absolute"></div>
+  <div class="modal-box" id="modalBox"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="shop.js"></script>
+</body>
+</html>

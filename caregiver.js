@@ -12,13 +12,21 @@ const CAP = 300; // per child, the number Angels asks donors to expect
 
 let step = 0;
 let cur = 0;   // which child's list is open on step 2
-let listFilter = { cat:'all', ageFit:true };
 
-const H = { caregiver:'', email:'', phone:'', county:'', street:'', city:'', zip:'', agency:'', worker:'' };
+const H = { caregiver:'', email:'', phone:'', county:'', street:'', city:'', zip:'' };
 let CHILDREN = [];
 const PAY = { method:'', connected:false, bank:'', mailName:'', mailAddr:'' };
 
 const uid = () => 'n' + Math.random().toString(36).slice(2, 7);
+
+/* Donors never see a legal first name, so the system assigns the stand-in
+   rather than asking a caregiver to invent one under time pressure. */
+const ALIAS_POOL = ['Maya','Theo','Nova','Beau','Rowan','Sage','Micah','Wren','Ezra','Iris',
+                    'Juno','Levi','Nia','Otis','Poppy','Quinn','Reese','Sol','Tess','Vera'];
+function nextAlias(){
+  const taken = new Set(CHILDREN.map(c => c.alias));
+  return ALIAS_POOL.find(n => !taken.has(n)) || 'Child ' + (CHILDREN.length + 1);
+}
 
 /* Caregivers paste whatever the browser gave them, so accept a bare domain and
    drop anything that is not a link at all. */
@@ -32,8 +40,8 @@ const linkHost = u => { try { return new URL(u).hostname.replace(/^www\./, ''); 
 const art = (catId, cat, icon, cls) => photoFor(catId)
   ? `<div class="${cls} has-photo"><img src="${photoFor(catId)}" alt="" loading="lazy"></div>`
   : `<div class="${cls} ${catById[cat].tint}">${icon}</div>`;
-const newChild = () => ({ id:uid(), alias:'', first:'', age:'', gender:'', hh:'new',
-  sizes:{ top:'', bottom:'', shoe:'' }, interests:[], note:'', items:[] });
+const newChild = () => ({ id:uid(), alias:nextAlias(), first:'', age:'', gender:'', hh:'new',
+  interests:[], note:'', items:[] });
 
 const childTotal = c => c.items.reduce((s, i) => s + i.price, 0);
 const allTotal   = () => CHILDREN.reduce((s, c) => s + childTotal(c), 0);
@@ -61,13 +69,9 @@ function foot(html){
   $('#footIn').innerHTML = html;
 }
 
-const back = lbl => `<button class="btn-plain step-back" data-back="1"><i class="fa-solid fa-arrow-left"></i> &nbsp;${lbl}</button>`;
-
-/* Every step gets the same centred header block, with the back link parked at
-   the left edge so it does not pull the title off centre. */
-const stepHeader = (title, lede, backLabel) => `
+/* Every step gets the same centred header block. */
+const stepHeader = (title, lede) => `
   <header class="step-header">
-    ${backLabel ? back(backLabel) : ''}
     <h1>${title}</h1>
     ${lede ? `<p class="step-lede">${lede}</p>` : ''}
   </header>`;
@@ -76,8 +80,8 @@ const stepHeader = (title, lede, backLabel) => `
 function stepHome(){
   return `
   ${stepHeader('Start with your home',
-     'This is how we verify you with your agency and how we pay you. None of it is ever shown to a donor.')}
-  <div class="panel" style="max-width:760px">
+     'This is how Atlanta Angels verifies your household and how we pay you. None of it is ever shown to a donor.')}
+  <div class="panel form-card">
     <div class="row2">
       <div class="field"><label class="f" for="h_caregiver">Your name</label>
         <input class="i" id="h_caregiver" value="${H.caregiver}" placeholder="Denise Brooks"></div>
@@ -104,16 +108,9 @@ function stepHome(){
       <div class="field"><label class="f" for="h_zip">ZIP</label>
         <input class="i" id="h_zip" value="${H.zip}" placeholder="30236"></div>
     </div>
-    <hr style="border:none; border-top:1px solid var(--line-soft); margin:6px 0 22px">
-    <div class="row2">
-      <div class="field" style="margin-bottom:0"><label class="f" for="h_agency">Placing agency or DFCS office</label>
-        <input class="i" id="h_agency" value="${H.agency}" placeholder="Clayton County DFCS"></div>
-      <div class="field" style="margin-bottom:0"><label class="f" for="h_worker">Case manager name</label>
-        <input class="i" id="h_worker" value="${H.worker}" placeholder="A. Reynolds"></div>
-    </div>
   </div>
-  <div class="disclosure" style="max-width:760px; margin-top:16px">
-    We confirm your placement with your case manager before your lists go live. It usually takes a day.
+  <div class="disclosure form-card mt-4">
+    We confirm your placement with Atlanta Angels before your lists go live. It usually takes a day.
   </div>`;
 }
 function bindHome(){
@@ -121,7 +118,7 @@ function bindHome(){
     const el = $('#h_' + k);
     if (el) el.oninput = () => { H[k] = el.value; check(); };
   });
-  const ok = () => H.caregiver && H.email && H.county && H.agency;
+  const ok = () => H.caregiver && H.email && H.county;
   const check = () => { const b = $('#next'); if (b) b.disabled = !ok(); };
   foot(`<span class="tiny muted">Nothing here is shown to donors.</span>
         <button class="btn btn-primary" id="next" ${ok() ? '' : 'disabled'}>Continue <i class="fa-solid fa-arrow-right"></i></button>`);
@@ -133,38 +130,24 @@ const SUGGESTED_INTERESTS = ['drawing','basketball','dinosaurs','reading','music
 
 function childForm(c, i){
   return `
-  <div class="panel" style="margin-bottom:18px" data-cid="${c.id}">
+  <div class="panel form-card mb-4" data-cid="${c.id}">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px">
-      <h3 class="t-lg">Child ${i + 1}${c.alias ? ' · ' + c.alias : ''}</h3>
+      <h3 class="t-lg">Child ${i + 1}${c.first ? ' · ' + c.first : ''}</h3>
       ${CHILDREN.length > 1 ? `<button class="rm" data-delkid="${c.id}"><i class="fa-solid fa-trash"></i> Remove</button>` : ''}
     </div>
-    <div class="row2">
+    <div class="row3">
       <div class="field"><label class="f">First name</label>
         <input class="i" data-k="first" value="${c.first}" placeholder="Amelia">
-        <p class="hint"><i class="fa-solid fa-lock t-2xs"></i> Angels staff only. Never published.</p></div>
-      <div class="field"><label class="f">Name donors will see</label>
-        <input class="i" data-k="alias" value="${c.alias}" placeholder="Maya">
-        <p class="hint">A nickname or a stand-in name. Pick something they would be happy to be called.</p></div>
-    </div>
-    <div class="row3">
+        <p class="hint"><i class="fa-solid fa-lock t-2xs"></i> Staff only. Donors see <b>${c.alias}</b>.</p></div>
       <div class="field"><label class="f">Age</label>
         <input class="i" data-k="age" type="number" min="0" max="18" value="${c.age}" placeholder="9"></div>
-      <div class="field"><label class="f">Donors browse by</label>
+      <div class="field"><label class="f">Gender</label>
         <select class="i" data-k="gender">
           <option value="">Choose</option>
           <option value="girl" ${c.gender === 'girl' ? 'selected' : ''}>Girl</option>
           <option value="boy" ${c.gender === 'boy' ? 'selected' : ''}>Boy</option>
         </select></div>
-      <div class="field"><label class="f">Shoe size</label>
-        <input class="i" data-k="shoe" value="${c.sizes.shoe}" placeholder="3Y"></div>
     </div>
-    <div class="row2">
-      <div class="field"><label class="f">Shirt size</label>
-        <input class="i" data-k="top" value="${c.sizes.top}" placeholder="Youth M"></div>
-      <div class="field"><label class="f">Pants size</label>
-        <input class="i" data-k="bottom" value="${c.sizes.bottom}" placeholder="10 slim"></div>
-    </div>
-    <p class="hint" style="margin:-8px 0 18px"><i class="fa-solid fa-lock t-2xs"></i> Sizes stay with you. They are here so you have them in one place when you shop.</p>
 
     <div class="field">
       <label class="f">What are they into?</label>
@@ -188,10 +171,9 @@ function childForm(c, i){
 function stepKids(){
   return `
   ${stepHeader('Who is in your home right now?',
-     'One entry per child. Donors see the name you choose, the age, and the interests. Nothing else.',
-     'Back to your home')}
+     'One entry per child. Donors see a stand-in name we assign, the age, and the interests. Nothing else.')}
   ${CHILDREN.map(childForm).join('')}
-  <button class="btn btn-ghost" id="addKid"><i class="fa-solid fa-plus"></i> Add another child</button>`;
+  <div class="form-card"><button class="btn btn-ghost" id="addKid"><i class="fa-solid fa-plus"></i> Add another child</button></div>`;
 }
 
 function bindKids(){
@@ -200,8 +182,7 @@ function bindKids(){
     $$('[data-k]', card).forEach(el => {
       el.oninput = () => {
         const k = el.dataset.k;
-        if (['top','bottom','shoe'].includes(k)) c.sizes[k] = el.value;
-        else if (k === 'age'){
+        if (k === 'age'){
           if (el.value !== '') el.value = String(Math.max(0, Math.min(18, Math.floor(+el.value) || 0)));
           c.age = el.value;
         }
@@ -219,7 +200,7 @@ function bindKids(){
     };
   });
   $('#addKid').onclick = () => { CHILDREN.push(newChild()); render(); };
-  const ok = () => CHILDREN.length && CHILDREN.every(c => c.alias && c.age && c.gender);
+  const ok = () => CHILDREN.length && CHILDREN.every(c => c.first && c.age && c.gender);
   const checkK = () => { const b = $('#next'); if (b) b.disabled = !ok(); };
   foot(`<span class="tiny muted">${CHILDREN.length} child${CHILDREN.length === 1 ? '' : 'ren'}</span>
         <button class="btn btn-primary" id="next" ${ok() ? '' : 'disabled'}>Build their lists <i class="fa-solid fa-arrow-right"></i></button>`);
@@ -227,137 +208,101 @@ function bindKids(){
 }
 
 /* ── Step 3 · the lists ── */
+/* A typed gift still tries to land on a catalog product, so the donor side
+   keeps its photo and its "4 children asked for this" grouping. Only an
+   unambiguous match counts; anything else becomes its own line. */
+function matchCatalog(name){
+  const n = name.toLowerCase().trim();
+  if (n.length < 3) return null;
+  const hits = CATALOG.filter(x => {
+    const c = x.name.toLowerCase();
+    return c === n || c.startsWith(n + ' ') || c.includes(' ' + n + ' ') || n.includes(c);
+  });
+  return hits.length === 1 ? hits[0] : null;
+}
+
 function stepLists(){
   const c = CHILDREN[cur];
-  const age = +c.age || 8;
-  const picked = new Set(c.items.map(i => i.catId));
-  const items = CATALOG.filter(x =>
-    (listFilter.cat === 'all' || x.cat === listFilter.cat) &&
-    (!listFilter.ageFit || (age >= x.ages[0] && age <= x.ages[1])));
   const total = childTotal(c);
+  const who = c.first || 'them';
   return `
-  ${stepHeader(`What would ${c.alias} want?`,
-     'Pick five or six things. Prices are what they usually run around Atlanta, and each one becomes a line a donor can fund.',
-     'Back to the children')}
+  ${stepHeader(`What would ${who} want?`,
+     'Add five or six things, with a link if you have one. Each line becomes a gift a donor can fund.')}
 
-  ${CHILDREN.length > 1 ? `<div class="list-controls">
+  ${CHILDREN.length > 1 ? `<div class="form-card mb-4">
     <div class="chip-scroll">
       ${CHILDREN.map((k, i) => `<button class="chip ${i === cur ? 'on' : ''}" data-cur="${i}">
-        ${k.alias || 'Child ' + (i + 1)} · ${money(childTotal(k))}</button>`).join('')}
+        ${k.first || 'Child ' + (i + 1)} · ${money(childTotal(k))}</button>`).join('')}
     </div>
   </div>` : ''}
 
-  <div class="row2" style="grid-template-columns:1.5fr 1fr; gap:24px; align-items:start; margin-top:14px">
-    <div>
-      <div class="chip-scroll" style="margin-bottom:16px">
-        <button class="chip ${listFilter.ageFit ? 'on' : ''}" id="ageFit">
-          <i class="fa-solid fa-wand-magic-sparkles" style="margin-right:6px; opacity:.7"></i>Age ${age}</button>
-        <span class="chip-div"></span>
-        <button class="chip ${listFilter.cat === 'all' ? 'on' : ''}" data-cat="all">All</button>
-        ${CATEGORIES.map(x => `<button class="chip ${listFilter.cat === x.id ? 'on' : ''}" data-cat="${x.id}">
-          <i class="fa-solid ${x.icon}" style="opacity:.6; margin-right:6px"></i>${x.label}</button>`).join('')}
-      </div>
-      <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px">
-        ${items.map(x => `
-          <div class="tile" data-pick="${x.id}">
-            <div class="art-wrap">
-              ${art(x.id, x.cat, x.icon, 'tile-art')}
-              ${picked.has(x.id) ? '<span class="claimed-tag"><i class="fa-solid fa-check"></i> On the list</span>' : ''}
-            </div>
-            <div class="tile-body" style="padding:12px 13px 14px">
-              <div class="tile-name t-base">${x.name}</div>
-              <div class="tile-foot"><span class="price t-base">${money(x.price)}</span>
-                <span class="add-btn ${picked.has(x.id) ? 'in' : ''}"><i class="fa-solid ${picked.has(x.id) ? 'fa-check' : 'fa-plus'}"></i></span></div>
-            </div>
-          </div>`).join('')}
-      </div>
+  <div class="panel form-card">
+    <div class="add-row">
+      <div class="field m-0"><label class="f" for="cusName">What is it?</label>
+        <input class="i" id="cusName" placeholder="Skateboard and helmet"></div>
+      <div class="field m-0"><label class="f" for="cusPrice">About what it costs</label>
+        <input class="i" id="cusPrice" type="number" min="5" step="5" placeholder="$"></div>
     </div>
+    <div class="field mt-3 m-0"><label class="f" for="cusLink">Link to it, if you have one</label>
+      <input class="i" id="cusLink" placeholder="Paste the page where you would buy it">
+      <p class="hint">Optional. Donors see it as the item you had in mind.</p></div>
+    <button class="btn btn-primary btn-block mt-3" id="addCustom">
+      <i class="fa-solid fa-plus"></i> Add to the list</button>
 
-    <div style="position:sticky; top:78px">
-      <div class="panel">
-        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px">
-          <span class="avatar" style="background:var(--brand)">${(c.alias || '?')[0]}</span>
-          <div><div class="kid-name t-md">${c.alias || 'This child'}${c.age ? ', ' + c.age : ''}</div>
-          <div class="tiny muted">${c.items.length} gift${c.items.length === 1 ? '' : 's'} on the list</div></div>
-        </div>
+    <div class="list-divider"></div>
 
-        <div class="add-own">
-          <div class="add-own-row">
-            <input class="i" id="cusName" placeholder="Something else they asked for">
-            <input class="i" id="cusPrice" type="number" min="5" step="5" placeholder="$">
-          </div>
-          <input class="i" id="cusLink" placeholder="Link to it, if you have one">
-          <button class="btn btn-ghost btn-sm btn-block" id="addCustom" style="margin-top:9px">
-            <i class="fa-solid fa-plus"></i> Add to the list</button>
+    ${c.items.length ? c.items.map(i => `
+      <div class="picked-row">
+        <div style="flex:1">
+          <div class="w-600 ink t-base">${i.name}</div>
+          ${i.link ? `<a class="item-link" href="${i.link}" target="_blank" rel="noopener">
+            <i class="fa-solid fa-link t-2xs"></i> ${linkHost(i.link)}</a>` : ''}
         </div>
+        <span class="price t-base">${money(i.price)}</span>
+        <button class="rm ml-3" data-drop="${i.id}" aria-label="Remove ${i.name}">
+          <i class="fa-solid fa-xmark"></i></button>
+      </div>`).join('')
+      : '<p class="tiny muted m-0">Nothing on the list yet. Add the first thing above.</p>'}
 
-        ${c.items.length ? c.items.map(i => `
-          <div class="picked">
-            <div class="mini" style="padding:9px 11px; border:none; background:none">
-              ${art(i.catId, i.cat, i.icon, 'icon icon-sm')}
-              <div style="flex:1"><div class="t-sm w-600 ink">${i.name}</div></div>
-              <span class="price t-base">${money(i.price)}</span>
-              <button class="rm" data-drop="${i.id}" style="margin-left:9px"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <input class="spec-in" data-spec="${i.id}" value="${i.spec || ''}"
-                   placeholder="Brand, size, or color? Optional">
-            <label class="link-in ${i.link ? 'has' : ''}">
-              <i class="fa-solid fa-link"></i>
-              <input data-link="${i.id}" value="${i.link || ''}" placeholder="Paste the link where you would buy it">
-            </label>
-          </div>`).join('') : '<p class="tiny muted">Tap a gift to start the list.</p>'}
-        ${c.items.length ? `<p class="tiny muted" style="margin:10px 0 0">
-          Leave the detail blank and your gift joins the pool other families are asking for,
-          which usually funds faster. Name a brand and it gets its own line.</p>` : ''}
-        <div class="total-row" style="margin-top:16px; padding-top:14px; border-top:1px solid var(--line-soft)">
-          <span class="muted">List total</span><b>${money(total)}</b>
-        </div>
-        <div class="bar ${total> CAP ? '' : 'done'}"><i style="width:${Math.min(100, total / CAP * 100)}%; ${total> CAP ? 'background:var(--brand-light)' : ''}"></i></div>
-        <p class="tiny muted" style="margin-top:9px">
-          ${total > CAP
-            ? `Above the ${money(CAP)} we ask donors to expect. That is allowed, it just tends to take longer to fully fund.`
-            : `Most lists land near ${money(CAP)}. Lists in that range usually fund completely.`}
-        </p>
-      </div>
-      <div class="disclosure" style="margin-top:14px">
-        A donor funds a line at this price. You get the money, not the object, so if it no longer fits
-        ${c.alias || 'them'} by December, buy what does.
-      </div>
+    <div class="total-row mt-4" style="padding-top:14px; border-top:1px solid var(--line-soft)">
+      <span class="muted">List total</span><b>${money(total)}</b>
     </div>
+    <div class="bar ${total > CAP ? '' : 'done'}">
+      <i style="width:${Math.min(100, total / CAP * 100)}%; ${total > CAP ? 'background:var(--brand-light)' : ''}"></i></div>
+    <p class="tiny muted mt-2">
+      ${total > CAP
+        ? `Above the ${money(CAP)} we ask donors to expect. That is allowed, it just tends to take longer to fully fund.`
+        : `Most lists land near ${money(CAP)}. Lists in that range usually fund completely.`}
+    </p>
+  </div>
+
+  <div class="disclosure form-card mt-4">
+    A donor funds a line at this price. You get the money, not the object, so if it no longer fits
+    ${who} by December, buy what does.
   </div>`;
 }
 
 function bindLists(){
   const c = CHILDREN[cur];
   $$('[data-cur]').forEach(b => b.onclick = () => { cur = +b.dataset.cur; render(); });
-  $$('[data-cat]').forEach(b => b.onclick = () => { listFilter.cat = b.dataset.cat; render(); });
-  $('#ageFit').onclick = () => { listFilter.ageFit = !listFilter.ageFit; render(); };
-  $$('[data-pick]').forEach(t => t.onclick = () => {
-    const x = catalogById[t.dataset.pick];
-    const at = c.items.findIndex(i => i.catId === x.id);
-    if (at > -1) c.items.splice(at, 1);
-    else c.items.push({ id:uid(), catId:x.id, name:x.name, spec:null, link:null, price:x.price, icon:x.icon, cat:x.cat, claimed:false, claimedBy:null });
-    render();
-  });
-  $$('[data-spec]').forEach(el => el.oninput = () => {
-    const it = c.items.find(i => i.id === el.dataset.spec);
-    if (it) it.spec = el.value.trim() || null;
-  });
-  $$('[data-link]').forEach(el => el.oninput = () => {
-    const it = c.items.find(i => i.id === el.dataset.link);
-    if (it) it.link = tidyLink(el.value);
-    el.parentElement.classList.toggle('has', !!(it && it.link));
-  });
   $$('[data-drop]').forEach(b => b.onclick = () => {
     c.items = c.items.filter(i => i.id !== b.dataset.drop); render();
   });
-  $('#addCustom').onclick = () => {
+
+  const add = () => {
     const n = $('#cusName').value.trim(), p = +$('#cusPrice').value;
     if (!n || !p) return;
-    c.items.push({ id:uid(), catId:'x' + uid(), name:n, spec:null, link:tidyLink($('#cusLink').value),
-                   price:p, icon:'🎁', cat:'toys', claimed:false, claimedBy:null });
+    const m = matchCatalog(n);
+    c.items.push({ id:uid(), catId:m ? m.id : 'x' + uid(), name:n, spec:null,
+                   link:tidyLink($('#cusLink').value), price:p,
+                   icon:m ? m.icon : '🎁', cat:m ? m.cat : 'toys', claimed:false, claimedBy:null });
     render();
   };
+  $('#addCustom').onclick = add;
+  ['cusName','cusPrice','cusLink'].forEach(id => {
+    $('#' + id).onkeydown = e => { if (e.key === 'Enter'){ e.preventDefault(); add(); } };
+  });
+
   const ok = CHILDREN.every(k => k.items.length >= 1);
   foot(`<span class="tiny muted">${CHILDREN.length} list${CHILDREN.length === 1 ? '' : 's'} · ${money(allTotal())} in total</span>
         <button class="btn btn-primary" id="next" ${ok ? '' : 'disabled'}>Set up how you get paid <i class="fa-solid fa-arrow-right"></i></button>`);
@@ -368,10 +313,9 @@ function bindLists(){
 function stepPay(){
   return `
   ${stepHeader('How should we get the money to you?',
-     'When your lists close on December 8, we send you everything they raised. Pick the way that actually works for your household.',
-     'Back to the lists')}
+     'When your lists close on December 8, we send you everything they raised. Pick the way that actually works for your household.')}
 
-  <div class="row2" style="gap:20px; align-items:start">
+  <div class="row2 form-card" style="gap:20px; align-items:start; max-width:900px">
     <button class="card-pick ${PAY.method === 'stripe' ? 'on' : ''}" data-pay="stripe">
       <span class="rec">Recommended</span>
       <div style="display:flex; gap:13px; align-items:flex-start">
@@ -408,7 +352,7 @@ function stepPay(){
     </button>
   </div>
 
-  <div id="payDetail" style="margin-top:22px"></div>`;
+  <div id="payDetail" class="form-card mt-5"></div>`;
 }
 
 function bindPay(){
@@ -496,8 +440,7 @@ function stripeModal(){
 function stepReview(){
   return `
   ${stepHeader('One last look',
-     `Once you submit, we verify with ${H.agency || 'your agency'} and your lists go live to donors.`,
-     'Back to payout')}
+     'Once you submit, Atlanta Angels verifies your household and your lists go live to donors.')}
 
   <div class="row2" style="grid-template-columns:1.4fr 1fr; gap:24px; align-items:start">
     <div>
@@ -520,7 +463,7 @@ function stepReview(){
             <span class="price t-base">${money(i.price)}</span></div>`).join('')}
           <div class="disclosure" style="margin-top:12px">
             Donors see: ${c.alias}, ${c.age}, ${c.interests.join(', ') || 'no interests listed'}, and these gift names.
-            They do not see ${c.first || 'the first name'}, sizes, your address, or your county beyond the region.
+            They do not see ${c.first || 'the first name'}, your address, or your county beyond the region.
           </div>
         </div>`).join('')}
     </div>
@@ -568,7 +511,7 @@ function stepDone(){
       ${CHILDREN.length} list${CHILDREN.length === 1 ? ' is' : 's are'} in.
     </h1>
     <p class="muted" style="max-width:540px; margin:0 auto">
-      We are confirming your placement with ${H.agency || 'your agency'}. Once that clears, usually within a day,
+      Atlanta Angels is confirming your household now. Once that clears, usually within a day,
       donors can start funding.
     </p>
   </div>
@@ -591,7 +534,6 @@ function bindDone(){ foot(''); }
 
 /* ── Events ── */
 document.addEventListener('click', e => {
-  if (e.target.closest('[data-back]')){ step = Math.max(0, step - 1); render(); return; }
   const del = e.target.closest('[data-delkid]');
   if (del){ CHILDREN = CHILDREN.filter(c => c.id !== del.dataset.delkid); cur = 0; render(); return; }
   const un = e.target.closest('[data-untag]');

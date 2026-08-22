@@ -16,11 +16,23 @@ five-step caregiver flow), `theme-*.css` (brand layers), and `img/` (product pho
 ```
 caregiver.html                         index.html
   your home                              browse gifts, by child,
-  the children (alias, age, interests)   still unfunded, give any amount
-  their lists  (pick from the catalog)         ↓
+  the children (name, age, gender)       still unfunded, give any amount
+  their lists  (name, price, link)             ↓
   getting paid (Stripe, or gift card)      cart → review → give
   review and submit ──────────────────→  the lists a donor shops
 ```
+
+Intake is deliberately short. It asks for a household, a first name and age per
+child, and then gifts as free text with a price and an optional link. It does
+**not** ask for the agency, the case manager, clothing sizes, or a stand-in
+name: the alias is assigned by the system, so a caregiver is never asked to
+invent one for a child in their care.
+
+A typed gift still tries to land on a catalog product. Type "Hoodie" and it
+joins the eight-child hoodie group with its photo; type something the catalog
+has no clear match for and it becomes its own line with a gift icon. Only an
+unambiguous match counts, because a wrong guess would put one child's request
+inside another product's counter.
 
 Submitting a list on the caregiver side writes it to `localStorage`, so it shows up in the donor
 view marked **New**. That is the whole loop in one prototype. To reset the demo, run

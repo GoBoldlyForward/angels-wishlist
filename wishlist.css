@@ -349,7 +349,7 @@ input.i:focus, select.i:focus, textarea.i:focus{outline:none; border-color:var(-
 .row2>*,.row3>*{min-width:0}
 
 /* ── Caregiver stepper ── */
-.steps{display:flex; gap:8px; padding:22px 0 6px; overflow-x:auto; scrollbar-width:none}
+.steps{display:flex; justify-content:center; gap:8px; padding:22px 0 6px; overflow-x:auto; scrollbar-width:none}
 .steps::-webkit-scrollbar{display:none}
 .step{display:flex; align-items:center; gap:9px; font-size:var(--fs-sm); font-weight:600; color:var(--faint); white-space:nowrap; padding:7px 14px 7px 8px; border-radius:50px}
 .step .n{width:24px; height:24px; border-radius:50px; background:var(--line-soft); color:var(--faint); display:flex; align-items:center; justify-content:center; font-size:var(--fs-xs); font-weight:700; flex:none}
@@ -364,6 +364,15 @@ input.i:focus, select.i:focus, textarea.i:focus{outline:none; border-color:var(-
 .item-link i{font-size:var(--fs-2xs)}
 .item-link:hover{color:var(--ink)}
 .item-link .muted{font-weight:500}
+
+/* ── Caregiver intake ── */
+.form-card{max-width:760px; margin-left:auto; margin-right:auto}
+.add-row{display:grid; grid-template-columns:1fr 180px; gap:var(--s3); align-items:start}
+.list-divider{border-top:1px solid var(--line-soft); margin:var(--s5) 0 var(--s4)}
+.picked-row{display:flex; align-items:center; gap:var(--s3); padding:11px 0; border-bottom:1px solid var(--line-soft)}
+.picked-row:last-of-type{border-bottom:none}
+.ml-3{margin-left:var(--s3)}
+@media (max-width:560px){ .add-row{grid-template-columns:1fr} }
 
 /* ── Caregiver step header ── */
 .step-header{position:relative; text-align:center; padding:46px 0 22px; max-width:680px; margin:0 auto}

@@ -9,7 +9,70 @@ Registered as `angels-wishlist` on port 5201.
 
 Files: `index.html` (donor home, checkout, FAQ), `index-passion.html` (the same home page in a
 partner skin), `category.html?c=<id>` (one landing page per category), `caregiver.html` (the
-five-step caregiver flow), `theme-*.css` (brand layers), and `img/` (product photography).
+five-step caregiver flow), `admin.html` (the staff side), `theme-*.css` (brand layers), and
+`img/` (product photography).
+
+## The admin
+
+`admin.html` is the third side of this: the room where Atlanta Angels staff actually run the
+program. Six record indexes plus an overview, sharing one table engine so search, tabs, filters,
+column sort, bulk select, pagination, and the detail drawer are written once rather than six times.
+
+The nav groups by what each record belongs to, widest unit first, because a household holds
+children, a child holds a wishlist, and a wishlist holds line items:
+
+| Group | Index | The grain | What staff do here |
+| --- | --- | --- | --- |
+| Families | **Households** | one home | verification, contact, payout method, payout hold |
+| Families | **Wishlists** | one child | see who is furthest behind and aim general giving |
+| Families | **Line items** | one gift one child asked for | the atomic row the whole program settles on |
+| Funding | **Donors** | one giver | receipts, anonymity, who gave to whom |
+| Funding | **Donations** | one card charge | the ledger, fees, refunds, disputes |
+| Inbox | **Submissions** | one thing somebody typed | the review queue for text, not gifts or dollars |
+
+Submissions sits on its own because it carries both sides: a caregiver's note about a child and a
+donor's note to the family land in the same queue.
+
+Layout, tokens, and components come from `_templates/admin:records#index.html`, so this reads as the
+same product as every other admin in the portfolio.
+
+**Nothing is invented twice.** Every row is derived from `data.js`: a line exists because a caregiver
+put it on a list, a donor exists because a line says who funded it, a charge exists because a donor
+funded something, and a household rollup is the sum of its children's lists. The season goal is the
+sum of every list, which is exactly how the donor home page computes it. Keeping one source means the
+two sides cannot quietly disagree about the same season.
+
+`admin-data.js` adds only what genuinely does not exist on the donor side and never could: caregiver
+email and phone, the placing agency, verification state, payout destination, the real name behind an
+anonymous gift, and the charge ledger. That split is the point. Everything a donor must not see lives
+in one file that the donor pages do not load.
+
+**Submissions is the index worth arguing about.** It holds everything a caregiver or a donor typed
+that is not a gift and not a dollar: child profiles, brand and size details, custom gift requests,
+list edits, payout changes, agency letters, donor notes to the family, anonymity requests, and
+checkout questions. Each row carries a **Visibility** column, because whether a piece of text
+publishes to the wish list site or never leaves the admin is a real decision staff make row by row,
+and burying it in a footnote is how the wrong sentence ends up in front of a donor.
+
+The seeded queue is deliberately uncomfortable in a few places. A donor note asks for a photo of a
+child, which is the one thing this program never sends. A child profile mentions a caseworker, which
+is case detail rather than who the child is. A household changed its payout account four days before
+a reported placement change. Each one is flagged with a staff note saying what the call is, because
+an inbox that only contains clean rows teaches nobody how the job actually goes.
+
+**The caregiver flow lands here.** Submitting lists in `caregiver.html` writes them to `localStorage`,
+and the admin reads the same key the donor site does. A submitted household shows up as pending
+verification with no payout method, its lists sit in review, its lines are flagged, and a **New
+household** row hits the top of the submissions queue. Same handoff, two audiences.
+
+**The demo clock is fixed.** `SEASON.today` is November 18, 2026, twenty days before lists close, so
+the admin always opens on a program mid-flight instead of an empty pre-launch one. Charge ids, dates,
+card brands, and the identities behind anonymous gifts are seeded from a deterministic PRNG, so every
+reload shows the same program and a screenshot stays true.
+
+**What is faked:** the charge ledger, card brands, Stripe payout destinations, agency verification,
+staff accounts, and every action button in the drawer. **What is real:** every line, list, child,
+household, price, and funder, because all of it comes from `data.js`.
 
 ## Two experiences
 
@@ -235,9 +298,10 @@ hears back.
 
 Donors see an alias, an age, girl or boy, a county, the interests the caregiver typed, and one
 sentence about the child. They never see a legal name, a photograph, a size, a school, an address,
-or anything about the case. Sizes are collected on the caregiver side only, so the caregiver has
-them in one place when they shop. The review step shows the caregiver exactly what a donor will
-and will not see, in the caregiver's own words about their own child.
+or anything about the case. Sizes are not collected at all: a caregiver names a size only when they
+want one specific gift bought a specific way, as free text on that single line. The review step shows
+the caregiver exactly what a donor will and will not see, in the caregiver's own words about their
+own child.
 
 ## What is real and what is faked
 

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overview · Wish List admin</title>
+  <link rel="icon" href="logo-mark.svg">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="admin.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SIDEBAR                                      -->
+<!-- ════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">AA</div>
+    <span class="logo-text">Wish List<span class="logo-sub">Atlanta Angels</span></span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Program</div>
+    <a class="nav-link" data-go="overview">
+      <i class="bi bi-grid-1x2"></i><span>Overview</span>
+    </a>
+
+    <!-- Widest unit first. A household holds children, a child holds a
+         wishlist, a wishlist holds line items, so the nav reads the way the
+         program nests. -->
+    <div class="nav-section-label">Families</div>
+    <a class="nav-link" data-go="households">
+      <i class="bi bi-house-heart"></i><span>Households</span>
+      <span class="badge bg-secondary bg-opacity-10 text-secondary" id="cHouseholds"></span>
+    </a>
+    <a class="nav-link" data-go="lists">
+      <i class="bi bi-list-check"></i><span>Wishlists</span>
+      <span class="badge bg-secondary bg-opacity-10 text-secondary" id="cLists"></span>
+    </a>
+    <a class="nav-link" data-go="lines">
+      <i class="bi bi-gift"></i><span>Line items</span>
+      <span class="badge bg-secondary bg-opacity-10 text-secondary" id="cLines"></span>
+    </a>
+
+    <div class="nav-section-label">Funding</div>
+    <a class="nav-link" data-go="donors">
+      <i class="bi bi-people"></i><span>Donors</span>
+      <span class="badge bg-secondary bg-opacity-10 text-secondary" id="cDonors"></span>
+    </a>
+    <a class="nav-link" data-go="charges">
+      <i class="bi bi-receipt"></i><span>Donations</span>
+      <span class="badge bg-secondary bg-opacity-10 text-secondary" id="cCharges"></span>
+    </a>
+
+    <div class="nav-section-label">Inbox</div>
+    <a class="nav-link" data-go="submissions">
+      <i class="bi bi-inbox"></i><span>Submissions</span>
+      <span class="badge bg-danger" id="cSubs"></span>
+    </a>
+
+    <div class="nav-section-label">The donor site</div>
+    <a class="nav-link" href="index.html">
+      <i class="bi bi-shop"></i><span>Open the shop</span>
+      <i class="bi bi-box-arrow-up-right" style="margin-left:auto;font-size:12px"></i>
+    </a>
+    <a class="nav-link" href="caregiver.html">
+      <i class="bi bi-pencil-square"></i><span>Caregiver flow</span>
+      <i class="bi bi-box-arrow-up-right" style="margin-left:auto;font-size:12px"></i>
+    </a>
+  </nav>
+
+  <div class="sidebar-season">
+    <div class="season-label" id="seasonName">Season</div>
+    <div class="season-value" id="seasonRaised">—</div>
+    <div class="season-bar"><i id="seasonBar" style="width:0%"></i></div>
+    <div class="season-note" id="seasonNote">—</div>
+  </div>
+
+  <div class="sidebar-bottom">
+    <a href="#" class="nav-link"><i class="bi bi-question-circle"></i><span>Help &amp; Support</span></a>
+    <a href="#" class="nav-link"><i class="bi bi-gear"></i><span>Settings</span></a>
+  </div>
+</aside>
+
+
+<!-- ════════════════════════════════════════════ -->
+<!-- MAIN                                         -->
+<!-- ════════════════════════════════════════════ -->
+<div class="main-content">
+
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="topbar-icon-btn sidebar-toggle" title="Menu"><i class="bi bi-list"></i></button>
+      <nav aria-label="breadcrumb"><ol class="breadcrumb" id="crumbs"></ol></nav>
+    </div>
+
+    <div class="topbar-right">
+      <button class="topbar-icon-btn" title="Search"><i class="bi bi-search"></i></button>
+      <button class="topbar-icon-btn" data-go="submissions" title="Submissions needing review">
+        <i class="bi bi-bell"></i><span class="notification-dot"></span>
+      </button>
+      <span class="badge bg-danger bg-opacity-10 text-danger d-none d-md-inline" id="notifCount"></span>
+      <div class="dropdown">
+        <button class="user-menu-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <div class="user-avatar">ML</div>
+          <span class="user-name">Morgan L.</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>My Profile</a></li>
+          <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Account Settings</a></li>
+          <li><a class="dropdown-item" href="#"><i class="bi bi-shield-lock me-2"></i>Staff permissions</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-content" id="page"></div>
+</div>
+
+
+<!-- ── Record detail drawer ── -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="drawer">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="drawerTitle">Record</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body" id="drawerBody"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="data.js"></script>
+<script src="admin-data.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

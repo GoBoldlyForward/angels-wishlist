@@ -825,7 +825,7 @@ function showCheckout(){
             Prototype. No card is collected and nothing is charged.</p>
         </div>
         <div class="disclosure" style="margin-top:16px">
-          Atlanta Angels is a 501(c)(3). Your gift is a tax deductible donation designated to
+          Atlanta Angels is a 501(c)(3). Your gift is a tax-deductible donation designated to
           a household's wish list, not a purchase of goods, and no goods or services are
           provided to you in return.
         </div>

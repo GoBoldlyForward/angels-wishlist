@@ -320,7 +320,7 @@ function bindLists(){
 function stepPay(){
   return `
   ${stepHeader('How should we get the money to you?',
-     'When your lists close on December 8, we send you everything they raised. Pick the way that actually works for your household.')}
+     'When lists close on December 8, we send you your household\'s share of everything raised. Pick the way that actually works for your household.')}
 
   <div class="row2 form-card" style="gap:20px; align-items:start; max-width:900px">
     <button class="card-pick ${PAY.method === 'stripe' ? 'on' : ''}" data-pay="stripe">
@@ -537,8 +537,8 @@ function stepDone(){
     <h3 class="t-md" style="margin-bottom:16px">What happens from here</h3>
     <div class="flow" style="grid-template-columns:1fr; gap:12px; margin-top:20px">
       <div class="flow-step"><b>Now to December 8</b><span>Donors fund gifts one at a time. You get a text each time a line is claimed, and you can edit anything until the deadline.</span></div>
-      <div class="flow-step"><b>December 9</b><span>We total each child's list and send the full amount ${PAY.method === 'stripe' ? 'to ' + PAY.bank : 'as a Visa gift card in the mail'}.</span></div>
-      <div class="flow-step"><b>Whenever works for you</b><span>You shop. Right sizes, right week. If something no longer fits the child, spend it on what does. Keep the receipts in the app so we can report back to donors.</span></div>
+      <div class="flow-step"><b>December 9</b><span>We total everything raised across all lists, spread it evenly, and send your household's share ${PAY.method === 'stripe' ? 'to ' + PAY.bank : 'as a Visa gift card in the mail'}.</span></div>
+      <div class="flow-step"><b>Whenever works for you</b><span>You shop. Right sizes, right week. If something no longer fits the child, spend it on what does.</span></div>
       <div class="flow-step"><b>January</b><span>Write one short note back. We pass it to everyone who gave, without any photo or detail about the child.</span></div>
     </div>
     <div class="panel panel-warm" style="margin-top:22px">

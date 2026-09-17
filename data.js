@@ -236,12 +236,11 @@ const FAQS = [
        no merchant is involved, and the tile you clicked is a wish a caregiver typed in, not inventory.` },
 
   { q:'So where does my money actually go?',
-    a:`To Atlanta Angels, a 501(c)(3), as a charitable donation. We designate it to the household you chose
-       and pay it out to that child's caregiver. As with any gift to a nonprofit, Atlanta Angels holds final
-       discretion over how the funds are used, which is what the IRS requires in order for your gift to be
-       tax-deductible. In practice we honor your choice almost every time. When we cannot, because a child
-       leaves the placement, a household withdraws, or a list closes early, the money moves to another
-       child's list rather than back to you.` },
+    a:`To Atlanta Angels, a 501(c)(3), as a charitable donation. We pool it with every other gift, spread
+       the total evenly across every child's list, and pay each household its share. As with any gift to a
+       nonprofit, Atlanta Angels holds final discretion over how the funds are used, which is what the IRS
+       requires in order for your gift to be tax-deductible. If a child leaves a placement or a household
+       withdraws, their share moves to the other lists rather than back to you.` },
 
   { q:'Where does the information about each child come from?',
     a:`Their caregiver, directly. The age, the interests, the one-line note, and every gift on the list are
@@ -263,8 +262,8 @@ const FAQS = [
 
   { q:'Five kids want the same thing. Am I funding all of them?',
     a:`Only the number you choose. Items that more than one child asked for are grouped, so a hoodie that
-       four children want shows up once with four still needed. You pick a quantity, and each one you fund is
-       assigned to a specific child and named on your receipt. When a caregiver asked for a particular brand
+       four children want shows up once with four still needed. You pick a quantity, and each one you fund
+       shows on your receipt. When a caregiver asked for a particular brand
        or size, that request is listed separately so you can fund exactly that one.` },
 
   { q:'What happens if a list is not fully funded?',

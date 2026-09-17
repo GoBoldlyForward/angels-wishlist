@@ -423,8 +423,8 @@ function renderFlex(){
         <button class="btn btn-primary" id="flexAdd" style="height:47px">Add to cart</button>
       </div>
       <div class="disclosure" style="margin-top:20px">
-        Unlike the gift lines, this one is not promised to a specific child up front. We apply it
-        at close, and your receipt in January names the households it reached.
+        This one is not tied to a gift on a list. It goes into the same pool as every other gift and
+        is spread evenly across every child's list at close.
       </div>
     </div>
   </div>
@@ -647,7 +647,7 @@ function openProduct(catId){
         <h4 class="t-md" style="margin-bottom:5px">Fund one for any child who asked</h4>
         <p class="tiny muted" style="margin:0 0 16px">
           Waiting: ${generic.map(r => r.kid.alias + ', ' + r.kid.age).join(' · ')}.
-          We apply each one to the child who has been waiting longest, and name them on your receipt.
+          We apply each one to the child who has been waiting longest.
         </p>
         <div class="stepper-row">
           <div class="stepper">
@@ -694,8 +694,8 @@ function openProduct(catId){
 
       <div class="disclosure" style="margin-top:16px">
         This request was added by the child's caregiver, and their household is verified by Atlanta Angels.
-        What you fund is recorded against their list and sent to that household. A named brand is the
-        request we pass along, not a guarantee of what gets bought.
+        What you fund shows on your receipt and goes into the pool that is spread evenly across every
+        child's list. A named brand is the request we pass along, not a guarantee of what gets bought.
       </div>
     </div>`;
   if (!$('#modal').classList.contains('on')) remember();
@@ -826,7 +826,7 @@ function showCheckout(){
         </div>
         <div class="disclosure" style="margin-top:16px">
           Atlanta Angels is a 501(c)(3). Your gift is a tax-deductible donation designated to
-          a household's wish list, not a purchase of goods, and no goods or services are
+          the holiday wish list program, not a purchase of goods, and no goods or services are
           provided to you in return.
         </div>
       </div>

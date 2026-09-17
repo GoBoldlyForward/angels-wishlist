@@ -1,6 +1,6 @@
 /* ──────────────────────────────────────────────
    Atlanta Angels · Wish List — caregiver side
-   Five steps: household, children, a list per child, payout, review.
+   Six steps: household, children, the love box, a list per child, payout, review.
    The list step is the one that has to feel good, so it is the only one
    that gets a picker; everything else is short and plain.
    ────────────────────────────────────────────── */
@@ -11,11 +11,45 @@ const money = n => '$' + Math.round(n).toLocaleString();
 const CAP = 200; // hard cap per child's list
 
 let step = 0;
-let cur = 0;   // which child's list is open on step 2
+let cur = 0;   // which child's list is open on the lists step
 
 const H = { caregiver:'', email:'', phone:'', county:'', street:'', city:'', zip:'' };
 let CHILDREN = [];
 const PAY = { method:'', connected:false, bank:'', mailName:'', mailAddr:'', agreed:false };
+
+/* The holiday Love Box every family gets alongside the gift funds. Each
+   group is one dropdown; groups with picks:2 show a second dropdown, or
+   only for households with more than five kids when bigOnly is set. */
+const NO_THANKS = 'No thank you';
+const BOX_GROUPS = [
+  { id:'holiday',  label:'Holiday celebrated', picks:1,
+    options:['Christmas','Hanukkah','Kwanzaa','Winter themed'] },
+  { id:'cups',     label:'Festive cups', picks:1, count:true,
+    options:['One holiday mug per caregiver','Holiday plastic cups for each member of the family', NO_THANKS] },
+  { id:'drink',    label:'Family drink', picks:1,
+    options:['Hot chocolate','Apple cider', NO_THANKS] },
+  { id:'snack',    label:'Family snack', picks:2, hint:'Pick up to two.',
+    options:['Microwave popcorn (box)','Boxed candy', NO_THANKS] },
+  { id:'treat',    label:'Family treat', picks:2, bigOnly:true,
+    options:['Gingerbread house','Decorate-a-cookie kit', NO_THANKS] },
+  { id:'game',     label:'Family game', picks:2, bigOnly:true,
+    options:['Uno','Taco Cat Goat Cheese','Herd Mentality','Tapple','Taboo','Throw Throw Burrito','Sushi Go!', NO_THANKS] },
+  { id:'activity', label:'Family activity', picks:1,
+    options:['Coloring book for teens and adults, with gel pens','Coloring book for kids, with crayons','Family word search book','Family puzzle','Family craft kit #1','Family craft kit #2', NO_THANKS] },
+  { id:'book',     label:'Holiday or winter themed book', picks:1,
+    options:['The Snowy Day','Santa Mouse','The Polar Express','The Night Before Christmas', NO_THANKS] },
+  { id:'grocery',  label:'$25 grocery gift card', picks:1,
+    options:['Walmart','Target','Publix','ALDI','Trader Joe\'s'] },
+  { id:'cozy',     label:'Cozy item', picks:1,
+    options:['Holiday blanket','Holiday candle', NO_THANKS] },
+  { id:'container',label:'Love Box container', picks:1,
+    options:['Cloth','Cardboard, ready to decorate'] },
+];
+const BOX = { cupsCount:'' };
+BOX_GROUPS.forEach(g => BOX[g.id] = []);
+const bigHousehold = () => CHILDREN.length > 5;
+const boxPicks = g => (g.picks === 2 && (!g.bigOnly || bigHousehold())) ? 2 : 1;
+
 
 const uid = () => 'n' + Math.random().toString(36).slice(2, 7);
 
@@ -46,7 +80,7 @@ const newChild = () => ({ id:uid(), alias:nextAlias(), first:'', age:'', gender:
 const childTotal = c => c.items.reduce((s, i) => s + i.price, 0);
 const allTotal   = () => CHILDREN.reduce((s, c) => s + childTotal(c), 0);
 
-const STEPS = ['Your home', 'The children', 'Their lists', 'Getting paid', 'Review'];
+const STEPS = ['Your home', 'The children', 'Love box', 'Their lists', 'Getting paid', 'Review'];
 
 /* ── Frame ── */
 function render(){
@@ -56,9 +90,9 @@ function render(){
     <div class="step ${i === step ? 'on' : ''} ${i < step ? 'done' : ''}">
       <span class="n">${i < step ? '<i class="fa-solid fa-check"></i>' : i + 1}</span>${s}
     </div>`).join('');
-  const S = [stepHome, stepKids, stepLists, stepPay, stepReview, stepDone][step];
+  const S = [stepHome, stepKids, stepBox, stepLists, stepPay, stepReview, stepDone][step];
   $('#screen').innerHTML = S();
-  ([bindHome, bindKids, bindLists, bindPay, bindReview, bindDone][step])();
+  ([bindHome, bindKids, bindBox, bindLists, bindPay, bindReview, bindDone][step])();
   window.scrollTo({ top:0, behavior:'smooth' });
 }
 
@@ -204,10 +238,63 @@ function bindKids(){
   const checkK = () => { const b = $('#next'); if (b) b.disabled = !ok(); };
   foot(`<span class="tiny muted">${CHILDREN.length} child${CHILDREN.length === 1 ? '' : 'ren'}</span>
         <button class="btn btn-primary" id="next" ${ok() ? '' : 'disabled'}>Build their lists <i class="fa-solid fa-arrow-right"></i></button>`);
-  $('#next').onclick = () => { step = 2; cur = 0; render(); };
+  $('#next').onclick = () => { step = 2; render(); };
 }
 
-/* ── Step 3 · the lists ── */
+/* ── Step 3 · the love box ── */
+function stepBox(){
+  return `
+  ${stepHeader('Customize your family\'s Love Box',
+     'Every family also gets a holiday Love Box. Pick what fits your home, and say no thank you to anything you would not use.')}
+
+  <div class="panel form-card">
+    ${BOX_GROUPS.map(g => {
+      const n = boxPicks(g);
+      const hint = g.hint || (g.picks === 2 && g.bigOnly ? (n === 2 ? 'Households with more than five kids pick two.' : '') : '');
+      return `
+      <div class="field">
+        <label class="f" for="box_${g.id}_0">${g.label}</label>
+        <div class="${n === 2 ? 'row2' : ''}">
+          ${Array.from({ length:n }, (_, i) => `
+            <select class="i" id="box_${g.id}_${i}" data-box="${g.id}" data-slot="${i}">
+              <option value="">${i === 0 ? 'Choose one' : 'Second pick, if you want one'}</option>
+              ${g.options.map(o => `<option ${BOX[g.id][i] === o ? 'selected' : ''}>${o}</option>`).join('')}
+            </select>`).join('')}
+        </div>
+        ${g.count && BOX[g.id][0] && BOX[g.id][0] !== NO_THANKS ? `
+          <div class="row2 mt-3" style="align-items:end">
+            <div><label class="f" for="box_cups_count">How many?</label>
+              <input class="i" id="box_cups_count" type="number" min="1" max="20" value="${BOX.cupsCount}" placeholder="${BOX[g.id][0].startsWith('One') ? 'Number of caregivers' : 'People in your home'}"></div>
+          </div>` : ''}
+        ${hint ? `<p class="hint">${hint}</p>` : ''}
+      </div>`;
+    }).join('')}
+  </div>
+
+  <div class="disclosure form-card mt-4">
+    The Love Box is put together by Atlanta Angels volunteers and delivered with your holiday visit.
+    It is separate from the gift funds, so nothing here comes out of your lists.
+  </div>`;
+}
+
+function bindBox(){
+  $$('[data-box]').forEach(s => s.onchange = () => {
+    const g = BOX_GROUPS.find(x => x.id === s.dataset.box);
+    BOX[g.id][+s.dataset.slot] = s.value;
+    if (g.count && +s.dataset.slot === 0) BOX.cupsCount = '';
+    render();
+  });
+  const cnt = $('#box_cups_count');
+  if (cnt) cnt.oninput = () => { BOX.cupsCount = cnt.value; checkB(); };
+  const ok = () => BOX_GROUPS.every(g => BOX[g.id][0])
+    && (BOX.cups[0] === NO_THANKS || +BOX.cupsCount > 0);
+  const checkB = () => { const b = $('#next'); if (b) b.disabled = !ok(); };
+  foot(`<span class="tiny muted">One box per household.</span>
+        <button class="btn btn-primary" id="next" ${ok() ? '' : 'disabled'}>Build their lists <i class="fa-solid fa-arrow-right"></i></button>`);
+  $('#next').onclick = () => { step = 3; cur = 0; render(); };
+}
+
+/* ── Step 4 · the lists ── */
 /* A typed gift still tries to land on a catalog product, so the donor side
    keeps its photo and its "4 children asked for this" grouping. Only an
    unambiguous match counts; anything else becomes its own line. */
@@ -313,10 +400,10 @@ function bindLists(){
   const ok = CHILDREN.every(k => k.items.length >= 1 && childTotal(k) <= CAP);
   foot(`<span class="tiny muted">${CHILDREN.length} list${CHILDREN.length === 1 ? '' : 's'} · ${money(allTotal())} in total</span>
         <button class="btn btn-primary" id="next" ${ok ? '' : 'disabled'}>Set up how you get paid <i class="fa-solid fa-arrow-right"></i></button>`);
-  $('#next').onclick = () => { step = 3; render(); };
+  $('#next').onclick = () => { step = 4; render(); };
 }
 
-/* ── Step 4 · payout ── */
+/* ── Step 5 · payout ── */
 function stepPay(){
   return `
   ${stepHeader('How should we get the money to you?',
@@ -416,7 +503,7 @@ function bindPay(){
   const ok = paid && PAY.agreed;
   foot(`<span class="tiny muted">${money(allTotal())} across ${CHILDREN.length} list${CHILDREN.length === 1 ? '' : 's'}</span>
         <button class="btn btn-primary" id="next" ${ok ? '' : 'disabled'}>Review and submit <i class="fa-solid fa-arrow-right"></i></button>`);
-  $('#next').onclick = () => { step = 4; render(); };
+  $('#next').onclick = () => { step = 5; render(); };
 }
 
 function stripeModal(){
@@ -454,7 +541,7 @@ function stripeModal(){
   };
 }
 
-/* ── Step 5 · review ── */
+/* ── Step 6 · review ── */
 function stepReview(){
   return `
   ${stepHeader('One last look',
@@ -484,6 +571,20 @@ function stepReview(){
             They do not see ${c.first || 'the first name'}, your address, or your county beyond the region.
           </div>
         </div>`).join('')}
+
+      <div class="panel" style="margin-bottom:16px">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px">
+          <span class="avatar" style="background:var(--brand)"><i class="fa-solid fa-gift"></i></span>
+          <div><div class="kid-name t-md">Your Love Box</div>
+            <div class="tiny muted">One per household</div></div>
+          <button class="btn btn-ghost btn-sm" style="margin-left:auto" id="editBox">Edit box</button>
+        </div>
+        ${BOX_GROUPS.map(g => {
+          const picks = BOX[g.id].filter(Boolean);
+          const cups = g.count && picks[0] !== NO_THANKS && BOX.cupsCount ? ` (${BOX.cupsCount})` : '';
+          return `<div class="fund-line" style="margin-bottom:7px"><span class="muted">${g.label}</span><b class="t-sm">${picks.join(', ') || '—'}${cups}</b></div>`;
+        }).join('')}
+      </div>
     </div>
     <div style="position:sticky; top:78px">
       <div class="panel">
@@ -503,7 +604,8 @@ function stepReview(){
 
 function bindReview(){
   foot('');
-  $$('[data-edit]').forEach(b => b.onclick = () => { cur = +b.dataset.edit; step = 2; render(); });
+  $$('[data-edit]').forEach(b => b.onclick = () => { cur = +b.dataset.edit; step = 3; render(); });
+  $('#editBox').onclick = () => { step = 2; render(); };
   $('#submit').onclick = () => {
     try {
       const prior = JSON.parse(localStorage.getItem('aa_submitted_kids') || '[]');
@@ -516,7 +618,7 @@ function bindReview(){
       }));
       localStorage.setItem('aa_submitted_kids', JSON.stringify([...payload, ...prior]));
     } catch (e) { /* file:// with storage blocked, the flow still completes */ }
-    step = 5; render();
+    step = 6; render();
   };
 }
 

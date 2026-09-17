@@ -8,14 +8,14 @@
 const $  = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const money = n => '$' + Math.round(n).toLocaleString();
-const CAP = 300; // per child, the number Angels asks donors to expect
+const CAP = 200; // hard cap per child's list
 
 let step = 0;
 let cur = 0;   // which child's list is open on step 2
 
 const H = { caregiver:'', email:'', phone:'', county:'', street:'', city:'', zip:'' };
 let CHILDREN = [];
-const PAY = { method:'', connected:false, bank:'', mailName:'', mailAddr:'' };
+const PAY = { method:'', connected:false, bank:'', mailName:'', mailAddr:'', agreed:false };
 
 const uid = () => 'n' + Math.random().toString(36).slice(2, 7);
 
@@ -241,7 +241,7 @@ function stepLists(){
       <div class="field m-0"><label class="f" for="cusName">What is it?</label>
         <input class="i" id="cusName" placeholder="Skateboard and helmet"></div>
       <div class="field m-0"><label class="f" for="cusPrice">About what it costs</label>
-        <input class="i" id="cusPrice" type="number" min="5" step="5" placeholder="$"></div>
+        <input class="i" id="cusPrice" type="number" min="5" max="${Math.max(0, CAP - total)}" step="5" placeholder="$"></div>
     </div>
     <div class="field mt-3 m-0"><label class="f" for="cusLink">Link to it, if you have one</label>
       <input class="i" id="cusLink" placeholder="Paste the page where you would buy it">
@@ -267,12 +267,12 @@ function stepLists(){
     <div class="total-row mt-4" style="padding-top:14px; border-top:1px solid var(--line-soft)">
       <span class="muted">List total</span><b>${money(total)}</b>
     </div>
-    <div class="bar ${total > CAP ? '' : 'done'}">
-      <i style="width:${Math.min(100, total / CAP * 100)}%; ${total > CAP ? 'background:var(--brand-light)' : ''}"></i></div>
-    <p class="tiny muted mt-2">
-      ${total > CAP
-        ? `Above the ${money(CAP)} we ask donors to expect. That is allowed, it just tends to take longer to fully fund.`
-        : `Most lists land near ${money(CAP)}. Lists in that range usually fund completely.`}
+    <div class="bar done">
+      <i style="width:${Math.min(100, total / CAP * 100)}%"></i></div>
+    <p class="tiny muted mt-2" id="capNote">
+      ${total >= CAP
+        ? `This list is at the ${money(CAP)} cap. Remove something to add another gift.`
+        : `Lists are capped at ${money(CAP)} per child. ${money(CAP - total)} left on this one.`}
     </p>
   </div>
 
@@ -292,6 +292,13 @@ function bindLists(){
   const add = () => {
     const n = $('#cusName').value.trim(), p = +$('#cusPrice').value;
     if (!n || !p) return;
+    if (childTotal(c) + p > CAP){
+      const note = $('#capNote');
+      note.textContent = `That would put this list over the ${money(CAP)} cap. ${money(CAP - childTotal(c))} left on it.`;
+      note.classList.add('c-brand');
+      $('#cusPrice').focus();
+      return;
+    }
     const m = matchCatalog(n);
     c.items.push({ id:uid(), catId:m ? m.id : 'x' + uid(), name:n, spec:null,
                    link:tidyLink($('#cusLink').value), price:p,
@@ -303,7 +310,7 @@ function bindLists(){
     $('#' + id).onkeydown = e => { if (e.key === 'Enter'){ e.preventDefault(); add(); } };
   });
 
-  const ok = CHILDREN.every(k => k.items.length >= 1);
+  const ok = CHILDREN.every(k => k.items.length >= 1 && childTotal(k) <= CAP);
   foot(`<span class="tiny muted">${CHILDREN.length} list${CHILDREN.length === 1 ? '' : 's'} · ${money(allTotal())} in total</span>
         <button class="btn btn-primary" id="next" ${ok ? '' : 'disabled'}>Set up how you get paid <i class="fa-solid fa-arrow-right"></i></button>`);
   $('#next').onclick = () => { step = 3; render(); };
@@ -352,7 +359,16 @@ function stepPay(){
     </button>
   </div>
 
-  <div id="payDetail" class="form-card mt-5"></div>`;
+  <div id="payDetail" class="form-card mt-5"></div>
+
+  <div class="panel panel-warm form-card mt-5" style="max-width:640px">
+    <label style="display:flex; gap:12px; align-items:flex-start; cursor:pointer">
+      <input type="checkbox" id="agree" ${PAY.agreed ? 'checked' : ''} style="width:20px; height:20px; margin-top:2px; flex:none; accent-color:var(--brand)">
+      <span class="t-base"><b class="ink">By accepting these funds, I agree to use them for holiday gifts for the
+      child each list is for.</b> If something on a list no longer fits or is no longer wanted, I will spend that
+      money on what that child actually needs.</span>
+    </label>
+  </div>`;
 }
 
 function bindPay(){
@@ -395,7 +411,9 @@ function bindPay(){
   } else {
     d.innerHTML = '';
   }
-  const ok = (PAY.method === 'stripe' && PAY.connected) || (PAY.method === 'card');
+  $('#agree').onchange = e => { PAY.agreed = e.target.checked; render(); };
+  const paid = (PAY.method === 'stripe' && PAY.connected) || (PAY.method === 'card');
+  const ok = paid && PAY.agreed;
   foot(`<span class="tiny muted">${money(allTotal())} across ${CHILDREN.length} list${CHILDREN.length === 1 ? '' : 's'}</span>
         <button class="btn btn-primary" id="next" ${ok ? '' : 'disabled'}>Review and submit <i class="fa-solid fa-arrow-right"></i></button>`);
   $('#next').onclick = () => { step = 4; render(); };

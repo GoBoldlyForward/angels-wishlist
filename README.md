@@ -9,7 +9,7 @@ Registered as `angels-wishlist` on port 5201.
 
 Files: `index.html` (donor home, checkout, FAQ), `index-passion.html` (the same home page in a
 partner skin), `category.html?c=<id>` (one landing page per category), `caregiver.html` (the
-five-step caregiver flow), `admin.html` (the staff side), `theme-*.css` (brand layers), and
+six-step caregiver flow), `admin.html` (the staff side), `theme-*.css` (brand layers), and
 `img/` (product photography).
 
 ## The admin

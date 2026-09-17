@@ -224,7 +224,7 @@ const REASONS = [
   { icon:'fa-truck-fast', title:'No warehouse, no sorting weekend',
     body:'Physical gift drives cost a nonprofit storage, volunteers, drivers, and duplicates. Every dollar of that is a dollar that never reaches a child. This program runs on a spreadsheet and a payout.' },
   { icon:'fa-eye', title:'You still see where your gift went',
-    body:'You chose the science kit on Nia\'s list. Your receipt names it, and in January you hear back from the household about what they were able to get. Nothing about your side of this changes.' },
+    body:'You chose the science kit on Nia\'s list. Your receipt shows that, and in January you receive an impact statement showing exactly how your support funded holiday gifts for kids.' },
 ];
 
 /* The FAQ carries the part the shopping metaphor cannot: this is a donation,
@@ -236,12 +236,11 @@ const FAQS = [
        no merchant is involved, and the tile you clicked is a wish a caregiver typed in, not inventory.` },
 
   { q:'So where does my money actually go?',
-    a:`To Atlanta Angels, a 501(c)(3), as a charitable donation. We designate it to the household you chose
-       and pay it out to that child's caregiver. As with any gift to a nonprofit, Atlanta Angels holds final
-       discretion over how the funds are used, which is what the IRS requires in order for your gift to be
-       deductible. In practice we honor your choice almost every time. When we cannot, because a child
-       leaves the placement, a household withdraws, or a list closes early, the money moves to another
-       child's list rather than back to you.` },
+    a:`To Atlanta Angels, a 501(c)(3), as a charitable donation. We pool it with every other gift, spread
+       the total evenly across every child's list, and pay each household its share. As with any gift to a
+       nonprofit, Atlanta Angels holds final discretion over how the funds are used, which is what the IRS
+       requires in order for your gift to be tax-deductible. If a child leaves a placement or a household
+       withdraws, their share moves to the other lists rather than back to you.` },
 
   { q:'Where does the information about each child come from?',
     a:`Their caregiver, directly. The age, the interests, the one-line note, and every gift on the list are
@@ -251,10 +250,10 @@ const FAQS = [
        describes, and we will not pretend to more certainty than that.` },
 
   { q:'How do you know the money is spent on the child?',
-    a:`Caregivers agree in writing that designated funds are spent on the named child, and they upload
-       receipts after they shop. We review them and follow up on the ones that do not come in. This is trust
-       plus verification, not a locked card, and we would rather say so plainly than imply a control we do
-       not have.` },
+    a:`We work directly and personally with each family whose lists you see. Our Program Coordinators are
+       in frequent contact with them, and we have built relationships with them. We trust them and are
+       empowering them with this opportunity. When they accept the funds, they agree to use them for the
+       purpose described.` },
 
   { q:'What if the gift I funded is not what the child needs by December?',
     a:`Their caregiver buys what does fit. That is the entire reason this program sends money instead of
@@ -263,29 +262,33 @@ const FAQS = [
 
   { q:'Five kids want the same thing. Am I funding all of them?',
     a:`Only the number you choose. Items that more than one child asked for are grouped, so a hoodie that
-       four children want shows up once with four still needed. You pick a quantity, and each one you fund is
-       assigned to a specific child and named on your receipt. When a caregiver asked for a particular brand
+       four children want shows up once with four still needed. You pick a quantity, and each one you fund
+       shows on your receipt. When a caregiver asked for a particular brand
        or size, that request is listed separately so you can fund exactly that one.` },
 
   { q:'What happens if a list is not fully funded?',
-    a:`The household receives what the list raised. We do not hold funds back waiting for a list to complete,
-       and we do not quietly cancel the gifts nobody claimed. Lists that are still short as the deadline gets
-       close are where general giving goes first.` },
+    a:`The household still receives its share. We spread everything raised evenly across every child's list,
+       so each one is funded to the same percentage. If every child asked for $200 and donors covered 75
+       percent of the total, every child's list receives $150. We do not hold funds back waiting for a list
+       to complete.` },
 
-  { q:'Is my gift tax deductible?',
+  { q:'Is my gift tax-deductible?',
     a:`Yes. Atlanta Angels is a registered 501(c)(3), and you will get an itemized receipt by email. No goods
        or services are provided to you in exchange, which is the other reason the money has to be a donation
        to us rather than a purchase from a family.` },
 
   { q:'What will I hear back?',
-    a:`One email in January with what the household bought and a short note from them. You will never receive
-       a photograph of a child, a last name, a school, or anything about a case. The names on this site are
-       aliases each caregiver chose for exactly that reason.` },
+    a:`A thank-you card and an impact statement in January. For privacy reasons you will not receive any
+       personal details or photos of children's faces. The names on this site are aliases each caregiver
+       chose for exactly that reason.` },
 
   { q:'Why not just collect the actual gifts?',
-    a:`Because that program costs a nonprofit storage, sorting volunteers, drivers, and a pile of duplicates,
-       and it still hands a family the wrong size in a bag with a stranger's handwriting on it. Every hour
-       and dollar of that comes out of the same donations. This way costs us a spreadsheet and a payout.` },
+    a:`We have in the past. We found that the lists provided in September often no longer reflect the
+       child's wishes or needs in December, and that purchasing and providing the gifts directly takes away
+       the joy of shopping from the caregiver. As we have grown, it also pulls too many resources away from
+       our primary programs and is not scalable: hundreds of hours of additional staff and administrative
+       time. We want to steward funds and time in the way that is most mission-aligned and impactful for
+       the families we support.` },
 ];
 
 /* A landing-page headline per category. Generic labels make a category page

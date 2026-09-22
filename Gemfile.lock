@@ -164,12 +164,17 @@ GEM
       responders
       warden (~> 1.2.3)
     dotenv (3.2.0)
+    dotenv-rails (3.2.0)
+      dotenv (= 3.2.0)
+      railties (>= 6.1)
     drb (2.2.3)
     ed25519 (1.4.0)
     erb (6.0.7)
     erubi (1.13.1)
     et-orbi (1.4.2)
       tzinfo
+    faker (3.8.0)
+      i18n (>= 1.8.11, < 2)
     ffi (1.17.4-aarch64-linux-gnu)
     ffi (1.17.4-aarch64-linux-musl)
     ffi (1.17.4-arm-linux-gnu)
@@ -563,6 +568,8 @@ DEPENDENCIES
   dartsass-rails
   debug
   devise
+  dotenv-rails
+  faker
   friendly_id (~> 5.4.0)
   geocoder (~> 1.8, >= 1.8.2)
   holidays

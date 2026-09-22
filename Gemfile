@@ -91,3 +91,6 @@ gem "friendly_id", "~> 5.4.0"
 
 # Pagination
 gem "pagy"
+
+# Visit and event tracking
+gem "ahoy_matey"

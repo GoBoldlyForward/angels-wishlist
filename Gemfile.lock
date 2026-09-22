@@ -123,6 +123,8 @@ GEM
       popper_js (>= 2.11.8, < 3)
     brakeman (8.0.6)
       racc
+    breadcrumbs_on_rails (4.1.0)
+      railties (>= 5.0)
     builder (3.3.0)
     bundler-audit (0.9.3)
       bundler (>= 1.2.0)
@@ -245,6 +247,8 @@ GEM
       net-smtp
     marcel (1.2.1)
     matrix (0.4.3)
+    meta-tags (2.24.0)
+      actionpack (>= 6.0.0)
     mini_magick (5.4.0)
       logger
     mini_mime (1.1.5)
@@ -524,6 +528,7 @@ DEPENDENCIES
   bootsnap
   bootstrap (~> 5.3.3)
   brakeman
+  breadcrumbs_on_rails
   bundler-audit
   capybara
   counter_culture (~> 3.2)
@@ -536,6 +541,7 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   kamal
+  meta-tags
   pagy
   paper_trail
   paranoia

@@ -115,3 +115,7 @@ gem "validate_url"
 
 # Geocoding
 gem "geocoder", "~> 1.8", ">= 1.8.2"
+
+# Presentation
+gem "meta-tags"
+gem "breadcrumbs_on_rails"

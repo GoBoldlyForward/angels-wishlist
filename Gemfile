@@ -134,3 +134,6 @@ gem "stripe"
 gem "httparty"
 gem "holidays"
 gem "roo"
+
+# json 3.0 dropped the two-argument JSON.parse that ActiveSupport still calls.
+gem "json", "~> 2.7"

@@ -1,0 +1,2366 @@
+{
+  "categories": [
+    {
+      "id": "clothes",
+      "label": "Clothes & Shoes",
+      "icon": "fa-shirt",
+      "tint": "t1"
+    },
+    {
+      "id": "toys",
+      "label": "Toys & Play",
+      "icon": "fa-shapes",
+      "tint": "t2"
+    },
+    {
+      "id": "sports",
+      "label": "Sports & Outdoors",
+      "icon": "fa-basketball",
+      "tint": "t3"
+    },
+    {
+      "id": "books",
+      "label": "Books & Learning",
+      "icon": "fa-book-open",
+      "tint": "t4"
+    },
+    {
+      "id": "art",
+      "label": "Art & Music",
+      "icon": "fa-palette",
+      "tint": "t5"
+    },
+    {
+      "id": "tech",
+      "label": "Tech & Gaming",
+      "icon": "fa-headphones",
+      "tint": "t6"
+    },
+    {
+      "id": "wheels",
+      "label": "Bikes & Wheels",
+      "icon": "fa-bicycle",
+      "tint": "t7"
+    },
+    {
+      "id": "room",
+      "label": "Comfort & Bedroom",
+      "icon": "fa-bed",
+      "tint": "t8"
+    },
+    {
+      "id": "care",
+      "label": "Care & Getting Ready",
+      "icon": "fa-pump-soap",
+      "tint": "t1"
+    },
+    {
+      "id": "outings",
+      "label": "Outings & Experiences",
+      "icon": "fa-ticket",
+      "tint": "t3"
+    }
+  ],
+  "catalog": [
+    {
+      "id": "c01",
+      "cat": "clothes",
+      "name": "Winter coat",
+      "price": 65,
+      "icon": "🧥",
+      "ages": [
+        2,
+        18
+      ]
+    },
+    {
+      "id": "c02",
+      "cat": "clothes",
+      "name": "Sneakers that fit right now",
+      "price": 70,
+      "icon": "👟",
+      "ages": [
+        2,
+        18
+      ]
+    },
+    {
+      "id": "c03",
+      "cat": "clothes",
+      "name": "Jeans, two pairs",
+      "price": 55,
+      "icon": "👖",
+      "ages": [
+        3,
+        18
+      ]
+    },
+    {
+      "id": "c04",
+      "cat": "clothes",
+      "name": "Hoodie",
+      "price": 40,
+      "icon": "🧢",
+      "ages": [
+        5,
+        18
+      ]
+    },
+    {
+      "id": "c05",
+      "cat": "clothes",
+      "name": "Church or picture-day outfit",
+      "price": 60,
+      "icon": "👗",
+      "ages": [
+        2,
+        18
+      ]
+    },
+    {
+      "id": "c06",
+      "cat": "clothes",
+      "name": "Pajama set",
+      "price": 28,
+      "icon": "🌙",
+      "ages": [
+        1,
+        16
+      ]
+    },
+    {
+      "id": "c07",
+      "cat": "clothes",
+      "name": "Socks and underwear, full restock",
+      "price": 35,
+      "icon": "🧦",
+      "ages": [
+        1,
+        18
+      ]
+    },
+    {
+      "id": "c08",
+      "cat": "clothes",
+      "name": "Rain boots",
+      "price": 32,
+      "icon": "🥾",
+      "ages": [
+        2,
+        14
+      ]
+    },
+    {
+      "id": "c10",
+      "cat": "toys",
+      "name": "Lego building set",
+      "price": 60,
+      "icon": "🧱",
+      "ages": [
+        5,
+        14
+      ]
+    },
+    {
+      "id": "c11",
+      "cat": "toys",
+      "name": "Dinosaur figure set",
+      "price": 30,
+      "icon": "🦕",
+      "ages": [
+        2,
+        9
+      ]
+    },
+    {
+      "id": "c12",
+      "cat": "toys",
+      "name": "Wooden train set",
+      "price": 48,
+      "icon": "🚂",
+      "ages": [
+        2,
+        7
+      ]
+    },
+    {
+      "id": "c13",
+      "cat": "toys",
+      "name": "Doll with extra outfits",
+      "price": 45,
+      "icon": "🪆",
+      "ages": [
+        2,
+        10
+      ]
+    },
+    {
+      "id": "c14",
+      "cat": "toys",
+      "name": "Board game for family night",
+      "price": 28,
+      "icon": "🎲",
+      "ages": [
+        5,
+        18
+      ]
+    },
+    {
+      "id": "c15",
+      "cat": "toys",
+      "name": "Dress-up trunk",
+      "price": 38,
+      "icon": "👑",
+      "ages": [
+        2,
+        8
+      ]
+    },
+    {
+      "id": "c16",
+      "cat": "toys",
+      "name": "Remote control car",
+      "price": 42,
+      "icon": "🏎️",
+      "ages": [
+        5,
+        13
+      ]
+    },
+    {
+      "id": "c17",
+      "cat": "toys",
+      "name": "Bubble machine",
+      "price": 22,
+      "icon": "🫧",
+      "ages": [
+        1,
+        6
+      ]
+    },
+    {
+      "id": "c20",
+      "cat": "sports",
+      "name": "Basketball and pump",
+      "price": 35,
+      "icon": "🏀",
+      "ages": [
+        6,
+        18
+      ]
+    },
+    {
+      "id": "c21",
+      "cat": "sports",
+      "name": "Soccer cleats",
+      "price": 55,
+      "icon": "⚽",
+      "ages": [
+        5,
+        18
+      ]
+    },
+    {
+      "id": "c22",
+      "cat": "sports",
+      "name": "Season fees for one sport",
+      "price": 120,
+      "icon": "🏅",
+      "ages": [
+        5,
+        18
+      ]
+    },
+    {
+      "id": "c23",
+      "cat": "sports",
+      "name": "Swim goggles and suit",
+      "price": 38,
+      "icon": "🥽",
+      "ages": [
+        3,
+        17
+      ]
+    },
+    {
+      "id": "c24",
+      "cat": "sports",
+      "name": "Skateboard and helmet",
+      "price": 85,
+      "icon": "🛹",
+      "ages": [
+        7,
+        18
+      ]
+    },
+    {
+      "id": "c25",
+      "cat": "sports",
+      "name": "Camping sleeping bag",
+      "price": 45,
+      "icon": "🏕️",
+      "ages": [
+        6,
+        18
+      ]
+    },
+    {
+      "id": "c30",
+      "cat": "books",
+      "name": "Chapter book series",
+      "price": 35,
+      "icon": "📚",
+      "ages": [
+        6,
+        14
+      ]
+    },
+    {
+      "id": "c31",
+      "cat": "books",
+      "name": "Picture books, stack of six",
+      "price": 40,
+      "icon": "📖",
+      "ages": [
+        1,
+        7
+      ]
+    },
+    {
+      "id": "c32",
+      "cat": "books",
+      "name": "Science kit",
+      "price": 45,
+      "icon": "🔬",
+      "ages": [
+        7,
+        15
+      ]
+    },
+    {
+      "id": "c33",
+      "cat": "books",
+      "name": "Baking set and cookbook",
+      "price": 50,
+      "icon": "🧁",
+      "ages": [
+        7,
+        17
+      ]
+    },
+    {
+      "id": "c34",
+      "cat": "books",
+      "name": "Backpack and school supplies",
+      "price": 65,
+      "icon": "🎒",
+      "ages": [
+        4,
+        18
+      ]
+    },
+    {
+      "id": "c35",
+      "cat": "books",
+      "name": "Graphic novel bundle",
+      "price": 38,
+      "icon": "💥",
+      "ages": [
+        8,
+        17
+      ]
+    },
+    {
+      "id": "c40",
+      "cat": "art",
+      "name": "Art supply set",
+      "price": 48,
+      "icon": "🎨",
+      "ages": [
+        3,
+        18
+      ]
+    },
+    {
+      "id": "c41",
+      "cat": "art",
+      "name": "Sketchbook and markers",
+      "price": 30,
+      "icon": "✏️",
+      "ages": [
+        5,
+        18
+      ]
+    },
+    {
+      "id": "c42",
+      "cat": "art",
+      "name": "Beginner keyboard",
+      "price": 110,
+      "icon": "🎹",
+      "ages": [
+        6,
+        18
+      ]
+    },
+    {
+      "id": "c43",
+      "cat": "art",
+      "name": "Ukulele",
+      "price": 65,
+      "icon": "🪕",
+      "ages": [
+        6,
+        18
+      ]
+    },
+    {
+      "id": "c44",
+      "cat": "art",
+      "name": "Jewelry making kit",
+      "price": 32,
+      "icon": "📿",
+      "ages": [
+        6,
+        15
+      ]
+    },
+    {
+      "id": "c45",
+      "cat": "art",
+      "name": "Instant camera and film",
+      "price": 95,
+      "icon": "📸",
+      "ages": [
+        8,
+        18
+      ]
+    },
+    {
+      "id": "c50",
+      "cat": "tech",
+      "name": "Headphones",
+      "price": 60,
+      "icon": "🎧",
+      "ages": [
+        6,
+        18
+      ]
+    },
+    {
+      "id": "c51",
+      "cat": "tech",
+      "name": "Bluetooth speaker",
+      "price": 45,
+      "icon": "🔊",
+      "ages": [
+        8,
+        18
+      ]
+    },
+    {
+      "id": "c52",
+      "cat": "tech",
+      "name": "Game controller",
+      "price": 65,
+      "icon": "🎮",
+      "ages": [
+        7,
+        18
+      ]
+    },
+    {
+      "id": "c53",
+      "cat": "tech",
+      "name": "Tablet for schoolwork",
+      "price": 180,
+      "icon": "📱",
+      "ages": [
+        6,
+        18
+      ]
+    },
+    {
+      "id": "c54",
+      "cat": "tech",
+      "name": "Beginner music production app + mic",
+      "price": 90,
+      "icon": "🎙️",
+      "ages": [
+        11,
+        18
+      ]
+    },
+    {
+      "id": "c60",
+      "cat": "wheels",
+      "name": "Bicycle",
+      "price": 150,
+      "icon": "🚲",
+      "ages": [
+        4,
+        16
+      ]
+    },
+    {
+      "id": "c61",
+      "cat": "wheels",
+      "name": "Bike helmet and lock",
+      "price": 45,
+      "icon": "⛑️",
+      "ages": [
+        4,
+        18
+      ]
+    },
+    {
+      "id": "c62",
+      "cat": "wheels",
+      "name": "Scooter",
+      "price": 70,
+      "icon": "🛴",
+      "ages": [
+        4,
+        13
+      ]
+    },
+    {
+      "id": "c63",
+      "cat": "wheels",
+      "name": "Roller skates",
+      "price": 65,
+      "icon": "🛼",
+      "ages": [
+        6,
+        17
+      ]
+    },
+    {
+      "id": "c70",
+      "cat": "room",
+      "name": "Bedding set they picked",
+      "price": 70,
+      "icon": "🛏️",
+      "ages": [
+        1,
+        18
+      ]
+    },
+    {
+      "id": "c71",
+      "cat": "room",
+      "name": "Weighted blanket",
+      "price": 60,
+      "icon": "🧸",
+      "ages": [
+        4,
+        18
+      ]
+    },
+    {
+      "id": "c72",
+      "cat": "room",
+      "name": "Night light and lamp",
+      "price": 28,
+      "icon": "💡",
+      "ages": [
+        1,
+        12
+      ]
+    },
+    {
+      "id": "c73",
+      "cat": "room",
+      "name": "Storage bins and shelf",
+      "price": 55,
+      "icon": "📦",
+      "ages": [
+        2,
+        18
+      ]
+    },
+    {
+      "id": "c74",
+      "cat": "room",
+      "name": "Stuffed animal to keep",
+      "price": 25,
+      "icon": "🐻",
+      "ages": [
+        1,
+        12
+      ]
+    },
+    {
+      "id": "c80",
+      "cat": "care",
+      "name": "Skincare and hair basics",
+      "price": 45,
+      "icon": "🧴",
+      "ages": [
+        10,
+        18
+      ]
+    },
+    {
+      "id": "c81",
+      "cat": "care",
+      "name": "Hair care for textured hair",
+      "price": 55,
+      "icon": "💇",
+      "ages": [
+        2,
+        18
+      ]
+    },
+    {
+      "id": "c82",
+      "cat": "care",
+      "name": "Barber or salon visit",
+      "price": 40,
+      "icon": "✂️",
+      "ages": [
+        2,
+        18
+      ]
+    },
+    {
+      "id": "c83",
+      "cat": "care",
+      "name": "Toiletry kit and towels",
+      "price": 35,
+      "icon": "🧼",
+      "ages": [
+        6,
+        18
+      ]
+    },
+    {
+      "id": "c90",
+      "cat": "outings",
+      "name": "Zoo Atlanta family pass",
+      "price": 90,
+      "icon": "🦁",
+      "ages": [
+        1,
+        14
+      ]
+    },
+    {
+      "id": "c91",
+      "cat": "outings",
+      "name": "Movie night out",
+      "price": 45,
+      "icon": "🍿",
+      "ages": [
+        3,
+        18
+      ]
+    },
+    {
+      "id": "c92",
+      "cat": "outings",
+      "name": "Aquarium day",
+      "price": 110,
+      "icon": "🐠",
+      "ages": [
+        1,
+        16
+      ]
+    },
+    {
+      "id": "c93",
+      "cat": "outings",
+      "name": "Trampoline park with a friend",
+      "price": 50,
+      "icon": "🤸",
+      "ages": [
+        5,
+        15
+      ]
+    },
+    {
+      "id": "c94",
+      "cat": "outings",
+      "name": "Braves game, two tickets",
+      "price": 80,
+      "icon": "⚾",
+      "ages": [
+        5,
+        18
+      ]
+    },
+    {
+      "id": "c95",
+      "cat": "outings",
+      "name": "Driver’s ed course",
+      "price": 350,
+      "icon": "🚗",
+      "ages": [
+        15,
+        18
+      ]
+    }
+  ],
+  "has_photo": [
+    "c01",
+    "c02",
+    "c03",
+    "c04",
+    "c05",
+    "c08",
+    "c10",
+    "c11",
+    "c12",
+    "c13",
+    "c14",
+    "c16",
+    "c17",
+    "c20",
+    "c21",
+    "c23",
+    "c24",
+    "c30",
+    "c32",
+    "c33",
+    "c40",
+    "c41",
+    "c42",
+    "c43",
+    "c44",
+    "c45",
+    "c50",
+    "c51",
+    "c52",
+    "c53",
+    "c54",
+    "c60",
+    "c61",
+    "c62",
+    "c70",
+    "c71",
+    "c72",
+    "c73",
+    "c74",
+    "c80",
+    "c82",
+    "c83",
+    "c90",
+    "c91",
+    "c92",
+    "c93",
+    "c94",
+    "c95"
+  ],
+  "households": [
+    {
+      "id": "h1",
+      "name": "The Brooks home",
+      "area": "Clayton County",
+      "caregiver": "Denise B."
+    },
+    {
+      "id": "h2",
+      "name": "The Okafor home",
+      "area": "DeKalb County",
+      "caregiver": "Grace O."
+    },
+    {
+      "id": "h3",
+      "name": "The Vance home",
+      "area": "Cobb County",
+      "caregiver": "Marcus V."
+    },
+    {
+      "id": "h4",
+      "name": "The Delgado home",
+      "area": "South Fulton",
+      "caregiver": "Rosa D."
+    },
+    {
+      "id": "h5",
+      "name": "The Whitfield home",
+      "area": "Gwinnett County",
+      "caregiver": "Tamika W."
+    },
+    {
+      "id": "h6",
+      "name": "The Alvarez home",
+      "area": "Henry County",
+      "caregiver": "Carmen A."
+    },
+    {
+      "id": "h7",
+      "name": "The Boateng home",
+      "area": "Rockdale County",
+      "caregiver": "Kofi B."
+    },
+    {
+      "id": "h8",
+      "name": "The Sinclair home",
+      "area": "Douglas County",
+      "caregiver": "Renee S."
+    },
+    {
+      "id": "h9",
+      "name": "The Tran home",
+      "area": "North Fulton",
+      "caregiver": "Mai T."
+    },
+    {
+      "id": "h10",
+      "name": "The Whitaker home",
+      "area": "Clayton County",
+      "caregiver": "Pam W."
+    }
+  ],
+  "kids": [
+    {
+      "id": "k1",
+      "alias": "Maya",
+      "age": 9,
+      "gender": "girl",
+      "hh": "h1",
+      "interests": [
+        "drawing",
+        "horses",
+        "anything sparkly"
+      ],
+      "note": "She draws on every napkin in the house. A real set of supplies would mean the world.",
+      "items": [
+        {
+          "id": "k1-0",
+          "catId": "c40",
+          "name": "Art supply set",
+          "spec": null,
+          "link": null,
+          "price": 48,
+          "icon": "🎨",
+          "cat": "art",
+          "claimed": true,
+          "claimedBy": "Priya S."
+        },
+        {
+          "id": "k1-1",
+          "catId": "c02",
+          "name": "Sneakers that fit right now",
+          "spec": null,
+          "link": null,
+          "price": 70,
+          "icon": "👟",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k1-2",
+          "catId": "c30",
+          "name": "Chapter book series",
+          "spec": null,
+          "link": null,
+          "price": 35,
+          "icon": "📚",
+          "cat": "books",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k1-3",
+          "catId": "c74",
+          "name": "Stuffed animal to keep",
+          "spec": null,
+          "link": null,
+          "price": 25,
+          "icon": "🐻",
+          "cat": "room",
+          "claimed": true,
+          "claimedBy": "The Hollis family"
+        },
+        {
+          "id": "k1-4",
+          "catId": "c91",
+          "name": "Movie night out",
+          "spec": null,
+          "link": null,
+          "price": 45,
+          "icon": "🍿",
+          "cat": "outings",
+          "claimed": false,
+          "claimedBy": null
+        }
+      ]
+    },
+    {
+      "id": "k2",
+      "alias": "Theo",
+      "age": 6,
+      "gender": "boy",
+      "hh": "h1",
+      "interests": [
+        "dinosaurs",
+        "trucks",
+        "being outside"
+      ],
+      "note": "He asks to go to the park every single day, rain or shine.",
+      "items": [
+        {
+          "id": "k2-0",
+          "catId": "c11",
+          "name": "Dinosaur figure set",
+          "spec": null,
+          "link": null,
+          "price": 30,
+          "icon": "🦕",
+          "cat": "toys",
+          "claimed": true,
+          "claimedBy": "Piedmont Church youth group"
+        },
+        {
+          "id": "k2-1",
+          "catId": "c62",
+          "name": "Scooter",
+          "spec": "Razor A5 Lo-Ride, blue",
+          "link": "https://www.amazon.com/s?k=razor+a5+lo+ride+scooter",
+          "price": 70,
+          "icon": "🛴",
+          "cat": "wheels",
+          "claimed": true,
+          "claimedBy": "Anonymous"
+        },
+        {
+          "id": "k2-2",
+          "catId": "c01",
+          "name": "Winter coat",
+          "spec": null,
+          "link": null,
+          "price": 65,
+          "icon": "🧥",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k2-3",
+          "catId": "c31",
+          "name": "Picture books, stack of six",
+          "spec": null,
+          "link": null,
+          "price": 40,
+          "icon": "📖",
+          "cat": "books",
+          "claimed": true,
+          "claimedBy": "M. Okonkwo"
+        },
+        {
+          "id": "k2-4",
+          "catId": "c72",
+          "name": "Night light and lamp",
+          "spec": null,
+          "link": null,
+          "price": 28,
+          "icon": "💡",
+          "cat": "room",
+          "claimed": true,
+          "claimedBy": "Anonymous"
+        }
+      ]
+    },
+    {
+      "id": "k3",
+      "alias": "Amari",
+      "age": 14,
+      "gender": "boy",
+      "hh": "h2",
+      "interests": [
+        "basketball",
+        "sneakers",
+        "making beats"
+      ],
+      "note": "He has been teaching himself to produce music on a borrowed phone.",
+      "items": [
+        {
+          "id": "k3-0",
+          "catId": "c54",
+          "name": "Beginner music production app + mic",
+          "spec": null,
+          "link": null,
+          "price": 90,
+          "icon": "🎙️",
+          "cat": "tech",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k3-1",
+          "catId": "c20",
+          "name": "Basketball and pump",
+          "spec": null,
+          "link": null,
+          "price": 35,
+          "icon": "🏀",
+          "cat": "sports",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k3-2",
+          "catId": "c02",
+          "name": "Sneakers that fit right now",
+          "spec": "Basketball shoes, size 11",
+          "link": "https://www.amazon.com/s?k=basketball+shoes+size+11",
+          "price": 85,
+          "icon": "👟",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k3-3",
+          "catId": "c50",
+          "name": "Headphones",
+          "spec": null,
+          "link": null,
+          "price": 60,
+          "icon": "🎧",
+          "cat": "tech",
+          "claimed": true,
+          "claimedBy": "Kroger volunteer team"
+        },
+        {
+          "id": "k3-4",
+          "catId": "c04",
+          "name": "Hoodie",
+          "spec": "Nike, size L",
+          "link": null,
+          "price": 40,
+          "icon": "🧢",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        }
+      ]
+    },
+    {
+      "id": "k4",
+      "alias": "Nia",
+      "age": 12,
+      "gender": "girl",
+      "hh": "h2",
+      "interests": [
+        "reading",
+        "science",
+        "baking"
+      ],
+      "note": "She reads a book every two days and has started cooking dinner on Sundays.",
+      "items": [
+        {
+          "id": "k4-0",
+          "catId": "c32",
+          "name": "Science kit",
+          "spec": null,
+          "link": null,
+          "price": 45,
+          "icon": "🔬",
+          "cat": "books",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k4-1",
+          "catId": "c33",
+          "name": "Baking set and cookbook",
+          "spec": null,
+          "link": null,
+          "price": 50,
+          "icon": "🧁",
+          "cat": "books",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k4-2",
+          "catId": "c30",
+          "name": "Chapter book series",
+          "spec": null,
+          "link": null,
+          "price": 35,
+          "icon": "📚",
+          "cat": "books",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k4-3",
+          "catId": "c34",
+          "name": "Backpack and school supplies",
+          "spec": null,
+          "link": null,
+          "price": 65,
+          "icon": "🎒",
+          "cat": "books",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k4-4",
+          "catId": "c04",
+          "name": "Hoodie",
+          "spec": null,
+          "link": null,
+          "price": 40,
+          "icon": "🧢",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k4-5",
+          "catId": "c50",
+          "name": "Headphones",
+          "spec": null,
+          "link": null,
+          "price": 60,
+          "icon": "🎧",
+          "cat": "tech",
+          "claimed": false,
+          "claimedBy": null
+        }
+      ]
+    },
+    {
+      "id": "k5",
+      "alias": "Luca",
+      "age": 3,
+      "gender": "boy",
+      "hh": "h3",
+      "interests": [
+        "trains",
+        "bubbles",
+        "his blue blanket"
+      ],
+      "note": "First placement. He is just starting to settle in and loves anything with wheels.",
+      "items": [
+        {
+          "id": "k5-0",
+          "catId": "c12",
+          "name": "Wooden train set",
+          "spec": null,
+          "link": null,
+          "price": 48,
+          "icon": "🚂",
+          "cat": "toys",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k5-1",
+          "catId": "c17",
+          "name": "Bubble machine",
+          "spec": null,
+          "link": null,
+          "price": 22,
+          "icon": "🫧",
+          "cat": "toys",
+          "claimed": true,
+          "claimedBy": "The Nguyen family"
+        },
+        {
+          "id": "k5-2",
+          "catId": "c31",
+          "name": "Picture books, stack of six",
+          "spec": null,
+          "link": null,
+          "price": 40,
+          "icon": "📖",
+          "cat": "books",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k5-3",
+          "catId": "c06",
+          "name": "Pajama set",
+          "spec": null,
+          "link": null,
+          "price": 28,
+          "icon": "🌙",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k5-4",
+          "catId": "c74",
+          "name": "Stuffed animal to keep",
+          "spec": null,
+          "link": null,
+          "price": 25,
+          "icon": "🐻",
+          "cat": "room",
+          "claimed": false,
+          "claimedBy": null
+        }
+      ]
+    },
+    {
+      "id": "k6",
+      "alias": "Selah",
+      "age": 16,
+      "gender": "girl",
+      "hh": "h3",
+      "interests": [
+        "photography",
+        "thrifting",
+        "skincare"
+      ],
+      "note": "She is saving for a camera and takes photos of everyone at church on Sundays.",
+      "items": [
+        {
+          "id": "k6-0",
+          "catId": "c45",
+          "name": "Instant camera and film",
+          "spec": "Instax Mini, any color",
+          "link": "https://www.amazon.com/s?k=fujifilm+instax+mini+camera",
+          "price": 95,
+          "icon": "📸",
+          "cat": "art",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k6-1",
+          "catId": "c80",
+          "name": "Skincare and hair basics",
+          "spec": null,
+          "link": null,
+          "price": 45,
+          "icon": "🧴",
+          "cat": "care",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k6-2",
+          "catId": "c03",
+          "name": "Jeans, two pairs",
+          "spec": null,
+          "link": null,
+          "price": 55,
+          "icon": "👖",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k6-3",
+          "catId": "c82",
+          "name": "Barber or salon visit",
+          "spec": null,
+          "link": null,
+          "price": 40,
+          "icon": "✂️",
+          "cat": "care",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k6-4",
+          "catId": "c94",
+          "name": "Braves game, two tickets",
+          "spec": null,
+          "link": null,
+          "price": 80,
+          "icon": "⚾",
+          "cat": "outings",
+          "claimed": true,
+          "claimedBy": "Anonymous"
+        },
+        {
+          "id": "k6-5",
+          "catId": "c50",
+          "name": "Headphones",
+          "spec": null,
+          "link": null,
+          "price": 60,
+          "icon": "🎧",
+          "cat": "tech",
+          "claimed": false,
+          "claimedBy": null
+        }
+      ]
+    },
+    {
+      "id": "k7",
+      "alias": "Kai",
+      "age": 8,
+      "gender": "boy",
+      "hh": "h4",
+      "interests": [
+        "Legos",
+        "swimming",
+        "space"
+      ],
+      "note": "He built a rocket out of cereal boxes last week. It took him four days.",
+      "items": [
+        {
+          "id": "k7-0",
+          "catId": "c10",
+          "name": "Lego building set",
+          "spec": null,
+          "link": null,
+          "price": 60,
+          "icon": "🧱",
+          "cat": "toys",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k7-1",
+          "catId": "c23",
+          "name": "Swim goggles and suit",
+          "spec": null,
+          "link": null,
+          "price": 38,
+          "icon": "🥽",
+          "cat": "sports",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k7-2",
+          "catId": "c71",
+          "name": "Weighted blanket",
+          "spec": null,
+          "link": null,
+          "price": 60,
+          "icon": "🧸",
+          "cat": "room",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k7-3",
+          "catId": "c04",
+          "name": "Hoodie",
+          "spec": null,
+          "link": null,
+          "price": 40,
+          "icon": "🧢",
+          "cat": "clothes",
+          "claimed": true,
+          "claimedBy": "Anonymous"
+        },
+        {
+          "id": "k7-4",
+          "catId": "c60",
+          "name": "Bicycle",
+          "spec": null,
+          "link": null,
+          "price": 150,
+          "icon": "🚲",
+          "cat": "wheels",
+          "claimed": false,
+          "claimedBy": null
+        }
+      ]
+    },
+    {
+      "id": "k8",
+      "alias": "Rosie",
+      "age": 4,
+      "gender": "girl",
+      "hh": "h4",
+      "interests": [
+        "dress-up",
+        "unicorns",
+        "dancing"
+      ],
+      "note": "She has worn the same costume for three weeks straight.",
+      "items": [
+        {
+          "id": "k8-0",
+          "catId": "c15",
+          "name": "Dress-up trunk",
+          "spec": null,
+          "link": null,
+          "price": 38,
+          "icon": "👑",
+          "cat": "toys",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k8-1",
+          "catId": "c13",
+          "name": "Doll with extra outfits",
+          "spec": null,
+          "link": null,
+          "price": 45,
+          "icon": "🪆",
+          "cat": "toys",
+          "claimed": true,
+          "claimedBy": "Delta ATL crew"
+        },
+        {
+          "id": "k8-2",
+          "catId": "c05",
+          "name": "Church or picture-day outfit",
+          "spec": null,
+          "link": null,
+          "price": 60,
+          "icon": "👗",
+          "cat": "clothes",
+          "claimed": true,
+          "claimedBy": "The Reyes family"
+        },
+        {
+          "id": "k8-3",
+          "catId": "c31",
+          "name": "Picture books, stack of six",
+          "spec": null,
+          "link": null,
+          "price": 40,
+          "icon": "📖",
+          "cat": "books",
+          "claimed": true,
+          "claimedBy": "Anonymous"
+        },
+        {
+          "id": "k8-4",
+          "catId": "c90",
+          "name": "Zoo Atlanta family pass",
+          "spec": null,
+          "link": null,
+          "price": 90,
+          "icon": "🦁",
+          "cat": "outings",
+          "claimed": true,
+          "claimedBy": "Buckhead Rotary"
+        }
+      ]
+    },
+    {
+      "id": "k9",
+      "alias": "Elena",
+      "age": 11,
+      "gender": "girl",
+      "hh": "h5",
+      "interests": [
+        "soccer",
+        "her sketchbook",
+        "sleepovers"
+      ],
+      "note": "She made the school team and needs cleats before the season starts.",
+      "items": [
+        {
+          "id": "k9-0",
+          "catId": "c21",
+          "name": "Soccer cleats",
+          "spec": "Size 6, any brand",
+          "link": null,
+          "price": 55,
+          "icon": "⚽",
+          "cat": "sports",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k9-1",
+          "catId": "c41",
+          "name": "Sketchbook and markers",
+          "spec": null,
+          "link": null,
+          "price": 30,
+          "icon": "✏️",
+          "cat": "art",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k9-2",
+          "catId": "c70",
+          "name": "Bedding set they picked",
+          "spec": null,
+          "link": null,
+          "price": 70,
+          "icon": "🛏️",
+          "cat": "room",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k9-3",
+          "catId": "c04",
+          "name": "Hoodie",
+          "spec": null,
+          "link": null,
+          "price": 40,
+          "icon": "🧢",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k9-4",
+          "catId": "c60",
+          "name": "Bicycle",
+          "spec": null,
+          "link": null,
+          "price": 150,
+          "icon": "🚲",
+          "cat": "wheels",
+          "claimed": false,
+          "claimedBy": null
+        }
+      ]
+    },
+    {
+      "id": "k10",
+      "alias": "Darius",
+      "age": 17,
+      "gender": "boy",
+      "hh": "h5",
+      "interests": [
+        "cars",
+        "working out",
+        "graduating on time"
+      ],
+      "note": "He ages out in eleven months. Driving is the difference between a job and no job.",
+      "items": [
+        {
+          "id": "k10-0",
+          "catId": "c95",
+          "name": "Driver’s ed course",
+          "spec": null,
+          "link": null,
+          "price": 350,
+          "icon": "🚗",
+          "cat": "outings",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k10-1",
+          "catId": "c02",
+          "name": "Sneakers that fit right now",
+          "spec": null,
+          "link": null,
+          "price": 70,
+          "icon": "👟",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k10-2",
+          "catId": "c83",
+          "name": "Toiletry kit and towels",
+          "spec": null,
+          "link": null,
+          "price": 35,
+          "icon": "🧼",
+          "cat": "care",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k10-3",
+          "catId": "c04",
+          "name": "Hoodie",
+          "spec": null,
+          "link": null,
+          "price": 40,
+          "icon": "🧢",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        }
+      ]
+    },
+    {
+      "id": "k11",
+      "alias": "Jaylen",
+      "age": 10,
+      "gender": "boy",
+      "hh": "h6",
+      "interests": [
+        "skateboarding",
+        "drawing",
+        "pizza"
+      ],
+      "note": "He redraws the same skate logo on everything he owns, including his math homework.",
+      "items": [
+        {
+          "id": "k11-0",
+          "catId": "c24",
+          "name": "Skateboard and helmet",
+          "spec": null,
+          "link": null,
+          "price": 85,
+          "icon": "🛹",
+          "cat": "sports",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k11-1",
+          "catId": "c40",
+          "name": "Art supply set",
+          "spec": "Copic markers if possible",
+          "link": "https://www.amazon.com/s?k=copic+marker+set",
+          "price": 48,
+          "icon": "🎨",
+          "cat": "art",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k11-2",
+          "catId": "c02",
+          "name": "Sneakers that fit right now",
+          "spec": null,
+          "link": null,
+          "price": 70,
+          "icon": "👟",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k11-3",
+          "catId": "c01",
+          "name": "Winter coat",
+          "spec": null,
+          "link": null,
+          "price": 65,
+          "icon": "🧥",
+          "cat": "clothes",
+          "claimed": true,
+          "claimedBy": "The Ferrell family"
+        },
+        {
+          "id": "k11-4",
+          "catId": "c04",
+          "name": "Hoodie",
+          "spec": null,
+          "link": null,
+          "price": 40,
+          "icon": "🧢",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        }
+      ]
+    },
+    {
+      "id": "k12",
+      "alias": "Aria",
+      "age": 5,
+      "gender": "girl",
+      "hh": "h6",
+      "interests": [
+        "unicorns",
+        "swimming",
+        "stickers"
+      ],
+      "note": "She has been in this home since March and finally asked for something for herself.",
+      "items": [
+        {
+          "id": "k12-0",
+          "catId": "c15",
+          "name": "Dress-up trunk",
+          "spec": null,
+          "link": null,
+          "price": 38,
+          "icon": "👑",
+          "cat": "toys",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k12-1",
+          "catId": "c23",
+          "name": "Swim goggles and suit",
+          "spec": null,
+          "link": null,
+          "price": 38,
+          "icon": "🥽",
+          "cat": "sports",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k12-2",
+          "catId": "c90",
+          "name": "Zoo Atlanta family pass",
+          "spec": null,
+          "link": null,
+          "price": 90,
+          "icon": "🦁",
+          "cat": "outings",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k12-3",
+          "catId": "c93",
+          "name": "Trampoline park with a friend",
+          "spec": null,
+          "link": null,
+          "price": 50,
+          "icon": "🤸",
+          "cat": "outings",
+          "claimed": true,
+          "claimedBy": "Anonymous"
+        },
+        {
+          "id": "k12-4",
+          "catId": "c31",
+          "name": "Picture books, stack of six",
+          "spec": null,
+          "link": null,
+          "price": 40,
+          "icon": "📖",
+          "cat": "books",
+          "claimed": false,
+          "claimedBy": null
+        }
+      ]
+    },
+    {
+      "id": "k13",
+      "alias": "Micah",
+      "age": 13,
+      "gender": "boy",
+      "hh": "h7",
+      "interests": [
+        "video games",
+        "football",
+        "sneakers"
+      ],
+      "note": "He plays with his younger brothers every night without being asked.",
+      "items": [
+        {
+          "id": "k13-0",
+          "catId": "c02",
+          "name": "Sneakers that fit right now",
+          "spec": "Air Force 1s, size 7",
+          "link": "https://www.amazon.com/s?k=nike+air+force+1+size+7",
+          "price": 95,
+          "icon": "👟",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k13-1",
+          "catId": "c52",
+          "name": "Game controller",
+          "spec": null,
+          "link": null,
+          "price": 65,
+          "icon": "🎮",
+          "cat": "tech",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k13-2",
+          "catId": "c22",
+          "name": "Season fees for one sport",
+          "spec": null,
+          "link": null,
+          "price": 120,
+          "icon": "🏅",
+          "cat": "sports",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k13-3",
+          "catId": "c03",
+          "name": "Jeans, two pairs",
+          "spec": null,
+          "link": null,
+          "price": 55,
+          "icon": "👖",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k13-4",
+          "catId": "c82",
+          "name": "Barber or salon visit",
+          "spec": null,
+          "link": null,
+          "price": 40,
+          "icon": "✂️",
+          "cat": "care",
+          "claimed": true,
+          "claimedBy": "Anonymous"
+        },
+        {
+          "id": "k13-5",
+          "catId": "c04",
+          "name": "Hoodie",
+          "spec": null,
+          "link": null,
+          "price": 40,
+          "icon": "🧢",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        }
+      ]
+    },
+    {
+      "id": "k14",
+      "alias": "Zoe",
+      "age": 15,
+      "gender": "girl",
+      "hh": "h7",
+      "interests": [
+        "fashion",
+        "doing nails",
+        "her playlists"
+      ],
+      "note": "She is the one who braids everyone else's hair before school.",
+      "items": [
+        {
+          "id": "k14-0",
+          "catId": "c50",
+          "name": "Headphones",
+          "spec": null,
+          "link": null,
+          "price": 60,
+          "icon": "🎧",
+          "cat": "tech",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k14-1",
+          "catId": "c80",
+          "name": "Skincare and hair basics",
+          "spec": null,
+          "link": null,
+          "price": 45,
+          "icon": "🧴",
+          "cat": "care",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k14-2",
+          "catId": "c03",
+          "name": "Jeans, two pairs",
+          "spec": null,
+          "link": null,
+          "price": 55,
+          "icon": "👖",
+          "cat": "clothes",
+          "claimed": true,
+          "claimedBy": "Emory service group"
+        },
+        {
+          "id": "k14-3",
+          "catId": "c05",
+          "name": "Church or picture-day outfit",
+          "spec": null,
+          "link": null,
+          "price": 60,
+          "icon": "👗",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k14-4",
+          "catId": "c44",
+          "name": "Jewelry making kit",
+          "spec": null,
+          "link": null,
+          "price": 32,
+          "icon": "📿",
+          "cat": "art",
+          "claimed": false,
+          "claimedBy": null
+        }
+      ]
+    },
+    {
+      "id": "k15",
+      "alias": "Ruby",
+      "age": 2,
+      "gender": "girl",
+      "hh": "h8",
+      "interests": [
+        "blocks",
+        "dogs",
+        "being carried"
+      ],
+      "note": "Placed with her two brothers in September. Everything in her room came from a donation bin.",
+      "items": [
+        {
+          "id": "k15-0",
+          "catId": "c70",
+          "name": "Bedding set they picked",
+          "spec": null,
+          "link": null,
+          "price": 70,
+          "icon": "🛏️",
+          "cat": "room",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k15-1",
+          "catId": "c74",
+          "name": "Stuffed animal to keep",
+          "spec": null,
+          "link": null,
+          "price": 25,
+          "icon": "🐻",
+          "cat": "room",
+          "claimed": true,
+          "claimedBy": "The Ferrell family"
+        },
+        {
+          "id": "k15-2",
+          "catId": "c31",
+          "name": "Picture books, stack of six",
+          "spec": null,
+          "link": null,
+          "price": 40,
+          "icon": "📖",
+          "cat": "books",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k15-3",
+          "catId": "c72",
+          "name": "Night light and lamp",
+          "spec": null,
+          "link": null,
+          "price": 28,
+          "icon": "💡",
+          "cat": "room",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k15-4",
+          "catId": "c01",
+          "name": "Winter coat",
+          "spec": null,
+          "link": null,
+          "price": 65,
+          "icon": "🧥",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        }
+      ]
+    },
+    {
+      "id": "k16",
+      "alias": "Isaiah",
+      "age": 7,
+      "gender": "boy",
+      "hh": "h8",
+      "interests": [
+        "space",
+        "Legos",
+        "running everywhere"
+      ],
+      "note": "He can name every planet in order and will do it unprompted.",
+      "items": [
+        {
+          "id": "k16-0",
+          "catId": "c60",
+          "name": "Bicycle",
+          "spec": null,
+          "link": null,
+          "price": 150,
+          "icon": "🚲",
+          "cat": "wheels",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k16-1",
+          "catId": "c34",
+          "name": "Backpack and school supplies",
+          "spec": null,
+          "link": null,
+          "price": 65,
+          "icon": "🎒",
+          "cat": "books",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k16-2",
+          "catId": "c71",
+          "name": "Weighted blanket",
+          "spec": null,
+          "link": null,
+          "price": 60,
+          "icon": "🧸",
+          "cat": "room",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k16-3",
+          "catId": "c82",
+          "name": "Barber or salon visit",
+          "spec": null,
+          "link": null,
+          "price": 40,
+          "icon": "✂️",
+          "cat": "care",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k16-4",
+          "catId": "c10",
+          "name": "Lego building set",
+          "spec": null,
+          "link": null,
+          "price": 60,
+          "icon": "🧱",
+          "cat": "toys",
+          "claimed": true,
+          "claimedBy": "Anonymous"
+        }
+      ]
+    },
+    {
+      "id": "k17",
+      "alias": "Camila",
+      "age": 9,
+      "gender": "girl",
+      "hh": "h9",
+      "interests": [
+        "soccer",
+        "art",
+        "her cousin"
+      ],
+      "note": "She switched schools twice this year and made the team anyway.",
+      "items": [
+        {
+          "id": "k17-0",
+          "catId": "c21",
+          "name": "Soccer cleats",
+          "spec": "Size 4",
+          "link": "https://www.amazon.com/s?k=youth+soccer+cleats+size+4",
+          "price": 55,
+          "icon": "⚽",
+          "cat": "sports",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k17-1",
+          "catId": "c41",
+          "name": "Sketchbook and markers",
+          "spec": null,
+          "link": null,
+          "price": 30,
+          "icon": "✏️",
+          "cat": "art",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k17-2",
+          "catId": "c43",
+          "name": "Ukulele",
+          "spec": null,
+          "link": null,
+          "price": 65,
+          "icon": "🪕",
+          "cat": "art",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k17-3",
+          "catId": "c02",
+          "name": "Sneakers that fit right now",
+          "spec": null,
+          "link": null,
+          "price": 70,
+          "icon": "👟",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k17-4",
+          "catId": "c22",
+          "name": "Season fees for one sport",
+          "spec": null,
+          "link": null,
+          "price": 120,
+          "icon": "🏅",
+          "cat": "sports",
+          "claimed": true,
+          "claimedBy": "Buckhead Rotary"
+        }
+      ]
+    },
+    {
+      "id": "k18",
+      "alias": "Owen",
+      "age": 11,
+      "gender": "boy",
+      "hh": "h9",
+      "interests": [
+        "fishing",
+        "Minecraft",
+        "bikes"
+      ],
+      "note": "His caseworker says he has not asked for anything in two years.",
+      "items": [
+        {
+          "id": "k18-0",
+          "catId": "c52",
+          "name": "Game controller",
+          "spec": null,
+          "link": null,
+          "price": 65,
+          "icon": "🎮",
+          "cat": "tech",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k18-1",
+          "catId": "c35",
+          "name": "Graphic novel bundle",
+          "spec": null,
+          "link": null,
+          "price": 38,
+          "icon": "💥",
+          "cat": "books",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k18-2",
+          "catId": "c25",
+          "name": "Camping sleeping bag",
+          "spec": null,
+          "link": null,
+          "price": 45,
+          "icon": "🏕️",
+          "cat": "sports",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k18-3",
+          "catId": "c34",
+          "name": "Backpack and school supplies",
+          "spec": null,
+          "link": null,
+          "price": 65,
+          "icon": "🎒",
+          "cat": "books",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k18-4",
+          "catId": "c60",
+          "name": "Bicycle",
+          "spec": null,
+          "link": null,
+          "price": 150,
+          "icon": "🚲",
+          "cat": "wheels",
+          "claimed": false,
+          "claimedBy": null
+        }
+      ]
+    },
+    {
+      "id": "k19",
+      "alias": "Tasha",
+      "age": 16,
+      "gender": "girl",
+      "hh": "h10",
+      "interests": [
+        "cooking",
+        "college applications",
+        "thrifting"
+      ],
+      "note": "She is applying to four schools and doing all of it on a library computer.",
+      "items": [
+        {
+          "id": "k19-0",
+          "catId": "c53",
+          "name": "Tablet for schoolwork",
+          "spec": null,
+          "link": null,
+          "price": 180,
+          "icon": "📱",
+          "cat": "tech",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k19-1",
+          "catId": "c95",
+          "name": "Driver’s ed course",
+          "spec": null,
+          "link": null,
+          "price": 350,
+          "icon": "🚗",
+          "cat": "outings",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k19-2",
+          "catId": "c33",
+          "name": "Baking set and cookbook",
+          "spec": null,
+          "link": null,
+          "price": 50,
+          "icon": "🧁",
+          "cat": "books",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k19-3",
+          "catId": "c80",
+          "name": "Skincare and hair basics",
+          "spec": null,
+          "link": null,
+          "price": 45,
+          "icon": "🧴",
+          "cat": "care",
+          "claimed": true,
+          "claimedBy": "Anonymous"
+        },
+        {
+          "id": "k19-4",
+          "catId": "c04",
+          "name": "Hoodie",
+          "spec": null,
+          "link": null,
+          "price": 40,
+          "icon": "🧢",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k19-5",
+          "catId": "c34",
+          "name": "Backpack and school supplies",
+          "spec": null,
+          "link": null,
+          "price": 65,
+          "icon": "🎒",
+          "cat": "books",
+          "claimed": false,
+          "claimedBy": null
+        }
+      ]
+    },
+    {
+      "id": "k20",
+      "alias": "Malik",
+      "age": 4,
+      "gender": "boy",
+      "hh": "h10",
+      "interests": [
+        "trucks",
+        "dinosaurs",
+        "bubbles"
+      ],
+      "note": "He is the loudest, happiest kid in the house and he has been here two weeks.",
+      "items": [
+        {
+          "id": "k20-0",
+          "catId": "c11",
+          "name": "Dinosaur figure set",
+          "spec": null,
+          "link": null,
+          "price": 30,
+          "icon": "🦕",
+          "cat": "toys",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k20-1",
+          "catId": "c17",
+          "name": "Bubble machine",
+          "spec": null,
+          "link": null,
+          "price": 22,
+          "icon": "🫧",
+          "cat": "toys",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k20-2",
+          "catId": "c74",
+          "name": "Stuffed animal to keep",
+          "spec": null,
+          "link": null,
+          "price": 25,
+          "icon": "🐻",
+          "cat": "room",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k20-3",
+          "catId": "c08",
+          "name": "Rain boots",
+          "spec": null,
+          "link": null,
+          "price": 32,
+          "icon": "🥾",
+          "cat": "clothes",
+          "claimed": false,
+          "claimedBy": null
+        },
+        {
+          "id": "k20-4",
+          "catId": "c16",
+          "name": "Remote control car",
+          "spec": null,
+          "link": null,
+          "price": 42,
+          "icon": "🏎️",
+          "cat": "toys",
+          "claimed": true,
+          "claimedBy": "Delta ATL crew"
+        }
+      ]
+    }
+  ],
+  "cat_copy": {
+    "clothes": "The clothes they actually need this winter",
+    "toys": "Toys a caregiver picked out for one specific kid",
+    "sports": "Everything it takes to play the season",
+    "books": "Books, school supplies, and the stuff school assumes you have",
+    "art": "For the kids who draw, build, and make noise",
+    "tech": "The screens and sound a teenager asked for by name",
+    "wheels": "Wheels, and the helmet that has to come with them",
+    "room": "A room that feels like theirs",
+    "care": "Getting ready in the morning without borrowing anything",
+    "outings": "A day out, not a thing to unwrap"
+  }
+}

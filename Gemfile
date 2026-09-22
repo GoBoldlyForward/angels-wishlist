@@ -73,3 +73,6 @@ gem "simple_form"
 # Bootstrap compiled through Dart Sass
 gem "dartsass-rails"
 gem "bootstrap", "~> 5.3.3"
+
+# Authentication
+gem "devise"

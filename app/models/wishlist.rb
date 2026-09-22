@@ -45,7 +45,7 @@ class Wishlist < ApplicationRecord
   end
 
   def open_line_items
-    line_items.open_status
+    line_items.shoppable
   end
 
   def over_cap?
@@ -53,7 +53,7 @@ class Wishlist < ApplicationRecord
   end
 
   def fully_funded?
-    line_items.any? && line_items.open_status.none?
+    line_items.any? && line_items.shoppable.none?
   end
 
   def shoppable?

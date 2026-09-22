@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_22_035313) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_22_040012) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_035313) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "addresses", force: :cascade do |t|
+    t.string "city"
+    t.string "country", default: "US", null: false
+    t.datetime "created_at", null: false
+    t.decimal "latitude", precision: 10, scale: 6
+    t.decimal "longitude", precision: 10, scale: 6
+    t.string "state"
+    t.string "street_line_1"
+    t.string "street_line_2"
+    t.datetime "updated_at", null: false
+    t.string "zipcode"
   end
 
   create_table "ahoy_events", force: :cascade do |t|
@@ -85,6 +98,101 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_035313) do
     t.index ["visitor_token", "started_at"], name: "index_ahoy_visits_on_visitor_token_and_started_at"
   end
 
+  create_table "catalog_items", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.bigint "category_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.string "icon"
+    t.integer "max_age"
+    t.integer "min_age"
+    t.string "name", null: false
+    t.string "photo_attribution"
+    t.integer "price_in_cents", null: false
+    t.string "slug"
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_catalog_items_on_active"
+    t.index ["category_id"], name: "index_catalog_items_on_category_id"
+    t.index ["deleted_at"], name: "index_catalog_items_on_deleted_at"
+    t.index ["slug"], name: "index_catalog_items_on_slug", unique: true
+  end
+
+  create_table "categories", force: :cascade do |t|
+    t.text "blurb"
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.string "headline"
+    t.string "icon"
+    t.string "name", null: false
+    t.integer "position"
+    t.string "slug"
+    t.string "tint"
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_categories_on_deleted_at"
+    t.index ["position"], name: "index_categories_on_position"
+    t.index ["slug"], name: "index_categories_on_slug", unique: true
+  end
+
+  create_table "children", force: :cascade do |t|
+    t.string "alias", null: false
+    t.datetime "archived_at"
+    t.date "birthdate"
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.string "gender"
+    t.bigint "household_id", null: false
+    t.string "legal_first_name"
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_children_on_deleted_at"
+    t.index ["household_id"], name: "index_children_on_household_id"
+  end
+
+  create_table "donations", force: :cascade do |t|
+    t.bigint "ahoy_visit_id"
+    t.boolean "anonymous", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.string "display_name"
+    t.bigint "donor_id", null: false
+    t.bigint "event_id", null: false
+    t.integer "fee_in_cents", default: 0, null: false
+    t.integer "general_gift_in_cents", default: 0, null: false
+    t.integer "gift_in_cents", default: 0, null: false
+    t.datetime "note_approved_at"
+    t.text "note_to_family"
+    t.string "payment_method_label"
+    t.datetime "receipt_sent_at"
+    t.string "status", default: "pending", null: false
+    t.bigint "storefront_organization_id"
+    t.string "stripe_payment_intent_id"
+    t.datetime "updated_at", null: false
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.index ["ahoy_visit_id"], name: "index_donations_on_ahoy_visit_id"
+    t.index ["deleted_at"], name: "index_donations_on_deleted_at"
+    t.index ["donor_id"], name: "index_donations_on_donor_id"
+    t.index ["event_id"], name: "index_donations_on_event_id"
+    t.index ["status"], name: "index_donations_on_status"
+    t.index ["storefront_organization_id"], name: "index_donations_on_storefront_organization_id"
+    t.index ["stripe_payment_intent_id"], name: "index_donations_on_stripe_payment_intent_id", unique: true
+    t.index ["uuid"], name: "index_donations_on_uuid", unique: true
+  end
+
+  create_table "events", force: :cascade do |t|
+    t.datetime "closes_at"
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.string "name", null: false
+    t.datetime "opened_at"
+    t.bigint "organization_id", null: false
+    t.datetime "payout_at"
+    t.integer "per_child_cap_in_cents", default: 30000, null: false
+    t.string "slug"
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_events_on_deleted_at"
+    t.index ["organization_id"], name: "index_events_on_organization_id"
+    t.index ["slug"], name: "index_events_on_slug", unique: true
+  end
+
   create_table "friendly_id_slugs", force: :cascade do |t|
     t.datetime "created_at"
     t.string "scope"
@@ -94,6 +202,81 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_035313) do
     t.index ["slug", "sluggable_type", "scope"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope", unique: true
     t.index ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type"
     t.index ["sluggable_type", "sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_type_and_sluggable_id"
+  end
+
+  create_table "households", force: :cascade do |t|
+    t.bigint "ahoy_visit_id"
+    t.datetime "archived_at"
+    t.bigint "caregiver_id", null: false
+    t.string "county"
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.string "display_name", null: false
+    t.text "hold_reason"
+    t.bigint "mailing_address_id"
+    t.bigint "organization_id", null: false
+    t.string "payout_method", default: "none", null: false
+    t.bigint "placing_organization_id"
+    t.string "slug"
+    t.string "stripe_account_id"
+    t.datetime "updated_at", null: false
+    t.string "verification_status", default: "pending", null: false
+    t.datetime "verified_at"
+    t.index ["ahoy_visit_id"], name: "index_households_on_ahoy_visit_id"
+    t.index ["caregiver_id"], name: "index_households_on_caregiver_id"
+    t.index ["deleted_at"], name: "index_households_on_deleted_at"
+    t.index ["mailing_address_id"], name: "index_households_on_mailing_address_id"
+    t.index ["organization_id"], name: "index_households_on_organization_id"
+    t.index ["placing_organization_id"], name: "index_households_on_placing_organization_id"
+    t.index ["slug"], name: "index_households_on_slug", unique: true
+    t.index ["verification_status"], name: "index_households_on_verification_status"
+  end
+
+  create_table "line_items", force: :cascade do |t|
+    t.bigint "catalog_item_id"
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.bigint "donation_id"
+    t.string "link_url"
+    t.string "name", null: false
+    t.integer "price_in_cents", null: false
+    t.string "spec"
+    t.string "status", default: "open", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "wishlist_id", null: false
+    t.index ["catalog_item_id"], name: "index_line_items_on_catalog_item_id"
+    t.index ["deleted_at"], name: "index_line_items_on_deleted_at"
+    t.index ["donation_id"], name: "index_line_items_on_donation_id"
+    t.index ["status"], name: "index_line_items_on_status"
+    t.index ["wishlist_id"], name: "index_line_items_on_wishlist_id"
+  end
+
+# Could not dump table "organizations" because of following ArgumentError
+#   wrong number of arguments (given 2, expected 1)
+
+
+  create_table "payouts", force: :cascade do |t|
+    t.text "adjustment_note"
+    t.integer "amount_in_cents", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.bigint "event_id", null: false
+    t.string "gift_card_tracking_number"
+    t.text "hold_reason"
+    t.bigint "household_id", null: false
+    t.bigint "mailing_address_id"
+    t.string "method", default: "stripe", null: false
+    t.datetime "scheduled_for"
+    t.datetime "sent_at"
+    t.string "status", default: "blocked", null: false
+    t.string "stripe_transfer_id"
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_payouts_on_deleted_at"
+    t.index ["event_id"], name: "index_payouts_on_event_id"
+    t.index ["household_id", "event_id"], name: "index_payouts_on_household_id_and_event_id", unique: true
+    t.index ["household_id"], name: "index_payouts_on_household_id"
+    t.index ["mailing_address_id"], name: "index_payouts_on_mailing_address_id"
+    t.index ["status"], name: "index_payouts_on_status"
   end
 
   create_table "settings", force: :cascade do |t|
@@ -117,6 +300,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_035313) do
     t.string "last_name"
     t.datetime "last_sign_in_at"
     t.string "last_sign_in_ip"
+    t.bigint "organization_id"
     t.string "phone"
     t.string "preferred_language"
     t.datetime "remember_created_at"
@@ -130,6 +314,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_035313) do
     t.index ["ahoy_visit_id"], name: "index_users_on_ahoy_visit_id"
     t.index ["deleted_at"], name: "index_users_on_deleted_at"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["organization_id"], name: "index_users_on_organization_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role"], name: "index_users_on_role"
     t.index ["slug"], name: "index_users_on_slug", unique: true
@@ -146,6 +331,48 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_035313) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  create_table "wishlists", force: :cascade do |t|
+    t.datetime "approved_at"
+    t.text "caregiver_note"
+    t.bigint "child_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.bigint "event_id", null: false
+    t.string "interests", default: [], null: false, array: true
+    t.string "slug"
+    t.string "status", default: "draft", null: false
+    t.datetime "submitted_at"
+    t.datetime "updated_at", null: false
+    t.index ["child_id", "event_id"], name: "index_wishlists_on_child_id_and_event_id", unique: true
+    t.index ["child_id"], name: "index_wishlists_on_child_id"
+    t.index ["deleted_at"], name: "index_wishlists_on_deleted_at"
+    t.index ["event_id"], name: "index_wishlists_on_event_id"
+    t.index ["slug"], name: "index_wishlists_on_slug", unique: true
+    t.index ["status"], name: "index_wishlists_on_status"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "catalog_items", "categories"
+  add_foreign_key "children", "households"
+  add_foreign_key "donations", "events"
+  add_foreign_key "donations", "organizations", column: "storefront_organization_id"
+  add_foreign_key "donations", "users", column: "donor_id"
+  add_foreign_key "events", "organizations"
+  add_foreign_key "households", "addresses", column: "mailing_address_id"
+  add_foreign_key "households", "organizations"
+  add_foreign_key "households", "organizations", column: "placing_organization_id"
+  add_foreign_key "households", "users", column: "caregiver_id"
+  add_foreign_key "line_items", "catalog_items"
+  add_foreign_key "line_items", "donations"
+  add_foreign_key "line_items", "wishlists"
+  add_foreign_key "organizations", "addresses", column: "mailing_address_id"
+  add_foreign_key "organizations", "organizations", column: "parent_id"
+  add_foreign_key "organizations", "users", column: "primary_contact_id"
+  add_foreign_key "payouts", "addresses", column: "mailing_address_id"
+  add_foreign_key "payouts", "events"
+  add_foreign_key "payouts", "households"
+  add_foreign_key "users", "organizations"
+  add_foreign_key "wishlists", "children"
+  add_foreign_key "wishlists", "events"
 end

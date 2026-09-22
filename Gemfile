@@ -104,3 +104,6 @@ gem "pg_search"
 
 # Ordered lists
 gem "acts_as_list"
+
+# Denormalised counts
+gem "counter_culture", "~> 3.2"

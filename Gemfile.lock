@@ -139,6 +139,9 @@ GEM
     cgi (0.5.2)
     concurrent-ruby (1.3.8)
     connection_pool (3.0.2)
+    counter_culture (3.14.0)
+      activerecord (>= 4.2)
+      activesupport (>= 4.2)
     crass (1.0.7)
     dartsass-rails (0.5.1)
       railties (>= 6.0.0)
@@ -510,6 +513,7 @@ DEPENDENCIES
   brakeman
   bundler-audit
   capybara
+  counter_culture (~> 3.2)
   dartsass-rails
   debug
   devise

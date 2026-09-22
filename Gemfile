@@ -112,3 +112,6 @@ gem "counter_culture", "~> 3.2"
 gem "phonelib"
 gem "valid_email2", "~> 6.0"
 gem "validate_url"
+
+# Geocoding
+gem "geocoder", "~> 1.8", ">= 1.8.2"

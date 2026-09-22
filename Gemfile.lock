@@ -143,6 +143,7 @@ GEM
       activerecord (>= 4.2)
       activesupport (>= 4.2)
     crass (1.0.7)
+    csv (3.3.6)
     dartsass-rails (0.5.1)
       railties (>= 6.0.0)
       sass-embedded (~> 1.63)
@@ -176,6 +177,9 @@ GEM
     fugit (1.14.0)
       et-orbi (~> 1.4)
       raabro (~> 1.4)
+    geocoder (1.8.6)
+      base64 (>= 0.1.0)
+      csv (>= 3.0.0)
     globalid (1.4.0)
       activesupport (>= 6.1)
     google-protobuf (4.36.2)
@@ -527,6 +531,7 @@ DEPENDENCIES
   debug
   devise
   friendly_id (~> 5.4.0)
+  geocoder (~> 1.8, >= 1.8.2)
   image_processing (~> 1.2)
   importmap-rails
   jbuilder

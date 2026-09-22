@@ -66,3 +66,6 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+# Form builder with Bootstrap-aware wrappers
+gem "simple_form"

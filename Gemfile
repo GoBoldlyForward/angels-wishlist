@@ -85,3 +85,6 @@ gem "paper_trail"
 
 # Application settings
 gem "rails-settings-cached"
+
+# Slugs
+gem "friendly_id", "~> 5.4.0"

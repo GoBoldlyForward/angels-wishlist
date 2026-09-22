@@ -88,3 +88,6 @@ gem "rails-settings-cached"
 
 # Slugs
 gem "friendly_id", "~> 5.4.0"
+
+# Pagination
+gem "pagy"

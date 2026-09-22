@@ -251,9 +251,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_040012) do
     t.index ["wishlist_id"], name: "index_line_items_on_wishlist_id"
   end
 
-# Could not dump table "organizations" because of following ArgumentError
-#   wrong number of arguments (given 2, expected 1)
-
+  create_table "organizations", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.string "co_brand_line"
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.string "kind", default: "chapter", null: false
+    t.bigint "mailing_address_id"
+    t.string "name", null: false
+    t.bigint "parent_id"
+    t.bigint "primary_contact_id"
+    t.string "short_name"
+    t.string "slug"
+    t.string "stripe_account_id"
+    t.jsonb "theme", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.string "website_url"
+    t.index ["deleted_at"], name: "index_organizations_on_deleted_at"
+    t.index ["kind"], name: "index_organizations_on_kind"
+    t.index ["mailing_address_id"], name: "index_organizations_on_mailing_address_id"
+    t.index ["parent_id"], name: "index_organizations_on_parent_id"
+    t.index ["primary_contact_id"], name: "index_organizations_on_primary_contact_id"
+    t.index ["slug"], name: "index_organizations_on_slug", unique: true
+  end
 
   create_table "payouts", force: :cascade do |t|
     t.text "adjustment_note"

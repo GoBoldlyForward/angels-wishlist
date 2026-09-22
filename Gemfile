@@ -76,3 +76,6 @@ gem "bootstrap", "~> 5.3.3"
 
 # Authentication
 gem "devise"
+
+# Soft delete
+gem "paranoia"

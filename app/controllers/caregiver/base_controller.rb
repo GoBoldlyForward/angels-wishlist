@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-module Household
+module Caregiver
   class BaseController < ApplicationController
-    layout "household"
+    layout "caregiver"
 
     before_action :authenticate_user!
     before_action :require_caregiver

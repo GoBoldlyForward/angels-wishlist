@@ -7,7 +7,7 @@ Rails.application.routes.draw do
     root "dashboard#index"
   end
 
-  namespace :household do
+  namespace :caregiver do
     root "dashboard#index"
   end
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Household
+module Caregiver
   class DashboardController < BaseController
     def index
     end

@@ -82,3 +82,6 @@ gem "paranoia"
 
 # Audit history
 gem "paper_trail"
+
+# Application settings
+gem "rails-settings-cached"

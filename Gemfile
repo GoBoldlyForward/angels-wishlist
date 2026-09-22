@@ -79,3 +79,6 @@ gem "devise"
 
 # Soft delete
 gem "paranoia"
+
+# Audit history
+gem "paper_trail"

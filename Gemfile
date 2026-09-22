@@ -94,3 +94,7 @@ gem "pagy"
 
 # Visit and event tracking
 gem "ahoy_matey"
+
+# Attachments
+gem "active_storage_validations", "~> 1.1", ">= 1.1.3"
+gem "aws-sdk-s3", require: false

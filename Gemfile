@@ -124,3 +124,9 @@ gem "breadcrumbs_on_rails"
 gem "rack-attack"
 gem "rack-cors"
 gem "invisible_captcha"
+
+# Integrations
+gem "stripe"
+gem "httparty"
+gem "holidays"
+gem "roo"

@@ -22,7 +22,7 @@ HOUSEHOLD_STAFF_FACTS = {
   "h8"  => { agency: nil,                          verification: "pending",  payout: "none",      joined: 9 },
   "h9"  => { agency: "Faithbridge Foster Care",    verification: "verified", payout: "stripe",    joined: 2 },
   "h10" => { agency: "DFCS · Clayton",             verification: "hold",     payout: "stripe",    joined: 7,
-             hold_reason: "Placement change reported Nov 14. Confirming with the Clayton case manager before this household is paid out." },
+             hold_reason: "Placement change reported Nov 14. Confirming with the Clayton case manager before this household is paid out." }
 }.freeze
 
 CAREGIVER_NAMES = {
@@ -30,7 +30,7 @@ CAREGIVER_NAMES = {
   "Marcus V." => %w[Marcus Vance],  "Rosa D." => %w[Rosa Delgado],
   "Tamika W." => %w[Tamika Whitfield], "Carmen A." => %w[Carmen Alvarez],
   "Kofi B." => %w[Kofi Boateng], "Renee S." => %w[Renee Sinclair],
-  "Mai T." => %w[Mai Tran], "Pam W." => %w[Pam Whitaker],
+  "Mai T." => %w[Mai Tran], "Pam W." => %w[Pam Whitaker]
 }.freeze
 
 DONOR_EMAILS = {
@@ -44,7 +44,7 @@ DONOR_EMAILS = {
   "The Reyes family" => "reyes.household@example.com",
   "Buckhead Rotary" => "service@buckheadrotary.example.org",
   "The Ferrell family" => "ferrell4@example.com",
-  "Emory service group" => "volunteer@emory.example.edu",
+  "Emory service group" => "volunteer@emory.example.edu"
 }.freeze
 
 ActiveRecord::Base.transaction do

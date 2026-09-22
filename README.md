@@ -22,3 +22,11 @@ Things you may want to cover:
 * Deployment instructions
 
 * ...
+
+## Soft delete
+
+Models that soft-delete declare `acts_as_paranoid` and carry a `deleted_at` column with an index.
+
+`deleted_at` means gone. `archived_at` means hidden but still real. They are different states and
+most models want both: a household that left the program is archived, a household created by
+mistake is deleted.

@@ -101,3 +101,6 @@ gem "aws-sdk-s3", require: false
 
 # Full text search
 gem "pg_search"
+
+# Ordered lists
+gem "acts_as_list"

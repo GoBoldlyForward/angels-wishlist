@@ -107,3 +107,8 @@ gem "acts_as_list"
 
 # Denormalised counts
 gem "counter_culture", "~> 3.2"
+
+# Input validation
+gem "phonelib"
+gem "valid_email2", "~> 6.0"
+gem "validate_url"

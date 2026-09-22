@@ -301,6 +301,7 @@ GEM
     pg_search (2.4.0)
       activerecord (>= 8.0)
       activesupport (>= 8.0)
+    phonelib (0.10.27)
     popper_js (2.11.8)
     pp (0.6.4)
       prettyprint
@@ -471,11 +472,19 @@ GEM
       railties (>= 7.1.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    unicode-display_width (3.3.0)
-      unicode-emoji (~> 4.3)
-    unicode-emoji (4.3.0)
+    unicode-display_width (2.6.0)
+    unicode-emoji (3.7.0)
+      unicode-version (~> 1.0)
+    unicode-version (1.6.0)
     uri (1.1.1)
     useragent (0.16.11)
+    valid_email2 (6.0.0)
+      activemodel (>= 6.0)
+      mail (~> 2.5)
+      unicode-emoji (~> 3.7.0)
+    validate_url (1.0.15)
+      activemodel (>= 3.0.0)
+      public_suffix
     warden (1.2.9)
       rack (>= 2.0.9)
     web-console (4.3.0)
@@ -527,6 +536,7 @@ DEPENDENCIES
   paranoia
   pg (~> 1.1)
   pg_search
+  phonelib
   propshaft
   puma (>= 5.0)
   rails (~> 8.1.3, >= 8.1.3.1)
@@ -541,6 +551,8 @@ DEPENDENCIES
   thruster
   turbo-rails
   tzinfo-data
+  valid_email2 (~> 6.0)
+  validate_url
   web-console
 
 RUBY VERSION

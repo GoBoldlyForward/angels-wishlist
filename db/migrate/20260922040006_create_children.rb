@@ -6,9 +6,9 @@ class CreateChildren < ActiveRecord::Migration[8.1]
       t.references :household, null: false, foreign_key: true
 
       # The legal name never leaves staff and the child's own caregiver.
-      # The alias is what a donor sees, and it is assigned by the system.
+      # The display name is the alias a donor sees, assigned by the system.
       t.string :legal_first_name
-      t.string :alias, null: false
+      t.string :display_name, null: false
       t.date   :birthdate
       t.string :gender
 

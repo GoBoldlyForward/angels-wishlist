@@ -134,11 +134,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_040012) do
   end
 
   create_table "children", force: :cascade do |t|
-    t.string "alias", null: false
     t.datetime "archived_at"
     t.date "birthdate"
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
+    t.string "display_name", null: false
     t.string "gender"
     t.bigint "household_id", null: false
     t.string "legal_first_name"

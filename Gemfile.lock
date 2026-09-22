@@ -126,6 +126,9 @@ GEM
     breadcrumbs_on_rails (4.1.0)
       railties (>= 5.0)
     builder (3.3.0)
+    bullet (8.2.0)
+      activesupport (>= 3.0.0)
+      uniform_notifier (~> 1.11)
     bundler-audit (0.9.3)
       bundler (>= 1.2.0)
       thor (~> 1.0)
@@ -507,6 +510,7 @@ GEM
     unicode-emoji (3.7.0)
       unicode-version (~> 1.0)
     unicode-version (1.6.0)
+    uniform_notifier (1.18.0)
     uri (1.1.1)
     useragent (0.16.11)
     valid_email2 (6.0.0)
@@ -552,6 +556,7 @@ DEPENDENCIES
   bootstrap (~> 5.3.3)
   brakeman
   breadcrumbs_on_rails
+  bullet
   bundler-audit
   capybara
   counter_culture (~> 3.2)

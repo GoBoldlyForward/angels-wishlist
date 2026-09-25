@@ -22,7 +22,8 @@ bin/dev
 `bin/dev` runs the server and the Dart Sass watcher together. The seed builds one chapter, one
 partner skin, one event dated around today, and the twenty children across ten households that the
 prototype holds. Sign in as `staff@atlantaangels.example.org` with `password123`; every seeded
-caregiver uses the same password.
+caregiver uses the same password. Every seeded write runs as the user who would have made it, so
+the audit trail reads as caregivers building lists, Sam verifying and approving, and donors giving.
 
 ## The three scopes
 
@@ -69,7 +70,7 @@ and a controller namespace of the same name collides with it.
 | Payout default | the household's raised total for that event |
 | Payout overridden | amount differs from raised |
 | Unapplied general giving | the event's pool minus what top-ups have spent |
-| Who verified or approved | PaperTrail `whodunnit` |
+| Who verified or approved | PaperTrail `whodunnit`, the acting user's id, resolved by `Version#actor` |
 
 ## Rules worth knowing
 

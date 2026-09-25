@@ -4,6 +4,10 @@
 # event, and the twenty children across ten households that donor-side data.js
 # already holds. db/seeds/prototype.json is generated from that file, so the two
 # cannot drift.
+#
+# Each write runs as the user who would have made it, so the versions table
+# carries the same trail a real program would: caregivers build households and
+# lists, Sam verifies and approves, donors give.
 
 require "json"
 
@@ -51,7 +55,7 @@ ActiveRecord::Base.transaction do
   puts "Clearing existing records"
   # Users and organizations reference each other, so ordered deletes cannot
   # satisfy both constraints. Truncate resolves the cycle in one statement.
-  tables = %w[payouts line_items donations wishlists children households catalog_items
+  tables = %w[versions payouts line_items donations wishlists children households catalog_items
               categories events organizations users addresses friendly_id_slugs]
   ActiveRecord::Base.connection.execute("TRUNCATE #{tables.join(', ')} RESTART IDENTITY CASCADE")
 
@@ -70,9 +74,9 @@ ActiveRecord::Base.transaction do
   end
 
   puts "Staff"
-  User.create!(email: "staff@atlantaangels.example.org", password: "password123",
-               first_name: "Sam", last_name: "Reed", role: "staff", is_admin: true,
-               organization: angels)
+  staff = User.create!(email: "staff@atlantaangels.example.org", password: "password123",
+                       first_name: "Sam", last_name: "Reed", role: "staff", is_admin: true,
+                       organization: angels)
 
   puts "Event"
   # Dated relative to now so the seed always opens on a program mid-flight
@@ -111,17 +115,27 @@ ActiveRecord::Base.transaction do
                               city: row["area"].sub(" County", ""), state: "GA",
                               zipcode: format("30%03d", rand(1000)))
 
-    household = Household.create!(
-      organization: angels, placing_organization: facts[:agency] && agencies[facts[:agency]],
-      caregiver: caregiver, mailing_address: address,
-      display_name: row["name"], county: row["area"],
-      verification_status: facts[:verification],
-      verified_at: facts[:verification] == "verified" ? event.opened_at + (facts[:joined] + 1).days : nil,
-      hold_reason: facts[:hold_reason],
-      payout_method: facts[:payout],
-      stripe_account_id: facts[:payout] == "stripe" ? "acct_seed_#{row['id']}" : nil,
-      created_at: event.opened_at + facts[:joined].days
-    )
+    household = PaperTrail.request(whodunnit: caregiver.id) do
+      Household.create!(
+        organization: angels, placing_organization: facts[:agency] && agencies[facts[:agency]],
+        caregiver: caregiver, mailing_address: address,
+        display_name: row["name"], county: row["area"],
+        payout_method: facts[:payout],
+        stripe_account_id: facts[:payout] == "stripe" ? "acct_seed_#{row['id']}" : nil,
+        created_at: event.opened_at + facts[:joined].days
+      )
+    end
+
+    # A hold follows verification, so a held household shows both steps.
+    PaperTrail.request(whodunnit: staff.id) do
+      unless facts[:verification] == "pending"
+        household.update!(verification_status: "verified", verified_at: household.created_at + 1.day)
+      end
+      if facts[:verification] == "hold"
+        household.update!(verification_status: "hold", hold_reason: facts[:hold_reason])
+      end
+    end
+
     [ row["id"], household ]
   end
 
@@ -134,21 +148,28 @@ ActiveRecord::Base.transaction do
                           display_name: kid_row["alias"], gender: kid_row["gender"],
                           birthdate: Date.current.advance(years: -kid_row["age"], days: -30))
 
+    wishlist, lines = PaperTrail.request(whodunnit: household.caregiver_id) do
+      list = Wishlist.create!(child: child, event: event, status: "in_review",
+                              interests: kid_row["interests"], caregiver_note: kid_row["note"],
+                              submitted_at: household.created_at)
+      items = kid_row["items"].map do |item|
+        LineItem.create!(wishlist: list, catalog_item: catalog[item["catId"]], name: item["name"],
+                         spec: item["spec"], link_url: item["link"],
+                         price_in_cents: item["price"] * 100,
+                         status: household.verification_pending? ? "needs_review" : "open")
+      end
+      [ list, items ]
+    end
+
     # A household still awaiting verification has lists in review, not live.
-    status = household.verification_pending? ? "in_review" : "live"
-    wishlist = Wishlist.create!(child: child, event: event, status: status,
-                                interests: kid_row["interests"], caregiver_note: kid_row["note"],
-                                submitted_at: household.created_at,
-                                approved_at: status == "live" ? household.verified_at : nil)
+    next if household.verification_pending?
 
-    kid_row["items"].each do |item|
-      catalog_item = catalog[item["catId"]]
-      line = LineItem.create!(wishlist: wishlist, catalog_item: catalog_item, name: item["name"],
-                              spec: item["spec"], link_url: item["link"],
-                              price_in_cents: item["price"] * 100,
-                              status: status == "in_review" ? "needs_review" : "open")
+    PaperTrail.request(whodunnit: staff.id) do
+      wishlist.update!(status: "live", approved_at: household.verified_at)
+    end
 
-      next unless item["claimed"] && status == "live"
+    kid_row["items"].zip(lines).each do |item, line|
+      next unless item["claimed"]
 
       display = item["claimedBy"]
       anonymous = display == "Anonymous"
@@ -162,22 +183,24 @@ ActiveRecord::Base.transaction do
       end
 
       # A donor's gifts on one visit ride one charge, the way a cart would.
-      donation = donations[key]
-      if donation
-        donation.increment!(:gift_in_cents, line.price_in_cents)
-      else
-        donation = donations[key] = Donation.create!(
-          donor: donor, event: event, storefront_organization: angels,
-          gift_in_cents: line.price_in_cents, status: "succeeded",
-          display_name: anonymous ? nil : display, anonymous: anonymous,
-          payment_method_label: [ "Visa ••••4242", "Mastercard ••••5518", "Amex ••••3007" ].sample,
-          stripe_payment_intent_id: "pi_seed_#{SecureRandom.hex(8)}",
-          receipt_sent_at: Time.current
-        )
-      end
+      PaperTrail.request(whodunnit: donor.id) do
+        donation = donations[key]
+        if donation
+          donation.increment!(:gift_in_cents, line.price_in_cents)
+        else
+          donation = donations[key] = Donation.create!(
+            donor: donor, event: event, storefront_organization: angels,
+            gift_in_cents: line.price_in_cents, status: "succeeded",
+            display_name: anonymous ? nil : display, anonymous: anonymous,
+            payment_method_label: [ "Visa ••••4242", "Mastercard ••••5518", "Amex ••••3007" ].sample,
+            stripe_payment_intent_id: "pi_seed_#{SecureRandom.hex(8)}",
+            receipt_sent_at: Time.current
+          )
+        end
 
-      line.fund!(donation)
-      donation.update!(fee_in_cents: (donation.gift_in_cents * 0.03).round)
+        line.fund!(donation)
+        donation.update!(fee_in_cents: (donation.gift_in_cents * 0.03).round)
+      end
     end
   end
 
@@ -185,12 +208,14 @@ ActiveRecord::Base.transaction do
   [ [ "Priya S.", 100_00 ], [ "Buckhead Rotary", 500_00 ], [ "Emory service group", 250_00 ] ].each do |name, cents|
     donor = donors[name] || User.create!(email: DONOR_EMAILS.fetch(name), role: "donor",
                                          first_name: name.split.first, last_name: name.split.last)
-    Donation.create!(donor: donor, event: event, storefront_organization: angels,
-                     gift_in_cents: 0, general_gift_in_cents: cents,
-                     fee_in_cents: (cents * 0.03).round, status: "succeeded",
-                     display_name: name, payment_method_label: "Visa ••••1881",
-                     stripe_payment_intent_id: "pi_seed_#{SecureRandom.hex(8)}",
-                     receipt_sent_at: Time.current)
+    PaperTrail.request(whodunnit: donor.id) do
+      Donation.create!(donor: donor, event: event, storefront_organization: angels,
+                       gift_in_cents: 0, general_gift_in_cents: cents,
+                       fee_in_cents: (cents * 0.03).round, status: "succeeded",
+                       display_name: name, payment_method_label: "Visa ••••1881",
+                       stripe_payment_intent_id: "pi_seed_#{SecureRandom.hex(8)}",
+                       receipt_sent_at: Time.current)
+    end
   end
 
   puts "A donor note awaiting staff review"
@@ -202,4 +227,5 @@ end
 puts ""
 puts "Seeded #{Organization.count} organizations, #{User.count} users, #{Household.count} households,"
 puts "        #{Child.count} children, #{Wishlist.count} lists, #{LineItem.count} line items,"
-puts "        #{LineItem.funded.count} of them funded, across #{Donation.count} donations."
+puts "        #{LineItem.funded.count} of them funded, across #{Donation.count} donations,"
+puts "        with #{Version.count} versions in the audit trail."

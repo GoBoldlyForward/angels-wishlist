@@ -3,6 +3,7 @@
 class Wishlist < ApplicationRecord
   extend FriendlyId
   acts_as_paranoid
+  has_paper_trail only: %i[status submitted_at approved_at caregiver_note interests]
 
   belongs_to :child
   belongs_to :event

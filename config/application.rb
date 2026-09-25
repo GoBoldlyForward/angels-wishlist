@@ -23,6 +23,9 @@ module AngelsWishlist
     #
     config.time_zone = "Eastern Time (US & Canada)"
 
+    # PaperTrail stores versions as YAML, and Psych only loads these classes back.
+    config.active_record.yaml_column_permitted_classes = [ Symbol, Date, Time, ActiveSupport::TimeWithZone, BigDecimal ]
+
     config.generators do |g|
       g.stylesheets false
       g.javascripts false

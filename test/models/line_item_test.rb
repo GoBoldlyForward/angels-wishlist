@@ -51,4 +51,21 @@ class LineItemTest < ActiveSupport::TestCase
 
     assert_equal [ open_line.id ], wishlist.line_items.shoppable.pluck(:id)
   end
+  test "changing a line status records who changed it" do
+    line = build_line_item(status: "needs_review")
+    staff = users(:staff)
+
+    PaperTrail.request(whodunnit: staff.id) { line.update!(status: "open") }
+
+    assert_equal staff, line.versions.last.actor
+    assert_equal [ "needs_review", "open" ], line.versions.last.changeset["status"]
+  end
+
+  test "funding a line is not an audited change" do
+    line = build_line_item
+
+    assert_no_difference -> { line.versions.count } do
+      line.fund!(build_donation(event: line.wishlist.event))
+    end
+  end
 end

@@ -43,4 +43,15 @@ class DonationTest < ActiveSupport::TestCase
   test "a donation is addressed by uuid rather than its id" do
     assert_equal 36, build_donation(event: build_event).to_param.length
   end
+  test "approving a note records who approved it" do
+    donation = build_donation(event: build_event, note_to_family: "Could you send a photo?")
+    staff = users(:staff)
+
+    PaperTrail.request(whodunnit: staff.id) { donation.approve_note! }
+
+    before, after = donation.versions.last.changeset["note_approved_at"]
+    assert_equal staff, donation.versions.last.actor
+    assert_nil before
+    assert_not_nil after
+  end
 end

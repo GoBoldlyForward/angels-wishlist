@@ -2,6 +2,7 @@
 
 class LineItem < ApplicationRecord
   acts_as_paranoid
+  has_paper_trail only: %i[status]
 
   belongs_to :wishlist
   belongs_to :catalog_item, optional: true

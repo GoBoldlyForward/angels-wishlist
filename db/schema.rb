@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_22_040012) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_25_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -347,6 +347,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_22_040012) do
     t.bigint "item_id", null: false
     t.string "item_type", null: false
     t.text "object"
+    t.jsonb "object_changes"
     t.string "whodunnit"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end

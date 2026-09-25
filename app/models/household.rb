@@ -4,6 +4,7 @@ class Household < ApplicationRecord
   extend FriendlyId
   include PgSearch::Model
   acts_as_paranoid
+  has_paper_trail only: %i[verification_status verified_at hold_reason]
 
   belongs_to :organization
   belongs_to :placing_organization, class_name: "Organization", optional: true

@@ -2,6 +2,7 @@
 
 class Donation < ApplicationRecord
   acts_as_paranoid
+  has_paper_trail only: %i[note_approved_at]
 
   belongs_to :donor, class_name: "User"
   belongs_to :event

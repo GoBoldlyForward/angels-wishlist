@@ -64,4 +64,29 @@ class WishlistTest < ActiveSupport::TestCase
 
     assert_raises(ActiveRecord::RecordNotUnique) { duplicate.save!(validate: false) }
   end
+  test "editing a live list records who edited it and what changed" do
+    wishlist = build_wishlist(status: "live", approved_at: Time.current, caregiver_note: "She loves to draw.")
+    caregiver = wishlist.household.caregiver
+
+    PaperTrail.request(whodunnit: caregiver.id) do
+      wishlist.update!(caregiver_note: "She started cooking dinner on Sundays.")
+    end
+
+    version = wishlist.versions.last
+    assert_equal caregiver, version.actor
+    assert_equal "live", version.reify.status
+    assert_equal [ "live", "in_review" ], version.changeset["status"]
+    assert_equal [ "She loves to draw.", "She started cooking dinner on Sundays." ],
+                 version.changeset["caregiver_note"]
+  end
+
+  test "approving a list records who approved it" do
+    wishlist = build_wishlist(status: "in_review")
+    staff = users(:staff)
+
+    PaperTrail.request(whodunnit: staff.id) { wishlist.approve! }
+
+    assert_equal staff, wishlist.versions.last.actor
+    assert_equal [ "in_review", "live" ], wishlist.versions.last.changeset["status"]
+  end
 end

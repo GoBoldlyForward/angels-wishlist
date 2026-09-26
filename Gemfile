@@ -114,7 +114,7 @@ gem "counter_culture", "~> 3.2"
 
 # Input validation
 gem "phonelib"
-gem "valid_email2", "~> 6.0"
+gem "valid_email2", "~> 7.1"
 gem "validate_url"
 
 # Geocoding

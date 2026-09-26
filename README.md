@@ -93,6 +93,22 @@ Models that soft-delete declare `acts_as_paranoid` and carry a `deleted_at` colu
 most models want both: a household that left the program is archived, a household created by
 mistake is deleted.
 
+## Deployment
+
+Production runs on Heroku as `angels-wishlist` in the `goboldlyforward` team, on one Postgres
+add-on. Solid Queue, Solid Cache, and Solid Cable share the primary database, so their tables live
+in `db/schema.rb` like any other, and `SOLID_QUEUE_IN_PUMA=true` runs the job supervisor inside the
+web dyno rather than paying for a worker. The `release` phase in the `Procfile` migrates on every
+deploy.
+
+The app is connected to this GitHub repository. Every merge to `main` deploys automatically once
+CI passes; nothing else needs to be pushed to Heroku by hand.
+
+```
+heroku logs --tail -a angels-wishlist
+heroku run bin/rails console -a angels-wishlist
+```
+
 ## TODO before this runs anywhere real
 
 - [ ] **Font Awesome.** Add the kit script and confirm the category icons render. The seeded
@@ -104,8 +120,6 @@ mistake is deleted.
       and `AWS_BUCKET`. Production Active Storage already points at the `amazon` service.
 - [ ] **Stripe.** Set `STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY`, and `STRIPE_WEBHOOK_SECRET`.
       Payment Intents for donations, Connect for caregiver payouts.
-- [ ] **Heroku.** Create the app, add Postgres, and note that Rails 8 puts Solid Queue, Solid Cache,
-      and Solid Cable on separate databases. Either provision them or point all four at the primary.
 - [ ] **Donor-facing copy.** The prototype promises a January note back to donors and says general
       giving goes to the furthest-behind lists automatically. Neither is true under this plan.
       Both are Christie's call before anything is rewritten.

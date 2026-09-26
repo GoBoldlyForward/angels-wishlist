@@ -91,7 +91,7 @@ gem "paper_trail"
 gem "rails-settings-cached"
 
 # Slugs
-gem "friendly_id", "~> 5.4.0"
+gem "friendly_id", "~> 5.7.0"
 
 # Pagination
 gem "pagy"

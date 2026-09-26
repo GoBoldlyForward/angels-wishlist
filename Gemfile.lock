@@ -184,7 +184,7 @@ GEM
     ffi (1.17.4-arm64-darwin)
     ffi (1.17.4-x86_64-linux-gnu)
     ffi (1.17.4-x86_64-linux-musl)
-    friendly_id (5.4.2)
+    friendly_id (5.7.0)
       activerecord (>= 4.0.0)
     fugit (1.14.0)
       et-orbi (~> 1.4)
@@ -578,7 +578,7 @@ DEPENDENCIES
   devise
   dotenv-rails
   faker
-  friendly_id (~> 5.4.0)
+  friendly_id (~> 5.7.0)
   geocoder (~> 1.8, >= 1.8.2)
   holidays
   httparty

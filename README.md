@@ -28,7 +28,7 @@ bin/dev
 
 `bin/dev` runs the server and the Dart Sass watcher together. The seed builds one chapter, one
 partner skin, one event dated around today, and the twenty children across ten households that the
-prototype holds. Sign in as `staff@atlantaangels.example.org` with `password123`; every seeded
+prototype holds, with each list fitted to the $200 cap. Sign in as `staff@atlantaangels.example.org` with `password123`; every seeded
 caregiver uses the same password. Every seeded write runs as the user who would have made it, so
 the audit trail reads as caregivers building lists, Sam verifying and approving, and donors giving.
 

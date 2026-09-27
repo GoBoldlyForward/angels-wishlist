@@ -16,7 +16,7 @@ and both describe rules the program no longer follows. Neither should be built f
 | Step | State |
 | --- | --- |
 | Foundation: schema, models, seeds, tests, deploy | Built |
-| 1. Bring the foundation in line with the prototype | Not started |
+| 1. Bring the foundation in line with the prototype | Started. The seeds fit the cap. The models are unchanged |
 | 2. Staff setup: organizations, events, categories, catalog | Not started |
 | 3. Caregiver intake | Not started |
 | 4. Staff review | Not started |
@@ -181,7 +181,7 @@ The models were written against the earlier rules. Correct them before anything 
 
 | Area | Now | Change to |
 | --- | --- | --- |
-| Cap | `Wishlist#over_cap?` flags a list and allows it. Seeded at $300 | A line that would put its list over the cap is invalid. Seeded at $200 |
+| Cap | `Wishlist#over_cap?` flags a list and allows it | A line that would put its list over the cap is invalid |
 | Payout amount | Defaults to what the household's own lists raised | The household's share of the pool |
 | General giving | `Event` tracks a pool that staff overrides draw on | Part of the one pool. Remove the top-up methods |
 | Payout override | A differing amount requires a note | No override. See decision 2 |
@@ -191,7 +191,9 @@ The models were written against the earlier rules. Correct them before anything 
 | Enrollment | No table | Add it, with the spending agreement and the Love Box |
 | Love Box options | None | Seed the eleven groups from the prototype onto the event |
 | Aliases | Set by whoever creates the child | Assigned from a name pool, unique among active children |
-| Seeds | 18 of 20 lists exceed $200 | Trim each list to fit |
+
+The seeds already fit every list to the $200 cap. The prototype's own data does not, so
+`db/seeds.rb` keeps funded gifts, then gifts naming a brand or size, then the least expensive.
 
 **Done when** the model tests cover the cap, the funded ratio, a withdrawn list leaving the total,
 rounding that sums to the pool, and a list from an unverified household staying private.

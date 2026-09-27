@@ -1,0 +1,25 @@
+<%# locals: run %>
+<% if run.rows.empty? %>
+  <div class="drawer-note mb-3">No household has a live list from a verified home yet, so there is nothing to pay out.</div>
+<% else %>
+  <div class="alert <%= run.balanced? ? "alert-success" : "alert-warning" %> d-flex gap-2 align-items-start" role="status">
+    <i class="bi <%= run.balanced? ? "bi-check-circle" : "bi-exclamation-triangle" %>"></i>
+    <div>
+      <strong>
+        <%= pluralize(run.rows.size, "payout") %> add up to <%= money_exact run.total_in_cents %>.
+        The pool is <%= money_exact run.pool_in_cents %>.
+      </strong>
+      <% if run.balanced? %>
+        They match to the cent.
+      <% else %>
+        They are <%= money_exact run.difference_in_cents.abs %> <%= run.difference_in_cents.positive? ? "short of" : "over" %> the pool.
+      <% end %>
+
+      <% if !run.built? %>
+        Nothing is built yet. These are the shares as they stand now.
+      <% elsif !run.current? %>
+        <%= pluralize(run.unbuilt_count + run.stale_count, "payout") %> no longer match the pool or the household. Build payouts again to bring them up to date.
+      <% end %>
+    </div>
+  </div>
+<% end %>

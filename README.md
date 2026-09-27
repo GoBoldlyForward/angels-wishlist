@@ -1,8 +1,12 @@
 # Atlanta Angels · Wish List
 
 A gift-list program that looks like shopping and settles like cash. Donors browse a catalog and
-fund specific gifts for specific children. The money goes to the caregiver, who buys the gift in
-the right size, in the right week, or buys what the child actually needs if the list has aged out.
+choose gifts that specific children asked for. Everything raised is pooled, spread evenly across
+every child's list, and paid to caregivers, who buy the gift in the right size, in the right week,
+or buy what the child actually needs if the list has aged out.
+
+The plan for building this as a real application, and a screen-by-screen reference to this
+prototype, live on the `main` branch in `docs/build-plan.md` and `docs/prototype.md`.
 
 Open `index.html` by double clicking it. No server needed.
 Registered as `angels-wishlist` on port 5201.
@@ -80,8 +84,9 @@ household, price, and funder, because all of it comes from `data.js`.
 caregiver.html                         index.html
   your home                              browse gifts, by child,
   the children (name, age, gender)       still unfunded, give any amount
-  their lists  (name, price, link)             ↓
-  getting paid (Stripe, or gift card)      cart → review → give
+  the love box (one per household)             ↓
+  their lists  (name, price, link)         cart → review → give
+  getting paid (Stripe, or gift card)
   review and submit ──────────────────→  the lists a donor shops
 ```
 
@@ -90,6 +95,17 @@ child, and then gifts as free text with a price and an optional link. It does
 **not** ask for the agency, the case manager, clothing sizes, or a stand-in
 name: the alias is assigned by the system, so a caregiver is never asked to
 invent one for a child in their care.
+
+A list is capped at $200 per child. A gift that would put it over is refused, with a note saying
+how much room is left.
+
+Every household also customizes a holiday Love Box: one pick from each of eleven groups, a second
+pick for snacks, and a second pick for treats and games in households with more than five
+children. Volunteers assemble it and deliver it with the holiday visit. It is separate from the
+gift funds.
+
+Before submitting, the caregiver agrees to spend the funds on holiday gifts for the child each
+list is for.
 
 A typed gift still tries to land on a catalog product. Type "Hoodie" and it
 joins the eight-child hoodie group with its photo; type something the catalog
@@ -105,8 +121,8 @@ view marked **New**. That is the whole loop in one prototype. To reset the demo,
 
 Five children asking for a hoodie is one hoodie tile that needs five. The donor sees `4 needed`
 on the tile, opens it, and chooses a quantity with a stepper capped at what is actually left. Each
-one they fund is assigned to a specific child and named on the receipt, so aggregation happens in
-the browsing layer and never in the accounting.
+one they fund is recorded against one child's line and shows on the receipt, so aggregation happens
+in the browsing layer and never in the record of what was chosen.
 
 Grouping keys on the catalog id, which is what makes the generic and the specific coexist:
 
@@ -123,9 +139,8 @@ Fund the Nike line and the tile drops to three needed. Fund two from the pool an
 Same counter either way, which is the behaviour a donor expects and the reason the two kinds of
 request cannot live in separate tiles.
 
-On the caregiver side this is one optional field under each gift they pick: *brand, size, or color?*
-Leaving it blank puts the gift in the pool, which funds faster. Filling it in gives the child their
-own line. The form says exactly that, because it is a real tradeoff the caregiver should get to make.
+The caregiver flow does not ask for a brand or size. A gift typed there joins the pool for its
+product or becomes a line of its own. The specific requests in the demo come from the seeded data.
 
 ## The donor home
 
@@ -272,13 +287,13 @@ onboarding, which is where the identity and account details would actually live.
 ## What the site does and does not claim
 
 Three things are said plainly and often: every family is **verified by Atlanta Angels**, every gift
-was **added by a caregiver for a specific child**, and funds go to the household. A trust strip under
-the hero carries all three.
+was **added by a caregiver for a specific child**, and everything raised is **pooled and spread
+evenly**, so each list is funded to the same share and each household is paid its part.
 
 What the site deliberately stops short of is promising that your $65 buys that particular coat for
 that particular child. It cannot: the money is a donation to Atlanta Angels, and the org holds final
-discretion, which is the condition of it being deductible. So the verbs are *recorded against*,
-*directed to*, *goes toward*, never *buys*. The one place that gets spelled out in full is the FAQ.
+discretion, which is the condition of it being deductible. So the verbs are *shows on your receipt*,
+*goes toward*, *goes into the pool*, never *buys*. The one place that gets spelled out in full is the FAQ.
 Everywhere else it is simply not overclaimed, which is a copy discipline rather than a disclaimer.
 
 ## The FAQ is not decoration
@@ -291,37 +306,55 @@ plainly that every detail about a child comes from their caregiver, that Angels 
 placement and reads the lists, and that this is alignment rather than certainty.
 
 The FAQ also answers the things a nonprofit is tempted to leave vague: what happens to an underfunded
-list, how spending is actually verified (receipts and follow-up, not a locked card), and what a donor
-hears back.
+list (it receives the same share as every other list), how spending is verified (a relationship
+and a signed agreement, not receipts or a locked card), and what a donor hears back (a thank-you
+and an impact statement in January).
 
 ## Privacy
 
 Donors see an alias, an age, girl or boy, a county, the interests the caregiver typed, and one
 sentence about the child. They never see a legal name, a photograph, a size, a school, an address,
-or anything about the case. Sizes are not collected at all: a caregiver names a size only when they
-want one specific gift bought a specific way, as free text on that single line. The review step shows
-the caregiver exactly what a donor will and will not see, in the caregiver's own words about their
-own child.
+or anything about the case. Sizes are not collected at all. The review step shows the caregiver
+exactly what a donor will and will not see, in the caregiver's own words about their own child.
 
 ## What is real and what is faked
 
 Real: the full donor browse, filter, cart, checkout, and confirmation; product grouping with
-quantity funding and brand-specific lines; the full caregiver flow across five steps including the
-picker, per-gift detail field, and per-child totals; the handoff between the two sides.
+quantity funding and brand-specific lines; the full caregiver flow across six steps including the
+Love Box, the $200 cap, per-child totals, and the spending agreement; the handoff between the two
+sides.
 
 Faked: payments, Stripe onboarding, agency verification, email and text, and the seeded twenty
 children across ten households. Prices are plausible metro-Atlanta numbers, not researched ones.
 
-## Open questions for Atlanta Angels
+## What Atlanta Angels decided
 
-1. **The cap.** The caregiver side suggests $300 per child and lets a list go over. Is that the
-   right number, and should over-cap lists be allowed at all?
-2. **Receipts.** The flow promises caregivers upload receipts. Is that enforced, spot-checked,
-   or dropped? It is the main accountability lever and also the main friction.
-3. **Partial funding.** The FAQ currently states that a household receives whatever its list
-   raised, and that general giving goes to the furthest-behind lists first. Confirm that is the
-   real policy before this copy goes anywhere near a donor.
-4. **What the donor hears back.** The prototype promises one note in January with no child photos.
-   That is a real operational commitment for a small staff.
-5. **Aging-out lists.** Darius, 17, has a $700 list because driver's ed is on it. Big-ticket
-   practical items may deserve their own lane rather than competing with toys.
+The prototype first shipped with five open questions. Four are answered.
+
+| Question | Answer |
+| --- | --- |
+| The cap | $200 per child. A list cannot go over |
+| Receipts | Caregivers are not asked for them. They agree in the flow to spend the funds on the child |
+| Partial funding | Everything raised is pooled and spread evenly, so every list is funded to the same percentage |
+| What the donor hears back | A thank-you and an impact statement in January, with no photos of children's faces |
+
+Still open: **aging-out lists.** Big-ticket practical items such as driver's ed no longer fit
+under the cap at all. They may deserve their own lane.
+
+## Known inconsistencies
+
+The donor FAQ and the caregiver flow carry the decisions above. These parts do not yet.
+
+| Where | What it still says |
+| --- | --- |
+| Checkout panel and confirmation | "Recorded, not pooled", and that funds go to the chosen household |
+| Give any amount, cart, and checkout | General gifts go to the furthest-behind or closest-to-complete lists |
+| Checkout confirmation and caregiver confirmation | A January note written by the household |
+| Checkout | Promises an emailed receipt without asking for an email address |
+| Donor footer, FAQ, and By child tab | Aliases are chosen by each caregiver. The system assigns them |
+| Child dialog and checkout | Shows the household name and the caregiver's first name and last initial |
+| Caregiver flow | Promises text messages |
+| Staff side | A $300 cap with an over-the-cap flag, a payout equal to what the household's own lists raised, "Direct general giving here", and "January note list" |
+| Staff side | No mention of the Love Box |
+| Seed data | 18 of the 20 lists ask for more than $200 |
+| Partner skin | Category pages and the checkout redirect fall back to the Angels skin |

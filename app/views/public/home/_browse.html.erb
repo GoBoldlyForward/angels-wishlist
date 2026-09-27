@@ -1,0 +1,59 @@
+<%# locals: (catalog:, filters:) -%>
+<%= render "public/shared/filters", filters: filters, categories: catalog.categories,
+           url: ->(query) { root_path(query.merge(anchor: "shop")) } %>
+
+<% if filters.any? %>
+  <% products = catalog.products(filters) %>
+  <div class="sec">
+    <div class="sec-head">
+      <div>
+        <h2><%= pluralize products.size, "gift" %> <%= products.one? ? "matches" : "match" %></h2>
+        <p><%= catalog.open_gifts(filters).size %> still needed across them</p>
+      </div>
+    </div>
+    <div class="grid">
+      <% if products.any? %>
+        <%= render partial: "public/shared/product_tile", collection: products, as: :product %>
+      <% else %>
+        <p class="muted">Nothing matches yet. Try widening the price range.</p>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <%= render "shelves", catalog: catalog %>
+
+  <% catalog.categories.each do |category| %>
+    <% gifts = catalog.category_gifts(category) %>
+    <% next if gifts.empty? %>
+    <% products = Storefront::Product.group(gifts) %>
+    <div class="sec reveal" data-controller="shop-reveal">
+      <div class="sec-head">
+        <div>
+          <h2><i class="fa-solid <%= category.icon %> t-md sec-icon" aria-hidden="true"></i><%= category.name %></h2>
+          <p><%= gifts.count { |gift| !gift.funded? } %> still needed · from <%= money gifts.map(&:price_in_cents).min %></p>
+        </div>
+        <%= link_to category_path(category), class: "sec-link" do %>
+          See all <%= products.size %> <i class="fa-solid fa-chevron-right t-2xs" aria-hidden="true"></i>
+        <% end %>
+      </div>
+      <div class="rail">
+        <%= render partial: "public/shared/product_tile", collection: products.sort_by { |product| product.open.any? ? 0 : 1 }, as: :product %>
+      </div>
+    </div>
+  <% end %>
+
+  <% custom = catalog.custom_products %>
+  <% if custom.any? %>
+    <div class="sec reveal" data-controller="shop-reveal">
+      <div class="sec-head">
+        <div>
+          <h2><i class="fa-solid fa-pen t-md sec-icon" aria-hidden="true"></i>Written in by a caregiver</h2>
+          <p><%= custom.sum { |product| product.open.size } %> still needed · requests that are not in the catalog</p>
+        </div>
+      </div>
+      <div class="rail">
+        <%= render partial: "public/shared/product_tile", collection: custom.sort_by { |product| product.open.any? ? 0 : 1 }, as: :product %>
+      </div>
+    </div>
+  <% end %>
+<% end %>

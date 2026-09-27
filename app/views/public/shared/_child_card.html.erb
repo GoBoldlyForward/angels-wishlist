@@ -1,0 +1,29 @@
+<%# locals: (child:) -%>
+<% left = child.left %>
+<%= link_to child_path(child.key), class: "kid-card", data: { turbo_frame: "modal" },
+            aria: { label: "#{child}. See their list." } do %>
+  <div class="kid-top">
+    <%= avatar child.alias_name %>
+    <div>
+      <div class="kid-name"><%= child %></div>
+      <div class="kid-meta"><%= child.meta %></div>
+    </div>
+    <% if child.new_this_week? %><span class="tag tag-new">New</span><% end %>
+  </div>
+  <div class="tags">
+    <% child.interests.first(3).each do |interest| %><span class="tag"><%= interest %></span><% end %>
+  </div>
+  <div class="bar <%= "done" if child.percent_chosen >= 100 %>"><i style="width:<%= child.percent_chosen %>%"></i></div>
+  <div class="fund-line">
+    <span><b><%= money child.chosen_in_cents %></b> of <%= money child.asked_in_cents %> chosen</span>
+    <span>
+      <% if left.any? %>
+        <%= pluralize left.size, "gift" %> left
+      <% elsif child.in_cart.any? %>
+        In your cart
+      <% else %>
+        Complete
+      <% end %>
+    </span>
+  </div>
+<% end %>

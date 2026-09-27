@@ -1,0 +1,20 @@
+<%# locals: (catalog:, filters:) -%>
+<% children = catalog.children.select { |child| filters.matches_child?(child) } %>
+<%= render "public/shared/filters", filters: filters, only: %i[gender age],
+           url: ->(query) { root_path(query.merge(tab: "children", anchor: "shop")) } %>
+
+<div class="sec">
+  <div class="sec-head">
+    <div>
+      <h2><%= pluralize children.size, "child" %> waiting on a list</h2>
+      <p>Names are stand-ins that <%= current_chapter&.name || "Atlanta Angels" %> assigns. Choose a child to see everything they asked for.</p>
+    </div>
+  </div>
+  <div class="grid grid-wide">
+    <% if children.any? %>
+      <%= render partial: "public/shared/child_card", collection: children, as: :child %>
+    <% else %>
+      <p class="muted">No child matches those filters yet.</p>
+    <% end %>
+  </div>
+</div>

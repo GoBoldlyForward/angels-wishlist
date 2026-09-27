@@ -1,0 +1,24 @@
+<%# locals: (season:) -%>
+<div class="season">
+  <div class="season-top">
+    <div class="season-raised">
+      <%= money season.raised_in_cents %> <span>of <%= money season.goal_in_cents %> for this year's lists</span>
+    </div>
+    <% if season.closes_on %>
+      <span class="season-deadline">
+        <i class="fa-regular fa-clock" aria-hidden="true"></i>
+        <%= season.open? ? "Closes" : "Closed" %> <%= season.closes_on.strftime("%B %-d") %>
+      </span>
+    <% end %>
+  </div>
+  <div class="season-bar" role="progressbar" aria-label="Raised so far" aria-valuemin="0" aria-valuemax="100"
+       aria-valuenow="<%= season.percent %>">
+    <i style="width:<%= season.bar_width %>%"></i>
+  </div>
+  <div class="season-legs">
+    <div class="season-leg"><b><%= season.gifts_chosen %></b>gifts chosen</div>
+    <div class="season-leg"><b><%= season.children_with_lists %></b>children with lists</div>
+    <div class="season-leg"><b><%= season.lists_finished %></b>lists finished</div>
+    <div class="season-leg"><b><%= season.percent %>%</b>of the way there</div>
+  </div>
+</div>

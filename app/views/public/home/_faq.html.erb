@@ -1,0 +1,19 @@
+<section class="faq" id="faq">
+  <div class="container section-narrow">
+    <span class="tag tag-accent">Read this part</span>
+    <h2 class="section-title text-balance">Questions people ask before they give</h2>
+    <p class="t-md m-0">
+      Short version: you are choosing a gift, and what actually moves is a donation to
+      <%= current_chapter&.name || "Atlanta Angels" %>. We value transparency and honesty. All of your
+      questions are answered below.
+    </p>
+    <div class="faq-list">
+      <% content.faqs.each do |faq| %>
+        <details class="faq-item">
+          <summary><%= faq.question %></summary>
+          <p><%= faq.answer %></p>
+        </details>
+      <% end %>
+    </div>
+  </div>
+</section>

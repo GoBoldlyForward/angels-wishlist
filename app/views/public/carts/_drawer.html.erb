@@ -1,0 +1,16 @@
+<div class="scrim" data-cart-drawer-target="scrim" data-action="click->cart-drawer#close"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" hidden
+       data-cart-drawer-target="drawer" data-action="keydown->cart-drawer#keepFocus">
+  <div class="drawer-hd">
+    <h3 class="t-lg" id="drawerTitle">Your cart</h3>
+    <button class="x" type="button" aria-label="Close" data-action="cart-drawer#close" data-cart-drawer-target="close">
+      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+    </button>
+  </div>
+  <div class="drawer-bd">
+    <%= render "public/carts/lines" %>
+  </div>
+  <div class="drawer-ft">
+    <%= render "public/carts/summary" %>
+  </div>
+</aside>

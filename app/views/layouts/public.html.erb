@@ -5,16 +5,22 @@
     <meta name="description" content="Browse gift lists written by caregivers for children navigating foster care in metro Atlanta. Every gift is a donation to Atlanta Angels.">
     <%= render "layouts/head" %>
     <%= render "layouts/storefront_styles", organization: current_storefront %>
+    <%= stylesheet_link_tag "storefront", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     <%= pinpoint_widget %>
   </head>
 
-  <body>
+  <body data-controller="cart-drawer shop-modal"
+        data-cart-drawer-open-value="<%= open_cart? && controller_name != "carts" %>"
+        data-action="keydown.esc->cart-drawer#close keydown.esc->shop-modal#close click->shop-modal#remember turbo:before-cache@document->shop-modal#close turbo:before-cache@document->cart-drawer#close">
     <%= test_payments_banner %>
+    <% content_for :header_actions do %><%= render "public/carts/button" %><% end %>
     <%= render "shared/storefront_header" %>
     <% if flash.any? %><div class="container"><%= render "shared/flash" %></div><% end %>
     <%= yield %>
     <%= render "shared/storefront_footer" %>
+    <%= render "public/carts/drawer" %>
+    <%= render "public/shared/modal" %>
     <%= yield :overlays %>
   </body>
 </html>

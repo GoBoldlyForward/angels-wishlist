@@ -6,8 +6,35 @@
 
   <nav class="sidebar-nav">
     <div class="nav-section-label">Program</div>
-    <%= link_to admin_root_path, class: [ "nav-link", ("active" if current_page?(admin_root_path)) ] do %>
-      <i class="bi bi-grid-1x2"></i><span>Overview</span>
+    <%= nav_item "Overview", admin_root_path, icon: "grid-1x2" %>
+
+    <div class="nav-section-label">Families</div>
+    <%= nav_item "Households", admin_households_path, icon: "house-heart" %>
+    <%= nav_item "Wishlists", admin_wishlists_path, icon: "list-check" %>
+    <%= nav_item "Line items", admin_line_items_path, icon: "gift" %>
+    <%= nav_item "Love Boxes", admin_love_box_path, icon: "box2-heart" %>
+
+    <div class="nav-section-label">Funding</div>
+    <%= nav_item "Donors", admin_donors_path, icon: "people" %>
+    <%= nav_item "Donations", admin_donations_path, icon: "receipt" %>
+    <%= nav_item "Payouts", admin_payouts_path, icon: "bank" %>
+
+    <div class="nav-section-label">Inbox</div>
+    <%= nav_item "Needs review", admin_inbox_path, icon: "inbox", count: Admin::Inbox.new(current_event).count, tone: "danger" %>
+    <%= nav_item "Audit trail", admin_versions_path, icon: "clock-history" %>
+
+    <div class="nav-section-label">Setup</div>
+    <%= nav_item "Events", admin_events_path, icon: "calendar-event" %>
+    <%= nav_item "Categories", admin_categories_path, icon: "tags" %>
+    <%= nav_item "Catalog", admin_catalog_items_path, icon: "bag" %>
+    <%= nav_item "Organizations", admin_organizations_path, icon: "building" %>
+
+    <div class="nav-section-label">The donor site</div>
+    <%= link_to root_path, class: "nav-link", target: "_blank", rel: "noopener" do %>
+      <i class="bi bi-shop"></i><span>Open the shop</span>
+    <% end %>
+    <%= link_to caregiver_root_path, class: "nav-link", target: "_blank", rel: "noopener" do %>
+      <i class="bi bi-pencil-square"></i><span>Caregiver flow</span>
     <% end %>
   </nav>
 
@@ -16,7 +43,7 @@
       <div class="season-label"><%= current_event.name %></div>
       <div class="season-value"><%= money(current_event.raised_in_cents) %> of <%= money(current_event.goal_in_cents) %></div>
       <div class="season-bar"><i style="width:<%= [ current_event.percent_funded, 100 ].min %>%"></i></div>
-      <div class="season-note"><%= current_event.percent_funded %>% there · <%= pluralize(current_event.days_remaining, "day") %> left</div>
+      <div class="season-note"><%= current_event.percent_funded %>% there · <%= pluralize(current_event.days_remaining.to_i, "day") %> left</div>
     </div>
   <% end %>
 </aside>

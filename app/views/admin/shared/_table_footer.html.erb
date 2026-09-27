@@ -1,0 +1,26 @@
+<%# locals: pagy %>
+<div class="table-footer">
+  <div class="table-footer-left">
+    <% if pagy.last > 1 %>
+      <nav aria-label="Pages">
+        <ul class="pagination pagination-sm">
+          <li class="page-item <%= "disabled" unless pagy.previous %>">
+            <%= link_to tag.i(class: "bi bi-chevron-left"), url_for(request.query_parameters.merge(page: pagy.previous)), class: "page-link", "aria-label": "Previous" %>
+          </li>
+          <% (1..pagy.last).each do |number| %>
+            <% next unless number == 1 || number == pagy.last || (number - pagy.page).abs <= 2 %>
+            <li class="page-item <%= "active" if number == pagy.page %>">
+              <%= link_to number, url_for(request.query_parameters.merge(page: number)), class: "page-link" %>
+            </li>
+          <% end %>
+          <li class="page-item <%= "disabled" unless pagy.next %>">
+            <%= link_to tag.i(class: "bi bi-chevron-right"), url_for(request.query_parameters.merge(page: pagy.next)), class: "page-link", "aria-label": "Next" %>
+          </li>
+        </ul>
+      </nav>
+    <% end %>
+    <span class="ms-3 text-muted">
+      <% if pagy.count.zero? %>No results<% else %>Showing <%= pagy.from %>–<%= pagy.to %> of <%= pluralize(pagy.count, "record") %><% end %>
+    </span>
+  </div>
+</div>

@@ -1,0 +1,9 @@
+<%# locals: title, lede (optional), and a block of action buttons %>
+<% content_for :title, "#{title} · Wish List admin" %>
+<div class="page-header">
+  <div>
+    <h1><%= title %></h1>
+    <% if local_assigns[:lede].present? %><p class="page-lede"><%= lede %></p><% end %>
+  </div>
+  <div class="page-header-actions"><%= yield %></div>
+</div>

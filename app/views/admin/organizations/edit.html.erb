@@ -1,0 +1,9 @@
+<% content_for :breadcrumbs do %>
+  <li class="breadcrumb-item"><%= link_to "Organizations", admin_organizations_path %></li>
+  <li class="breadcrumb-item"><%= link_to @organization.name_was, admin_organization_path(@organization) %></li>
+  <li class="breadcrumb-item active">Edit</li>
+<% end %>
+
+<%= render "admin/shared/page_header", title: "Edit #{@organization.name_was}" %>
+
+<%= render "form", form_object: @form %>

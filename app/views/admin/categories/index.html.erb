@@ -1,0 +1,50 @@
+<% content_for :breadcrumbs do %><li class="breadcrumb-item active">Categories</li><% end %>
+
+<%= render "admin/shared/page_header", title: "Categories",
+           lede: "The shelves of the donor site, in the order donors see them." do %>
+  <%= link_to new_admin_category_path, class: "btn btn-primary btn-sm" do %>
+    <i class="bi bi-plus-lg"></i> New category
+  <% end %>
+<% end %>
+
+<div class="data-table-wrapper">
+  <div class="table-scroll">
+    <table class="table table-hover">
+      <thead>
+        <tr><th class="text-end">Position</th><th>Category</th><th>Icon</th><th>Tint</th><th>Headline</th><th class="text-end">Catalog items</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% @categories.each do |category| %>
+          <% items = @item_counts.fetch(category.id, 0) %>
+          <tr>
+            <td class="text-end"><span class="num"><%= category.position %></span></td>
+            <td class="item-name">
+              <%= link_to category.name, edit_admin_category_path(category) %>
+              <%= cell_sub truncate(category.blurb, length: 90) if category.blurb.present? %>
+            </td>
+            <td><code><%= category.icon.presence || "—" %></code></td>
+            <td><span class="tag-soft"><%= category.tint.presence || "—" %></span></td>
+            <td><%= category.headline.presence || "—" %></td>
+            <td class="text-end">
+              <%= link_to items, admin_catalog_items_path(f: { category: category.id }), class: "num" %>
+            </td>
+            <td class="text-end text-nowrap">
+              <%= link_to "Edit", edit_admin_category_path(category), class: "btn btn-outline-secondary btn-sm" %>
+              <%= button_to "Delete", admin_category_path(category), method: :delete, class: "btn btn-outline-danger btn-sm",
+                            disabled: items.positive?, title: ("Has catalog items" if items.positive?),
+                            form: { data: { turbo_confirm: "Delete #{category.name}?" } } %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @categories.empty? %>
+          <tr><td colspan="7">
+            <div class="empty-state"><i class="bi bi-tags"></i>
+              <h3>No categories yet</h3>
+              <p>Add the first one, then fill it from the catalog.</p>
+            </div>
+          </td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

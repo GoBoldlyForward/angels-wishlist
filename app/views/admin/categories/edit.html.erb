@@ -1,0 +1,8 @@
+<% content_for :breadcrumbs do %>
+  <li class="breadcrumb-item"><%= link_to "Categories", admin_categories_path %></li>
+  <li class="breadcrumb-item active"><%= @category.name_was %></li>
+<% end %>
+
+<%= render "admin/shared/page_header", title: "Edit #{@category.name_was}" %>
+
+<%= render "form", category: @category %>

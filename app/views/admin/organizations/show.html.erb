@@ -1,0 +1,67 @@
+<% content_for :breadcrumbs do %>
+  <li class="breadcrumb-item"><%= link_to "Organizations", admin_organizations_path %></li>
+  <li class="breadcrumb-item active"><%= @organization.name %></li>
+<% end %>
+
+<%= render "admin/shared/page_header", title: @organization.name, lede: @organization.kind.humanize do %>
+  <%= link_to edit_admin_organization_path(@organization), class: "btn btn-outline-secondary btn-sm" do %>
+    <i class="bi bi-pencil"></i> Edit
+  <% end %>
+<% end %>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="panel-card p-4">
+      <div class="drawer-hero">
+        <%= initials_avatar @organization.display_name %>
+        <div>
+          <h3><%= @organization.name %></h3>
+          <p><%= @organization.kind.humanize %><% if @organization.parent %> · part of <%= @organization.parent.display_name %><% end %></p>
+        </div>
+      </div>
+
+      <%= detail_section "The organization" do %>
+        <%= key_values [
+          [ "Short name", @organization.short_name ],
+          [ "Kind", @organization.kind.humanize ],
+          [ "Part of", (link_to(@organization.parent.name, admin_organization_path(@organization.parent)) if @organization.parent) ],
+          [ "Website", (link_to(@organization.website_url, @organization.website_url, target: "_blank", rel: "noopener") if @organization.website_url.present?) ],
+          [ "Status", status_badge(@organization.active ? "live" : "draft", label: @organization.active ? "Active" : "Inactive") ],
+          [ "Co-brand line", @organization.co_brand_line ]
+        ] %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="panel-card p-4">
+      <% if @organization.partner? %>
+        <% storefront = root_path(storefront: @organization.slug) %>
+        <%= detail_section "Storefront" do %>
+          <%= key_values [
+            [ "Address", link_to(storefront, storefront, target: "_blank", rel: "noopener") ],
+            [ "Theme", theme_stylesheet(@organization) ],
+            [ "Open to donors", @organization.active ? "Yes" : "No. The address shows the chapter's own site" ]
+          ] %>
+          <div class="drawer-note mt-3">Every page a donor reaches from this address, checkout included, wears this partner's theme. Donations still go to the chapter.</div>
+        <% end %>
+      <% elsif @organization.agency? %>
+        <%= detail_section "Households placed" do %>
+          <%= key_values [ [ "Households", @organization.placed_households.count ] ] %>
+          <div class="privacy-note mt-3">
+            <i class="bi bi-shield-lock"></i>
+            <span>The placing agency is a staff-only fact. It is never shown to a donor.</span>
+          </div>
+        <% end %>
+      <% else %>
+        <%= detail_section "Events" do %>
+          <% if @organization.events.any? %>
+            <%= key_values @organization.events.newest_first.map { |event| [ event.phase.to_s.humanize, link_to(event.name, admin_event_path(event)) ] } %>
+          <% else %>
+            <div class="drawer-note">No events yet.</div>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

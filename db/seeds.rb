@@ -44,6 +44,16 @@ CAREGIVER_NAMES = {
   "Mai T." => %w[Mai Tran], "Pam W." => %w[Pam Whitaker]
 }.freeze
 
+# Who is behind each anonymous gift. Staff see both the name and the alias.
+ANONYMOUS_DONORS = [
+  [ "Nathan Poole", "nathan.poole@example.com" ], [ "Bettina Ruiz", "b.ruiz@example.com" ],
+  [ "Chris Yamada", "cyamada@example.com" ], [ "Dana Kirkland", "dana.k@example.com" ],
+  [ "Wes Aldridge", "wesa@example.com" ], [ "Priscilla Bowen", "pbowen@example.com" ],
+  [ "Trent Alcott", "trent.alcott@example.com" ], [ "Joanna Meier", "jmeier@example.com" ],
+  [ "Rafael Cordova", "rcordova@example.com" ], [ "Hannah Steed", "h.steed@example.com" ],
+  [ "Miles Ferrante", "miles.f@example.com" ], [ "Ada Lindqvist", "ada.l@example.com" ]
+].freeze
+
 CAP_IN_DOLLARS = 200
 
 # Funded gifts stay, then gifts naming a brand or size, then the least expensive.
@@ -170,6 +180,7 @@ ActiveRecord::Base.transaction do
 
   donors = {}
   donations = {}
+  anonymous_gifts = 0
 
   DATA["kids"].each do |kid_row|
     household = households.fetch(kid_row["hh"])
@@ -203,11 +214,12 @@ ActiveRecord::Base.transaction do
 
       display = item["claimedBy"]
       anonymous = display == "Anonymous"
-      key = anonymous ? "anon-#{line.id}" : display
+      name, email = anonymous ? ANONYMOUS_DONORS[anonymous_gifts % ANONYMOUS_DONORS.size] : [ display, nil ]
+      anonymous_gifts += 1 if anonymous
+      key = anonymous ? "anon-#{name}" : display
 
       donor = donors[key] ||= begin
-        name = anonymous ? Faker::Name.name : display
-        email = anonymous ? Faker::Internet.unique.email : DONOR_EMAILS.fetch(display, "#{display.parameterize}@example.com")
+        email ||= DONOR_EMAILS.fetch(display, "#{display.parameterize}@example.com")
         User.create!(email: email, role: "donor",
                      first_name: name.split.first, last_name: name.split.last)
       end

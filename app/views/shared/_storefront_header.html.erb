@@ -1,0 +1,19 @@
+<header class="hdr">
+  <div class="container hdr-in">
+    <%= link_to root_path, class: "brand" do %>
+      <% if current_storefront&.partner? %>
+        <% if current_storefront.logo.attached? %><%= image_tag current_storefront.logo, alt: "" %><% end %>
+        <span class="brand-name"><%= current_storefront.name %><span><%= current_storefront.co_brand_line.presence || "Wish List · with #{current_chapter.name}" %></span></span>
+      <% else %>
+        <%= image_tag "logo-mark.svg", alt: "" %>
+        <span class="brand-name"><%= current_chapter&.name || "Atlanta Angels" %><span>Wish List</span></span>
+      <% end %>
+    <% end %>
+    <nav class="hdr-nav">
+      <%= link_to "How it works", root_path(anchor: "why"), class: "hdr-link hide-sm" %>
+      <%= link_to "FAQ", root_path(anchor: "faq"), class: "hdr-link hide-sm" %>
+      <%= link_to "For caregivers", caregiver_root_path, class: "hdr-link hide-sm" %>
+      <%= yield :header_actions %>
+    </nav>
+  </div>
+</header>

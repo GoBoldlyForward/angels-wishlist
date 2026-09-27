@@ -1,21 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title><%= content_for(:title) || "Wish List" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
-    <%= yield :head %>
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <title><%= content_for(:title) || "For caregivers | Wish List" %></title>
+    <%= render "layouts/head" %>
+    <%= render "layouts/storefront_styles", organization: current_chapter %>
     <%= javascript_importmap_tags %>
+    <%= pinpoint_widget %>
   </head>
 
-  <body class="d-flex flex-column min-vh-100">
-    <%= render "shared/navbar" %>
-    <main class="container flex-grow-1 py-4">
-      <%= render "shared/flash" %>
-      <%= yield %>
-    </main>
-    <%= render "shared/footer" %>
+  <body>
+    <header class="hdr">
+      <div class="container hdr-in">
+        <%= link_to caregiver_root_path, class: "brand" do %>
+          <%= image_tag "logo-mark.svg", alt: "" %>
+          <span class="brand-name"><%= current_chapter&.name || "Atlanta Angels" %><span>Wish List</span></span>
+        <% end %>
+        <nav class="hdr-nav">
+          <%= link_to "See the donor view", root_path, class: "hdr-link hide-sm" %>
+          <%= yield :header_actions %>
+          <% if user_signed_in? %>
+            <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "hdr-link btn-plain" %>
+          <% else %>
+            <%= link_to "Sign in", new_user_session_path, class: "hdr-link" %>
+          <% end %>
+        </nav>
+      </div>
+    </header>
+    <% if flash.any? %><div class="container" style="max-width:1040px"><%= render "shared/flash" %></div><% end %>
+    <%= yield %>
+    <footer class="ftr">
+      <div class="container ftr-in">
+        <div style="display:flex; align-items:center; gap:10px">
+          <%= image_tag "logo-mark.svg", alt: "", style: "height:28px" %>
+          <div>
+            <div class="t-base w-700 ink"><%= current_chapter&.name || "Atlanta Angels" %></div>
+            <div class="tiny">Consistent relationships are the solution.</div>
+          </div>
+        </div>
+        <div class="tiny" style="max-width:520px">
+          Anything you enter about a child stays with <%= current_chapter&.name || "Atlanta Angels" %> staff.
+          Donors see a stand-in name, an age, and the interests you write.
+        </div>
+      </div>
+    </footer>
+    <%= yield :overlays %>
   </body>
 </html>

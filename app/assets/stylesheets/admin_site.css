@@ -1,0 +1,4 @@
+/* What the application adds on top of the prototype's admin stylesheet. */
+
+form.button_to { display: inline; }
+.dropdown-menu form.button_to { display: block; }

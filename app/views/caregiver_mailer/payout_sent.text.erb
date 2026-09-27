@@ -1,0 +1,13 @@
+Hi <%= @household.caregiver.first_name %>,
+
+Your household's share for <%= @payout.event.name %> is on the way: <%= number_to_currency(@payout.amount_in_dollars) %>.
+
+<% if @payout.via_stripe? -%>
+It was sent by direct deposit and should land in one to two business days.
+<% else -%>
+It was mailed as a Visa gift card and should arrive in seven to ten days.<% if @payout.gift_card_tracking_number.present? %> Tracking number: <%= @payout.gift_card_tracking_number %><% end %>
+<% end -%>
+
+You agreed to use these funds for holiday gifts for the child each list is for. If something on a list no longer fits or is no longer wanted, spend it on what that child needs.
+
+<%= @household.organization.name %>

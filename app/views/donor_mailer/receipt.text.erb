@@ -1,0 +1,20 @@
+Thank you for your gift to <%= @chapter.name %>.
+
+Receipt <%= @donation.uuid.first(8).upcase %>
+<%= l(@donation.created_at.to_date, format: :long) %>
+
+<% @donation.line_items.includes(wishlist: :child).each do |line| -%>
+<%= line.name %><%= " (#{line.spec})" if line.spec.present? %>, asked for by <%= line.wishlist.child %>: <%= number_to_currency(line.price_in_dollars) %>
+<% end -%>
+<% if @donation.general_gift_in_cents.positive? -%>
+Where it is needed most: <%= number_to_currency(@donation.general_gift_in_cents / 100.0) %>
+<% end -%>
+<% if @donation.fee_covered? -%>
+Card processing: <%= number_to_currency(@donation.fee_in_cents / 100.0) %>
+<% end -%>
+
+Total: <%= number_to_currency(@donation.charged_in_dollars) %>
+
+<%= @chapter.name %> is a 501(c)(3). Your gift is a tax-deductible donation designated to the holiday wish list program, not a purchase of goods, and no goods or services were provided to you in return.
+
+Everything raised is pooled and spread evenly across every child's list, so each one is funded to the same share.

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for(:title) || "Sign in | Wish List" %></title>
+    <%= render "layouts/head" %>
+    <%= render "layouts/storefront_styles", organization: current_chapter %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <header class="hdr">
+      <div class="container hdr-in">
+        <%= link_to root_path, class: "brand" do %>
+          <%= image_tag "logo-mark.svg", alt: "" %>
+          <span class="brand-name"><%= current_chapter&.name || "Atlanta Angels" %><span>Wish List</span></span>
+        <% end %>
+      </div>
+    </header>
+    <main class="container">
+      <div class="account-card">
+        <%= render "shared/flash" %>
+        <%= yield %>
+      </div>
+    </main>
+  </body>
+</html>

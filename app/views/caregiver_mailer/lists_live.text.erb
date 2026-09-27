@@ -1,0 +1,9 @@
+Hi <%= @household.caregiver.first_name %>,
+
+Your household is verified and your lists are live. Donors can see them now.
+
+Lists close on <%= l(@event.closes_at.to_date, format: :long) %>. Everything raised is spread evenly across every child's list, and your household's share is sent the next day.
+
+<%= caregiver_root_url %>
+
+<%= @household.organization.name %>

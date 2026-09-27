@@ -1,0 +1,22 @@
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">AA</div>
+    <span class="logo-text">Wish List<span class="logo-sub"><%= current_chapter&.name || "Atlanta Angels" %></span></span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Program</div>
+    <%= link_to admin_root_path, class: [ "nav-link", ("active" if current_page?(admin_root_path)) ] do %>
+      <i class="bi bi-grid-1x2"></i><span>Overview</span>
+    <% end %>
+  </nav>
+
+  <% if current_event %>
+    <div class="sidebar-season">
+      <div class="season-label"><%= current_event.name %></div>
+      <div class="season-value"><%= money(current_event.raised_in_cents) %> of <%= money(current_event.goal_in_cents) %></div>
+      <div class="season-bar"><i style="width:<%= [ current_event.percent_funded, 100 ].min %>%"></i></div>
+      <div class="season-note"><%= current_event.percent_funded %>% there · <%= pluralize(current_event.days_remaining, "day") %> left</div>
+    </div>
+  <% end %>
+</aside>

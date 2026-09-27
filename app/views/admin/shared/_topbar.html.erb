@@ -1,0 +1,23 @@
+<header class="topbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><%= link_to current_chapter&.name || "Atlanta Angels", admin_root_path %></li>
+        <%= yield :breadcrumbs %>
+      </ol>
+    </nav>
+  </div>
+  <div class="topbar-right">
+    <div class="dropdown">
+      <button class="user-menu-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <div class="user-avatar"><%= current_user.initials %></div>
+        <span class="user-name"><%= current_user.full_name %></span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><%= link_to "Open the shop", root_path, class: "dropdown-item" %></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "dropdown-item text-danger" %></li>
+      </ul>
+    </div>
+  </div>
+</header>

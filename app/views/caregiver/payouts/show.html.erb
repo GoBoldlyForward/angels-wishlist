@@ -1,0 +1,124 @@
+<% content_for :title, "Getting paid | Wish List" %>
+<% chapter = current_chapter&.name || "Atlanta Angels" %>
+<% closes = event_day(current_event.closes_at) %>
+
+<%= render "caregiver/shared/steps" %>
+
+<%= form_with model: @form, scope: :payout, url: caregiver_intake_payout_path, method: :patch, class: "pay-form" do |f| %>
+  <main class="container flow-screen">
+    <%= render "caregiver/shared/step_header", title: "How should we get the money to you?",
+               lede: "#{closes ? "When lists close on #{closes}" : "When lists close"}, everything raised is spread evenly across every child's list, and we send you your household's share. Pick the way that actually works for your household." %>
+
+    <%= render "caregiver/shared/errors", messages: @form.errors.full_messages %>
+
+    <div class="row2 form-card pay-grid">
+      <label class="card-pick">
+        <%= f.radio_button :payout_method, "stripe" %>
+        <span class="rec">Recommended</span>
+        <div class="pick-body">
+          <span class="pick-icon" style="background:var(--green-bg)"><i class="fa-solid fa-building-columns c-green"></i></span>
+          <div>
+            <h3 class="t-md" style="margin-bottom:6px">Bank account or debit card</h3>
+            <p class="t-base" style="margin:0 0 12px">Connect once through Stripe. The money lands in your account and you shop wherever you want.</p>
+            <ul class="t-sm" style="color:var(--body)">
+              <li>In your account in one to two days</li>
+              <li>Instant to a debit card for a $0.50 fee</li>
+              <li>Works online, in store, anywhere</li>
+              <li>Nothing to lose in the mail</li>
+            </ul>
+          </div>
+        </div>
+      </label>
+
+      <label class="card-pick">
+        <%= f.radio_button :payout_method, "gift_card" %>
+        <div class="pick-body">
+          <span class="pick-icon" style="background:var(--brand-wash)"><i class="fa-solid fa-credit-card c-brand"></i></span>
+          <div>
+            <h3 class="t-md" style="margin-bottom:6px">Visa gift card in the mail</h3>
+            <p class="t-base" style="margin:0 0 12px">No bank needed. We mail a prepaid Visa to your home address.</p>
+            <ul class="t-sm" style="color:var(--soft)">
+              <li>Arrives seven to ten days after lists close</li>
+              <li>Some online checkouts reject prepaid cards</li>
+              <li>If it is lost or stolen, the money is gone</li>
+              <li>Cannot be split across two stores easily</li>
+            </ul>
+          </div>
+        </div>
+      </label>
+    </div>
+
+    <div class="form-card mt-5 pay-detail pay-detail-stripe">
+      <% if @form.connected? %>
+        <div class="panel panel-green" style="max-width:640px">
+          <div class="note"><i class="fa-solid fa-circle-check c-green"></i>
+            <div><b class="ink">Connected.</b> Your household's share goes to the account you set up with Stripe.
+            You can change it any time before lists close. <%= chapter %> never sees your full account number.</div></div>
+          <button class="btn btn-ghost btn-sm mt-3" type="submit" form="connect-stripe">Change the account</button>
+        </div>
+      <% else %>
+        <div class="panel" style="max-width:640px">
+          <h3 class="t-md" style="margin-bottom:8px">Connect with Stripe</h3>
+          <p class="t-base" style="margin:0 0 18px">
+            Stripe handles the account details, not us. You will confirm your name and date of birth,
+            then link a bank account or debit card. It takes about three minutes.
+          </p>
+          <button class="btn btn-ink" type="submit" form="connect-stripe"><i class="fa-brands fa-stripe-s"></i> &nbsp;Connect with Stripe</button>
+          <p class="hint" style="margin-top:12px">You come back to this page when you are done.</p>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="form-card mt-5 pay-detail pay-detail-gift-card">
+      <div class="panel" style="max-width:640px">
+        <h3 class="t-md" style="margin-bottom:14px">Where should we mail it?</h3>
+        <p class="t-base" style="margin:0 0 14px">It is addressed to <b class="ink"><%= current_user.full_name %></b>.</p>
+        <div class="field">
+          <%= f.label :street_line_1, "Mailing address", class: "f" %>
+          <%= f.text_field :street_line_1, class: input_class(@form, :street_line_1), placeholder: "1420 Peachtree Way", autocomplete: "address-line1" %>
+          <%= field_error(@form, :street_line_1) %>
+        </div>
+        <div class="row2">
+          <div class="field" style="margin-bottom:8px">
+            <%= f.label :city, "City", class: "f" %>
+            <%= f.text_field :city, class: input_class(@form, :city), placeholder: "Jonesboro", autocomplete: "address-level2" %>
+            <%= field_error(@form, :city) %>
+          </div>
+          <div class="field" style="margin-bottom:8px">
+            <%= f.label :zipcode, "ZIP", class: "f" %>
+            <%= f.text_field :zipcode, class: input_class(@form, :zipcode), placeholder: "30236", inputmode: "numeric", autocomplete: "postal-code" %>
+            <%= field_error(@form, :zipcode) %>
+          </div>
+        </div>
+        <div class="panel panel-warm" style="margin-top:18px">
+          <div class="note"><i class="fa-solid fa-triangle-exclamation"></i>
+            <div>Gift cards are the slowest and riskiest way we pay. If a bank or debit card is possible
+            at all, take that instead. You can switch later without redoing your lists.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-warm form-card mt-5" style="max-width:640px">
+      <label class="agree">
+        <%= f.check_box :agreed, disabled: current_enrollment.spending_agreed? %>
+        <span class="t-base"><b class="ink">By accepting these funds, I agree to use them for holiday gifts for the
+        child each list is for.</b> If something on a list no longer fits or is no longer wanted, I will spend that
+        money on what that child actually needs.</span>
+      </label>
+      <% if current_enrollment.spending_agreed? %>
+        <p class="hint" style="margin:10px 0 0 32px">You agreed on <%= event_day(current_enrollment.spending_agreed_at) %>.</p>
+      <% end %>
+    </div>
+  </main>
+
+  <div class="sticky-foot">
+    <div class="container sticky-in flow-screen">
+      <span class="tiny muted"><%= money(current_household.asked_in_cents(current_event)) %> across <%= pluralize(enrolled_lists.count, "list") %></span>
+      <button class="btn btn-primary" type="submit">
+        <%= current_enrollment.submitted? ? "Save" : "Review and submit" %> <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+<% end %>
+
+<%= form_with url: caregiver_intake_stripe_connection_path, id: "connect-stripe", data: { turbo: false } do %><% end %>

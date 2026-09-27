@@ -1,0 +1,97 @@
+<% content_for :title, "Your home | Wish List" %>
+<% chapter = current_chapter&.name || "Atlanta Angels" %>
+
+<%= render "caregiver/shared/steps" %>
+
+<%= form_with model: @form, scope: :home, url: caregiver_intake_home_path,
+              method: (@form.new_account? ? :post : :patch) do |f| %>
+  <main class="container flow-screen">
+    <%= render "caregiver/shared/step_header", title: "Start with your home",
+               lede: "This is how #{chapter} verifies your household and how we pay you. None of it is ever shown to a donor." %>
+
+    <% if @form.email_taken? %>
+      <div class="flash flash-alert form-errors" role="alert">
+        That email already has an account.
+        <%= link_to "Sign in", new_user_session_path, class: "link" %> to pick up where you left off.
+      </div>
+    <% else %>
+      <%= render "caregiver/shared/errors", messages: @form.errors.full_messages_for(:base) %>
+    <% end %>
+
+    <div class="panel form-card">
+      <div class="row2">
+        <div class="field">
+          <%= f.label :first_name, "First name", class: "f" %>
+          <%= f.text_field :first_name, class: input_class(@form, :first_name), placeholder: "Denise", autocomplete: "given-name", required: true %>
+          <%= field_error(@form, :first_name) %>
+        </div>
+        <div class="field">
+          <%= f.label :last_name, "Last name", class: "f" %>
+          <%= f.text_field :last_name, class: input_class(@form, :last_name), placeholder: "Brooks", autocomplete: "family-name", required: true %>
+          <%= field_error(@form, :last_name) %>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <%= f.label :email, "Email", class: "f" %>
+          <%= f.email_field :email, class: input_class(@form, :email), placeholder: "denise@example.com", autocomplete: "email", required: true %>
+          <%= field_error(@form, :email) %>
+          <p class="hint">We email you when your lists are received and when they go live.</p>
+        </div>
+        <% if @form.new_account? %>
+          <div class="field">
+            <%= f.label :password, "Choose a password", class: "f" %>
+            <%= f.password_field :password, class: input_class(@form, :password), autocomplete: "new-password", required: true, minlength: Devise.password_length.min %>
+            <%= field_error(@form, :password) %>
+            <p class="hint">So you can leave and come back. At least <%= Devise.password_length.min %> characters.</p>
+          </div>
+        <% end %>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <%= f.label :phone, "Mobile number", class: "f" %>
+          <%= f.telephone_field :phone, class: input_class(@form, :phone), placeholder: "(404) 555-0134", autocomplete: "tel" %>
+          <%= field_error(@form, :phone) %>
+          <p class="hint">So your coordinator can reach you about your lists.</p>
+        </div>
+        <div class="field">
+          <%= f.label :county, "County", class: "f" %>
+          <%= f.select :county, Household::COUNTIES, { include_blank: "Choose one" }, class: input_class(@form, :county), required: true %>
+          <%= field_error(@form, :county) %>
+        </div>
+      </div>
+      <div class="field">
+        <%= f.label :street_line_1, "Home address", class: "f" %>
+        <%= f.text_field :street_line_1, class: input_class(@form, :street_line_1), placeholder: "1420 Peachtree Way", autocomplete: "address-line1" %>
+        <%= field_error(@form, :street_line_1) %>
+        <p class="hint">Only used if you choose a mailed gift card instead of direct deposit.</p>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <%= f.label :city, "City", class: "f" %>
+          <%= f.text_field :city, class: input_class(@form, :city), placeholder: "Jonesboro", autocomplete: "address-level2" %>
+          <%= field_error(@form, :city) %>
+        </div>
+        <div class="field">
+          <%= f.label :zipcode, "ZIP", class: "f" %>
+          <%= f.text_field :zipcode, class: input_class(@form, :zipcode), placeholder: "30236", inputmode: "numeric", autocomplete: "postal-code" %>
+          <%= field_error(@form, :zipcode) %>
+        </div>
+      </div>
+      <% if @form.new_account? %><%= invisible_captcha :nickname %><% end %>
+    </div>
+
+    <div class="disclosure form-card mt-4">
+      We confirm your placement with <%= chapter %> before your lists go live. It usually takes a day.
+    </div>
+  </main>
+
+  <div class="sticky-foot">
+    <div class="container sticky-in flow-screen">
+      <span class="tiny muted">Nothing here is shown to donors.</span>
+      <button class="btn btn-primary" type="submit">
+        <%= current_enrollment&.submitted? ? "Save" : "Continue" %> <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+<% end %>

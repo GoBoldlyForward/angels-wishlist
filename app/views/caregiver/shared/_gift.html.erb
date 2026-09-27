@@ -1,0 +1,17 @@
+<%# locals: (gift:, show_chosen: false) %>
+<div class="mini gift-row">
+  <%= gift_art(gift.catalog_item, css_class: "icon icon-sm") %>
+  <div class="grow">
+    <div class="t-sm w-600 ink"><%= gift.name %></div>
+    <% if gift.spec.present? %><div class="tiny muted"><i class="fa-solid fa-tag t-2xs"></i> <%= gift.spec %></div><% end %>
+    <% if gift.link_url.present? %>
+      <div class="tiny">
+        <%= link_to gift.link_url, target: "_blank", rel: "noopener", class: "c-brand" do %>
+          <i class="fa-solid fa-link t-2xs"></i> <%= link_host(gift.link_url) %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  <% if show_chosen && gift.funded? %><span class="status status-chosen">Chosen by a donor</span><% end %>
+  <span class="price t-base"><%= money(gift.price_in_cents) %></span>
+</div>

@@ -1,0 +1,19 @@
+<%# locals: (event:, household:) %>
+<% closes = event_day(event.closes_at) %>
+<div class="flow flow-stacked">
+  <div class="flow-step">
+    <b><%= closes ? "Now to #{closes}" : "Until lists close" %></b>
+    <span>Donors give toward the gifts on every list. We email you when your lists go live, and you can edit anything until the deadline.</span>
+  </div>
+  <div class="flow-step">
+    <b><%= event_day(event.payout_at) || "After lists close" %></b>
+    <span>
+      We total everything raised across all lists, spread it evenly, and send your household's share
+      <%= household.payout_via_gift_card? ? "as a Visa gift card in the mail" : "to the account you connected through Stripe" %>.
+    </span>
+  </div>
+  <div class="flow-step">
+    <b>Whenever works for you</b>
+    <span>You shop. Right sizes, right week. If something no longer fits the child, spend it on what does.</span>
+  </div>
+</div>

@@ -1,0 +1,72 @@
+<%# locals: (entry:) %>
+<% prefix = "children[#{entry.key}]" %>
+<%= fields_for prefix, entry do |f| %>
+  <div class="panel form-card mb-4 child-form" data-controller="intake-child"
+       data-intake-child-saved-value="<%= !entry.new_child? %>" <%= "hidden" if entry.remove %>>
+    <% unless entry.new_child? %><%= hidden_field_tag "#{prefix}[id]", entry.child.id, id: nil %><% end %>
+    <%= f.hidden_field :display_name, id: nil %>
+    <%= f.hidden_field :remove, value: entry.remove ? "1" : "0", id: nil, data: { intake_child_target: "remove" } %>
+
+    <div class="child-head">
+      <h3 class="t-lg"><span data-intake-child-target="heading"><%= entry.legal_first_name %></span></h3>
+      <button type="button" class="rm" data-action="intake-child#remove"><i class="fa-solid fa-trash"></i> Remove</button>
+    </div>
+
+    <div class="row3">
+      <div class="field">
+        <%= f.label :legal_first_name, "First name", class: "f" %>
+        <%= f.text_field :legal_first_name, class: input_class(entry, :legal_first_name), placeholder: "Amelia",
+                         data: { intake_child_target: "name", action: "input->intake-child#rename" } %>
+        <%= field_error(entry, :legal_first_name) %>
+        <p class="hint"><i class="fa-solid fa-lock t-2xs"></i> Staff only. Donors see <b><%= entry.display_name || "a stand-in name we assign" %></b>.</p>
+      </div>
+      <div class="field">
+        <%= f.label :birthdate, "Birthdate", class: "f" %>
+        <%= f.date_field :birthdate, class: input_class(entry, :birthdate),
+                         min: Date.current.advance(years: -(Intake::ChildEntry::OLDEST_AGE + 1), days: 1), max: Date.current %>
+        <%= field_error(entry, :birthdate) %>
+        <p class="hint"><i class="fa-solid fa-lock t-2xs"></i> Staff only. Donors see the age.</p>
+      </div>
+      <div class="field">
+        <%= f.label :gender, "Girl or boy", class: "f" %>
+        <%= f.select :gender, [ [ "Girl", "girl" ], [ "Boy", "boy" ] ], { include_blank: "Choose" }, class: input_class(entry, :gender) %>
+        <%= field_error(entry, :gender) %>
+      </div>
+    </div>
+
+    <div class="field" data-controller="intake-tags" data-intake-tags-name-value="<%= prefix %>[interests][]">
+      <label class="f" for="<%= f.field_id(:interest) %>">What are they into?</label>
+      <div class="tags" style="margin-bottom:10px">
+        <% entry.interests.each do |interest| %>
+          <span class="tag" data-intake-tags-target="tag" data-value="<%= interest %>">
+            <%= hidden_field_tag "#{prefix}[interests][]", interest, id: nil %>
+            <span><%= interest %></span>
+            <button type="button" class="tag-x" data-action="intake-tags#remove" aria-label="Remove <%= interest %>"><i class="fa-solid fa-xmark t-2xs"></i></button>
+          </span>
+        <% end %>
+        <span class="tiny muted" data-intake-tags-target="empty" <%= "hidden" if entry.interests.any? %>>Nothing added yet</span>
+      </div>
+      <input class="i" id="<%= f.field_id(:interest) %>" placeholder="Type an interest and press enter" maxlength="<%= Intake::ChildEntry::LONGEST_INTEREST %>"
+             autocomplete="off" enterkeyhint="done" data-intake-tags-target="input" data-action="keydown.enter->intake-tags#add">
+      <div class="chip-scroll" style="margin-top:10px">
+        <% entry.suggested_interests.each do |interest| %>
+          <button type="button" class="chip btn-sm" data-intake-tags-target="suggestion" data-action="intake-tags#suggest" data-value="<%= interest %>">+ <%= interest %></button>
+        <% end %>
+      </div>
+      <template data-intake-tags-target="template">
+        <span class="tag" data-intake-tags-target="tag">
+          <input type="hidden" autocomplete="off">
+          <span></span>
+          <button type="button" class="tag-x" data-action="intake-tags#remove"><i class="fa-solid fa-xmark t-2xs"></i></button>
+        </span>
+      </template>
+    </div>
+
+    <div class="field" style="margin-bottom:0">
+      <%= f.label :caregiver_note, "One thing a donor should know", class: "f" %>
+      <%= f.text_area :caregiver_note, rows: 2, maxlength: 400, class: input_class(entry, :caregiver_note), placeholder: "Draws on every napkin in the house." %>
+      <%= field_error(entry, :caregiver_note) %>
+      <p class="hint">This shows on their page. Keep it about who they are, not about their case.</p>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,25 @@
+<div class="container flow-screen">
+  <% if current_enrollment&.submitted? %>
+    <div class="steps">
+      <%= link_to caregiver_root_path, class: "step" do %>
+        <span class="n"><i class="fa-solid fa-arrow-left"></i></span><span class="step-name">Back to my lists</span>
+      <% end %>
+    </div>
+  <% else %>
+    <nav class="steps" aria-label="Steps">
+      <% furthest = current_enrollment ? current_enrollment.step_number - 1 : 0 %>
+      <% Enrollment::INTAKE_STEPS.each_with_index do |name, index| %>
+        <% on = name == step %>
+        <% done = !on && index < furthest %>
+        <% content = capture do %>
+          <span class="n"><% if done %><i class="fa-solid fa-check"></i><% else %><%= index + 1 %><% end %></span><span class="step-name"><%= Caregiver::IntakeHelper::STEP_LABELS.fetch(name) %></span>
+        <% end %>
+        <% if current_enrollment && index <= furthest %>
+          <%= link_to content, intake_step_path(name), class: class_names("step", on: on, done: done), aria: { current: (on ? "step" : nil) } %>
+        <% else %>
+          <div class="<%= class_names("step", on: on) %>"><%= content %></div>
+        <% end %>
+      <% end %>
+    </nav>
+  <% end %>
+</div>

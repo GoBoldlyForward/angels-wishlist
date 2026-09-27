@@ -1,0 +1,70 @@
+<% content_for :breadcrumbs do %><li class="breadcrumb-item active">Donations</li><% end %>
+
+<%= render "admin/shared/page_header", title: "Donations",
+           lede: "The ledger for #{current_event.name}. One row is one donation, whether by card or recorded by hand." do %>
+  <%= link_to new_admin_donation_path, class: "btn btn-primary btn-sm" do %>
+    <i class="bi bi-plus-lg"></i> Record an offline gift
+  <% end %>
+<% end %>
+
+<div class="stat-cards five">
+  <%= stat_card "Raised", money(@table.raised_in_cents), icon: "cash-stack", color: "green",
+                note: "#{pluralize(@table.succeeded_count, 'completed donation')}" %>
+  <%= stat_card "Chosen gifts", money(@table.chosen_in_cents), icon: "gift", color: "gold",
+                note: "picked from a child's list" %>
+  <%= stat_card "General giving", money(@table.general_in_cents), icon: "heart", color: "blue",
+                note: "where it is needed most" %>
+  <%= stat_card "Fees covered", money(@table.fees_in_cents), icon: "credit-card", color: "amber",
+                note: "kept apart from the pool" %>
+  <%= stat_card "Needs a look", @table.count_of(:disputed, :pending), icon: "exclamation-triangle", color: "red",
+                note: "#{@table.count_of(:refunded)} refunded this season" %>
+</div>
+
+<%= render "admin/shared/table_controls", table: @table, placeholder: "Search references, donors, emails..." %>
+
+<div class="data-table-wrapper">
+  <div class="table-scroll">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <%= sortable_header @table, "date", "Reference" %>
+          <%= sortable_header @table, "donor", "Donor" %>
+          <th>What they chose</th>
+          <%= sortable_header @table, "gift", "Gift", align: :end %>
+          <%= sortable_header @table, "fee", "Fee", align: :end %>
+          <%= sortable_header @table, "charged", "Charged", align: :end %>
+          <%= sortable_header @table, "method", "Method" %>
+          <%= sortable_header @table, "status", "Status" %>
+        </tr>
+      </thead>
+      <tbody>
+        <% @rows.each do |donation| %>
+          <tr>
+            <td class="item-name">
+              <%= link_to donation.uuid.first(8), admin_donation_path(donation) %>
+              <%= cell_sub l(donation.created_at.to_date, format: :long) %>
+            </td>
+            <td>
+              <div class="item-name">
+                <%= link_to donation.donor.full_name, admin_donor_path(donation.donor) %>
+                <%= cell_sub donation.donor.email %>
+                <% if donation.anonymous? %><%= cell_sub "shown as Anonymous" %><% end %>
+              </div>
+            </td>
+            <td><% Admin::DonationChoice.new(donation).parts.each do |part| %><div><%= part %></div><% end %></td>
+            <td class="text-end"><span class="num"><%= money_exact donation.given_in_cents %></span></td>
+            <td class="text-end"><span class="num"><%= donation.fee_covered? ? money_exact(donation.fee_in_cents) : "—" %></span></td>
+            <td class="text-end"><span class="num"><%= money_exact donation.charged_in_cents %></span></td>
+            <td>
+              <%= donation.payment_method_label.presence || "—" %>
+              <% if donation.offline? %><%= cell_sub "recorded by staff" %><% end %>
+            </td>
+            <td><%= status_badge donation.status %></td>
+          </tr>
+        <% end %>
+        <% if @rows.empty? %><%= render "admin/shared/empty_row", columns: 8, what: "donations" %><% end %>
+      </tbody>
+    </table>
+  </div>
+  <%= render "admin/shared/table_footer", pagy: @pagy %>
+</div>

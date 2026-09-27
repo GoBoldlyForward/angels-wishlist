@@ -1,0 +1,115 @@
+<% reference = @donation.uuid.first(8) %>
+<% content_for :breadcrumbs do %>
+  <li class="breadcrumb-item"><%= link_to "Donations", admin_donations_path %></li>
+  <li class="breadcrumb-item active"><%= reference %></li>
+<% end %>
+
+<%= render "admin/shared/page_header", title: "Donation #{reference}",
+           lede: "#{money_exact(@donation.charged_in_cents)} from #{@donation.donor.full_name}" do %>
+  <% if @donation.succeeded? %>
+    <%= button_to resend_receipt_admin_donation_path(@donation), class: "btn btn-outline-secondary btn-sm" do %>
+      <i class="bi bi-envelope"></i> Resend receipt
+    <% end %>
+    <%= button_to refund_admin_donation_path(@donation), method: :patch, class: "btn btn-outline-danger btn-sm",
+                  form: { data: { turbo_confirm: "Refund #{money_exact(@donation.charged_in_cents)} to #{@donation.donor.full_name}? The donation leaves the pool and its gifts return to open." } } do %>
+      <i class="bi bi-arrow-counterclockwise"></i> Refund
+    <% end %>
+  <% end %>
+<% end %>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="panel-card p-4">
+      <div class="drawer-hero">
+        <span class="thumb-emoji"><i class="bi bi-receipt"></i></span>
+        <div>
+          <h3><%= money_exact @donation.charged_in_cents %> <%= status_badge @donation.status %></h3>
+          <p><%= l @donation.created_at, format: :long %> · <%= @donation.event.name %></p>
+        </div>
+      </div>
+
+      <%= detail_section "The charge" do %>
+        <%= key_values [
+          [ "Reference", @donation.uuid ],
+          [ "Chosen gifts", money_exact(@donation.gift_in_cents) ],
+          [ "General gift", money_exact(@donation.general_gift_in_cents) ],
+          [ "Card fee", @donation.fee_covered? ? "#{money_exact(@donation.fee_in_cents)}, covered by the donor" : "Not covered" ],
+          [ "Charged", money_exact(@donation.charged_in_cents) ],
+          [ "Method", @donation.payment_method_label ],
+          [ "Stripe payment", @donation.stripe_payment_intent_id.presence || "None. Recorded by staff" ],
+          [ "Receipt sent", @donation.receipt_sent_at ? l(@donation.receipt_sent_at, format: :long) : "Not yet" ]
+        ] %>
+      <% end %>
+
+      <%= detail_section "Chosen gifts" do %>
+        <% if @choice.gifts.any? %>
+          <table class="table table-sm mb-0">
+            <tbody>
+              <% @choice.gifts.each do |line| %>
+                <tr>
+                  <td class="item-name"><%= line.name %><%= cell_sub line.spec if line.spec.present? %></td>
+                  <td>for <%= line.wishlist.child %></td>
+                  <td class="text-end"><span class="num"><%= money_exact line.price_in_cents %></span></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% elsif @donation.gift_in_cents.positive? %>
+          <div class="drawer-note">The gifts this donor chose have returned to open, so another donor can choose them.</div>
+        <% else %>
+          <div class="drawer-note">No gifts were chosen from a list.</div>
+        <% end %>
+      <% end %>
+
+      <%= detail_section "General gift" do %>
+        <% if @donation.general_gift_in_cents.positive? %>
+          <div class="drawer-note"><%= money_exact @donation.general_gift_in_cents %> given where it is needed most.</div>
+        <% else %>
+          <div class="drawer-note">None on this donation.</div>
+        <% end %>
+      <% end %>
+
+      <%= detail_section "What this is" do %>
+        <div class="drawer-note">
+          A donation to <%= @donation.event.organization.name %> designated to the holiday wish list program, not a purchase.
+          Everything raised is pooled and spread evenly, so every list is funded to the same percentage.
+          <%= @donation.event.organization.name %> holds final discretion over the funds.
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="panel-card p-4">
+      <%= detail_section "Donor" do %>
+        <%= key_values [
+          [ "Name", link_to(@donation.donor.full_name, admin_donor_path(@donation.donor)) ],
+          [ "Email", mail_to(@donation.donor.email) ],
+          [ "Type", Admin::DonorType.of(@donation.donor).label ],
+          [ "Shown as", @donation.public_display_name ]
+        ] %>
+        <% if @donation.anonymous? %>
+          <div class="privacy-note mt-3">
+            <i class="bi bi-eye-slash"></i>
+            <span>This donor gives anonymously. Their name and email are for the receipt and are never published.</span>
+          </div>
+        <% end %>
+      <% end %>
+
+      <%= detail_section "Note to the family" do %>
+        <% if @donation.note_to_family.present? %>
+          <div class="drawer-quote"><%= @donation.note_to_family %></div>
+          <p class="small text-muted mt-2 mb-0">
+            <% if @donation.note_pending_review? %>
+              <%= status_badge "pending", label: "Awaiting approval" %> Held until staff approve it in the Inbox.
+            <% else %>
+              <%= status_badge "verified", label: "Approved" %> <%= l @donation.note_approved_at, format: :long %>
+            <% end %>
+          </p>
+        <% else %>
+          <div class="drawer-note">The donor did not leave a note.</div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

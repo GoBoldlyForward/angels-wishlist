@@ -1,0 +1,63 @@
+<% content_for :breadcrumbs do %><li class="breadcrumb-item active">Donors</li><% end %>
+
+<%= render "admin/shared/page_header", title: "Donors",
+           lede: "Everyone who gave to #{current_event.name}. Staff always see the name behind an anonymous gift." do %>
+  <%= link_to new_admin_impact_statement_path, class: "btn btn-outline-secondary btn-sm" do %>
+    <i class="bi bi-envelope-heart"></i> Send the impact statement
+  <% end %>
+<% end %>
+
+<div class="stat-cards">
+  <%= stat_card "Donors", @table.donor_count, icon: "people", color: "blue",
+                note: "#{@table.anonymous_count} giving anonymously" %>
+  <%= stat_card "Average gift", money(@table.average_gift_in_cents), icon: "graph-up", color: "green",
+                note: "across every completed donation" %>
+  <%= stat_card "Groups & teams", @table.group_count, icon: "building", color: "gold",
+                note: "#{money(@table.group_given_in_cents)} from groups" %>
+  <%= stat_card "Fees covered", money(@table.fees_in_cents), icon: "credit-card", color: "amber",
+                note: "#{@table.fee_covered_percent}% of donations added it" %>
+</div>
+
+<%= render "admin/shared/table_controls", table: @table, placeholder: "Search donors, emails, display names..." %>
+
+<div class="data-table-wrapper">
+  <div class="table-scroll">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <%= sortable_header @table, "name", "Donor" %>
+          <th>Type</th>
+          <%= sortable_header @table, "donations", "Donations", align: :end %>
+          <%= sortable_header @table, "gifts", "Gifts chosen", align: :end %>
+          <%= sortable_header @table, "given", "Given", align: :end %>
+          <th class="text-end">Fees covered</th>
+          <%= sortable_header @table, "last", "Last gave" %>
+        </tr>
+      </thead>
+      <tbody>
+        <% @rows.each do |donor| %>
+          <tr>
+            <td>
+              <div class="cell-media">
+                <%= initials_avatar donor.full_name %>
+                <div class="item-name">
+                  <%= link_to donor.full_name, admin_donor_path(donor) %>
+                  <%= cell_sub donor.email %>
+                  <% if donor.gives_anonymously %><%= cell_sub "shown as Anonymous" %><% end %>
+                </div>
+              </div>
+            </td>
+            <td><span class="tag-soft"><%= Admin::DonorType.of(donor).label %></span></td>
+            <td class="text-end"><span class="num"><%= donor.donations_count %></span></td>
+            <td class="text-end"><span class="num"><%= donor.gifts_count %></span></td>
+            <td class="text-end"><span class="num"><%= money_exact donor.given_in_cents %></span></td>
+            <td class="text-end"><span class="num"><%= donor.fees_in_cents.positive? ? money_exact(donor.fees_in_cents) : "—" %></span></td>
+            <td><%= l donor.last_gave_at.to_date, format: :long %></td>
+          </tr>
+        <% end %>
+        <% if @rows.empty? %><%= render "admin/shared/empty_row", columns: 7, what: "donors" %><% end %>
+      </tbody>
+    </table>
+  </div>
+  <%= render "admin/shared/table_footer", pagy: @pagy %>
+</div>

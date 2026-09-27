@@ -4,7 +4,11 @@ class Household < ApplicationRecord
   extend FriendlyId
   include PgSearch::Model
   acts_as_paranoid
-  has_paper_trail only: %i[verification_status verified_at hold_reason]
+  has_paper_trail only: %i[verification_status verified_at hold_reason payout_method stripe_account_id
+                           mailing_address_id]
+
+  COUNTIES = [ "Clayton", "Cobb", "DeKalb", "Douglas", "Fulton", "Gwinnett", "Henry", "Rockdale",
+               "South Fulton" ].freeze
 
   belongs_to :organization
   belongs_to :placing_organization, class_name: "Organization", optional: true
@@ -14,6 +18,7 @@ class Household < ApplicationRecord
   has_many :children, dependent: :destroy
   has_many :wishlists, through: :children
   has_many :line_items, through: :wishlists
+  has_many :enrollments, dependent: :destroy
   has_many :payouts, dependent: :destroy
 
   accepts_nested_attributes_for :children, allow_destroy: true
@@ -36,19 +41,24 @@ class Household < ApplicationRecord
   validates :display_name, presence: true
   validates :hold_reason, presence: true, if: :verification_hold?
 
-  def raised_in_cents(event)
+  before_validation :name_after_caregiver, on: :create
+
+  # What donors chose from this household's lists. It drives what staff see,
+  # not what the household is paid.
+  def chosen_in_cents(event)
     line_items.funded.joins(:wishlist).where(wishlists: { event_id: event.id }).sum(:price_in_cents)
   end
 
   def asked_in_cents(event)
-    line_items.joins(:wishlist).where(wishlists: { event_id: event.id }).sum(:price_in_cents)
+    line_items.listed.joins(:wishlist).where(wishlists: { event_id: event.id }).sum(:price_in_cents)
   end
 
-  def percent_funded(event)
-    asked = asked_in_cents(event)
-    return 0 if asked.zero?
+  def share_in_cents(event)
+    wishlists.where(event_id: event.id).pluck(:id).sum { |id| event.shares.fetch(id, 0) }
+  end
 
-    ((raised_in_cents(event).to_f / asked) * 100).round
+  def enrollment_for(event)
+    enrollments.find_by(event_id: event.id)
   end
 
   # A payout is blocked by verification or by having nowhere to send money.
@@ -60,8 +70,18 @@ class Household < ApplicationRecord
     payouts.find_by(event_id: event.id)&.status&.to_sym || :scheduled
   end
 
+  def payout_blocker
+    return hold_reason if verification_hold?
+    return "Verification has not cleared." unless verification_verified?
+    return "No payout method on file." if payout_via_none?
+    return "Stripe onboarding is not finished." if payout_via_stripe? && stripe_account_id.blank?
+    return "No mailing address for the gift card." if payout_via_gift_card? && mailing_address.blank?
+
+    nil
+  end
+
   def payable?
-    verification_verified? && !payout_via_none?
+    payout_blocker.nil?
   end
 
   def returning?
@@ -73,7 +93,23 @@ class Household < ApplicationRecord
     archived_at.present?
   end
 
+  def verify!
+    update!(verification_status: "verified", verified_at: Time.current, hold_reason: nil)
+  end
+
+  def hold!(reason)
+    update!(verification_status: "hold", hold_reason: reason)
+  end
+
   def archive!
     update!(archived_at: Time.current)
+  end
+
+  private
+
+  def name_after_caregiver
+    return if display_name.present? || caregiver&.last_name.blank?
+
+    self.display_name = "The #{caregiver.last_name} home"
   end
 end

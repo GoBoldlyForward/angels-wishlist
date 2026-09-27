@@ -8,11 +8,16 @@ class ApplicationController < ActionController::Base
   stale_when_importmap_changes
 
   before_action :set_paper_trail_whodunnit
+  before_action :set_current_user
 
   private
 
   # Versions store the user's id; Version#actor turns it back into a User.
   def user_for_paper_trail
     current_user&.id
+  end
+
+  def set_current_user
+    Current.user = current_user
   end
 end

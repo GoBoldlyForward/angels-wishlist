@@ -54,4 +54,58 @@ class DonationTest < ActiveSupport::TestCase
     assert_nil before
     assert_not_nil after
   end
+
+  test "settling funds the chosen gifts" do
+    event = build_event
+    line = build_line_item(wishlist: build_wishlist(event: event), price_in_cents: 4_800)
+    donation = build_donation(event: event, status: "pending", gift_in_cents: 4_800,
+                              cart: { "line_item_ids" => [ line.id ] })
+
+    donation.settle!
+
+    assert donation.succeeded?
+    assert_equal donation, line.reload.donation
+  end
+
+  test "a gift somebody else funded first stays in the pool as a general gift" do
+    event = build_event
+    line = build_line_item(wishlist: build_wishlist(event: event), price_in_cents: 4_800)
+    line.fund!(build_donation(event: event))
+    late = build_donation(event: event, status: "pending", gift_in_cents: 4_800,
+                          cart: { "line_item_ids" => [ line.id ] })
+
+    late.settle!
+
+    assert_equal 0, late.gift_in_cents
+    assert_equal 4_800, late.general_gift_in_cents
+    assert_not_equal late, line.reload.donation
+  end
+
+  test "settling twice funds once" do
+    event = build_event
+    line = build_line_item(wishlist: build_wishlist(event: event), price_in_cents: 4_800)
+    donation = build_donation(event: event, status: "pending", gift_in_cents: 4_800,
+                              cart: { "line_item_ids" => [ line.id ] })
+
+    2.times { donation.settle! }
+
+    assert_equal 4_800, donation.reload.gift_in_cents
+    assert_equal 0, donation.general_gift_in_cents
+  end
+
+  test "a refund returns its gifts to open and leaves the pool" do
+    event = build_event
+    line = build_line_item(wishlist: build_wishlist(event: event), price_in_cents: 4_800)
+    donation = build_donation(event: event, gift_in_cents: 4_800)
+    line.fund!(donation)
+
+    donation.refund!
+
+    assert_not line.reload.funded?
+    assert_equal 0, event.raised_in_cents
+  end
+
+  test "the fee is three percent" do
+    assert_equal 255, Donation.fee_for(8_500)
+  end
 end

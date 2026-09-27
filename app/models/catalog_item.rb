@@ -30,6 +30,11 @@ class CatalogItem < ApplicationRecord
     price_in_cents / 100.0
   end
 
+  # Lines donors can fund right now, oldest first.
+  def open_line_items
+    line_items.visible_to_donors.unfunded.oldest_first
+  end
+
   def suits_age?(age)
     return true if age.blank?
 
@@ -39,7 +44,13 @@ class CatalogItem < ApplicationRecord
   # A typed gift only joins a catalog tile on an unambiguous name match,
   # because a wrong guess puts one child's request inside another's counter.
   def self.unambiguous_match(typed_name)
-    matches = available.where("LOWER(name) = ?", typed_name.to_s.strip.downcase).to_a
+    typed = typed_name.to_s.strip.downcase
+    return nil if typed.length < 3
+
+    matches = available.select do |item|
+      name = item.name.downcase
+      name == typed || name.start_with?("#{typed} ") || name.include?(" #{typed} ") || typed.include?(name)
+    end
     matches.one? ? matches.first : nil
   end
 

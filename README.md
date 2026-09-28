@@ -8,8 +8,15 @@ The donor catalog is not a store. It is the union of every child's list, so a ti
 because a caregiver put it there. What the donor experiences is a purchase. What actually happens
 is a designated donation.
 
-Built from the prototype in `_prototypes/angels-wishlist` and the database plan in that repo's
-`docs/build-plan.md`.
+## The plan
+
+- [`docs/build-plan.md`](docs/build-plan.md) is the plan: the program's rules, what is built, what
+  has to change, the order of the remaining work, and the decisions Atlanta Angels still owes.
+- [`docs/prototype.md`](docs/prototype.md) describes the prototype this is built from, screen by
+  screen, and where it disagrees with itself.
+
+The prototype lives on this repository's `prototype` branch and is published at
+https://goboldlyforward.github.io/angels-wishlist/.
 
 ## Getting started
 
@@ -21,7 +28,7 @@ bin/dev
 
 `bin/dev` runs the server and the Dart Sass watcher together. The seed builds one chapter, one
 partner skin, one event dated around today, and the twenty children across ten households that the
-prototype holds. Sign in as `staff@atlantaangels.example.org` with `password123`; every seeded
+prototype holds, with each list fitted to the $200 cap. Sign in as `staff@atlantaangels.example.org` with `password123`; every seeded
 caregiver uses the same password. Every seeded write runs as the user who would have made it, so
 the audit trail reads as caregivers building lists, Sam verifying and approving, and donors giving.
 
@@ -85,6 +92,10 @@ and a controller namespace of the same name collides with it.
 - Donors never see a legal name, a photograph, a size, a school, an address, or anything about the
   case. Those columns live on households and children and are never serialized to the storefront.
 
+The cap and payout rules above describe the models as they stand. The program now caps a list at
+$200 and spreads everything raised evenly across every list. Step 1 of the build plan brings the
+models in line.
+
 ## Soft delete
 
 Models that soft-delete declare `acts_as_paranoid` and carry a `deleted_at` column with an index.
@@ -120,6 +131,6 @@ heroku run bin/rails console -a angels-wishlist
       and `AWS_BUCKET`. Production Active Storage already points at the `amazon` service.
 - [ ] **Stripe.** Set `STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY`, and `STRIPE_WEBHOOK_SECRET`.
       Payment Intents for donations, Connect for caregiver payouts.
-- [ ] **Donor-facing copy.** The prototype promises a January note back to donors and says general
-      giving goes to the furthest-behind lists automatically. Neither is true under this plan.
-      Both are Christie's call before anything is rewritten.
+- [ ] **Mail.** Choose a provider and a sending domain. Production has no outgoing mail settings.
+- [ ] **Decisions.** Sixteen questions in the build plan are waiting on Atlanta Angels. The build
+      proceeds on a stated assumption for each.

@@ -3,7 +3,7 @@
 # Seeds the program the prototype describes: one chapter, one partner skin, one
 # event, and the twenty children across ten households that donor-side data.js
 # already holds. db/seeds/prototype.json is generated from that file, so the two
-# cannot drift.
+# cannot drift. The prototype's lists run past the cap, so each is fitted to it.
 #
 # Each write runs as the user who would have made it, so the versions table
 # carries the same trail a real program would: caregivers build households and
@@ -36,6 +36,19 @@ CAREGIVER_NAMES = {
   "Kofi B." => %w[Kofi Boateng], "Renee S." => %w[Renee Sinclair],
   "Mai T." => %w[Mai Tran], "Pam W." => %w[Pam Whitaker]
 }.freeze
+
+CAP_IN_DOLLARS = 200
+
+# Funded gifts stay, then gifts naming a brand or size, then the least expensive.
+FIT_TO_CAP = lambda do |items|
+  ranked = items.each_with_index.sort_by do |item, index|
+    [ item["claimed"] ? 0 : 1, item["spec"] ? 0 : 1, item["claimed"] || item["spec"] ? 0 : item["price"], index ]
+  end
+  kept = ranked.each_with_object([]) do |(item, _index), list|
+    list << item if list.sum { |row| row["price"] } + item["price"] <= CAP_IN_DOLLARS
+  end
+  items.select { |item| kept.include?(item) }
+end
 
 DONOR_EMAILS = {
   "Priya S." => "priya.sundaram@example.com",
@@ -85,7 +98,7 @@ ActiveRecord::Base.transaction do
                         opened_at: 6.weeks.ago.change(hour: 9),
                         closes_at: 3.weeks.from_now.change(hour: 23),
                         payout_at: (3.weeks.from_now + 1.day).change(hour: 9),
-                        per_child_cap_in_cents: 30_000)
+                        per_child_cap_in_cents: CAP_IN_DOLLARS * 100)
 
   puts "Categories and catalog"
   categories = DATA["categories"].each_with_index.to_h do |row, index|
@@ -144,6 +157,7 @@ ActiveRecord::Base.transaction do
 
   DATA["kids"].each do |kid_row|
     household = households.fetch(kid_row["hh"])
+    gifts = FIT_TO_CAP.call(kid_row["items"])
     child = Child.create!(household: household, legal_first_name: kid_row["alias"],
                           display_name: kid_row["alias"], gender: kid_row["gender"],
                           birthdate: Date.current.advance(years: -kid_row["age"], days: -30))
@@ -152,7 +166,7 @@ ActiveRecord::Base.transaction do
       list = Wishlist.create!(child: child, event: event, status: "in_review",
                               interests: kid_row["interests"], caregiver_note: kid_row["note"],
                               submitted_at: household.created_at)
-      items = kid_row["items"].map do |item|
+      items = gifts.map do |item|
         LineItem.create!(wishlist: list, catalog_item: catalog[item["catId"]], name: item["name"],
                          spec: item["spec"], link_url: item["link"],
                          price_in_cents: item["price"] * 100,
@@ -168,7 +182,7 @@ ActiveRecord::Base.transaction do
       wishlist.update!(status: "live", approved_at: household.verified_at)
     end
 
-    kid_row["items"].zip(lines).each do |item, line|
+    gifts.zip(lines).each do |item, line|
       next unless item["claimed"]
 
       display = item["claimedBy"]

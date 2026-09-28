@@ -13,7 +13,7 @@ module ProgramBuilder
       organization: organization || build_organization,
       name: "Christmas #{SecureRandom.hex(3)}",
       opened_at: 2.weeks.ago, closes_at: 2.weeks.from_now, payout_at: 3.weeks.from_now,
-      per_child_cap_in_cents: 30_000
+      per_child_cap_in_cents: 20_000
     }.merge(attrs))
   end
 

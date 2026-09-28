@@ -1,0 +1,60 @@
+<% families_breadcrumbs "Families", "Love Boxes" %>
+
+<%= render "admin/shared/page_header", title: "Love Box packing list",
+           lede: "#{current_event&.name || 'No event yet'}. What to pull for every box, then each household's choices. Separate from the gift funds." do %>
+  <%= link_to admin_love_box_path(format: :csv, sheet: "totals"), class: "btn btn-outline-secondary" do %><i class="bi bi-download me-1"></i>Export totals<% end %>
+  <%= link_to admin_love_box_path(format: :csv), class: "btn btn-outline-secondary" do %><i class="bi bi-download me-1"></i>Export households<% end %>
+  <button type="button" class="btn btn-primary" onclick="window.print()"><i class="bi bi-printer me-1"></i>Print</button>
+<% end %>
+
+<div class="stat-cards">
+  <%= stat_card "Boxes to pack", @packing_list.boxes.size, icon: "box2-heart", color: "gold",
+                note: "households that submitted intake" %>
+  <%= stat_card "Verified", @packing_list.boxes.count { |box| box.household.verification_verified? }, icon: "shield-check", color: "green",
+                note: "cleared with the placing agency" %>
+  <%= stat_card "Children", @packing_list.boxes.sum(&:children_count), icon: "people", color: "blue",
+                note: "across those households" %>
+  <%= stat_card "Items to pull", @packing_list.totals.values.sum { |items| items.values.sum }, icon: "basket", color: "amber",
+                note: "not counting anything declined" %>
+</div>
+
+<h2 class="section-title">Totals per item</h2>
+<% if @packing_list.totals.empty? %>
+  <div class="panel-card detail-card"><div class="drawer-note">No household has submitted a Love Box yet.</div></div>
+<% else %>
+  <div class="packing-totals">
+    <% @packing_list.totals.each do |label, items| %>
+      <div class="panel-card detail-card packing-card">
+        <%= detail_section label do %>
+          <dl class="kv packing-kv">
+            <% items.sort_by { |item, count| [ -count, item ] }.each do |item, count| %>
+              <dt><%= item %></dt><dd class="num"><%= count %></dd>
+            <% end %>
+          </dl>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<h2 class="section-title">Each household's box</h2>
+<div class="packing-boxes">
+  <% @packing_list.boxes.each do |box| %>
+    <div class="panel-card detail-card packing-card">
+      <div class="drawer-hero">
+        <%= initials_avatar(box.household.display_name.delete_prefix("The ")) %>
+        <div>
+          <h3><%= link_to box.household.display_name, admin_household_path(box.household), class: "text-reset text-decoration-none" %></h3>
+          <p>
+            <%= [ box.household.caregiver&.full_name, box.household.county, pluralize(box.children_count, "child") ].compact_blank.join(" · ") %>
+          </p>
+        </div>
+        <span class="ms-auto">
+          <%= status_badge box.household.verification_status %>
+          <% if box.household.archived? %><%= status_badge "withdrawn", label: "Archived" %><% end %>
+        </span>
+      </div>
+      <%= key_values @packing_list.groups.map { |group| [ group.label, box.selection.summary_for(group) ] } %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,64 @@
+<% families_breadcrumbs "Families", "Wishlists" %>
+<% summary = @table.summary %>
+
+<%= render "admin/shared/page_header", title: "Wishlists",
+           lede: "One row per child. What was asked, what donors chose, and the share of everything raised that the list receives." do %>
+<% end %>
+
+<div class="stat-cards">
+  <%= stat_card "Wishlists", summary[:lists], icon: "list-check", color: "blue",
+                note: "#{summary[:live]} live to donors" %>
+  <%= stat_card "In review", summary[:in_review], icon: "hourglass-split", color: "amber",
+                note: "waiting on a staff decision" %>
+  <%= stat_card "Fully chosen", summary[:fully_chosen], icon: "patch-check", color: "green",
+                note: "every gift picked by a donor" %>
+  <%= stat_card "Asked", money(summary[:asked_in_cents]), icon: "currency-dollar", color: "gold",
+                note: "#{money(summary[:chosen_in_cents])} chosen by donors" %>
+</div>
+
+<%= render "admin/shared/table_controls", table: @table, placeholder: "Search children, households, interests..." %>
+
+<div class="data-table-wrapper">
+  <div class="table-scroll">
+    <table class="table">
+      <thead>
+        <tr>
+          <%= sortable_header @table, :child, "Child" %>
+          <%= sortable_header @table, :household, "Household" %>
+          <%= sortable_header @table, :gifts, "Gifts", align: :end %>
+          <%= sortable_header @table, :asked, "Asked", align: :end %>
+          <%= sortable_header @table, :chosen, "Chosen by donors", align: :end %>
+          <%= sortable_header @table, :share, "Share", align: :end %>
+          <%= sortable_header @table, :status, "Status" %>
+          <%= sortable_header @table, :last_gift, "Last gift" %>
+        </tr>
+      </thead>
+      <tbody>
+        <% @wishlists.each do |wishlist| %>
+          <% child = wishlist.child %>
+          <% household = child.household %>
+          <tr>
+            <td>
+              <div class="cell-media"><%= initials_avatar(child.display_name) %>
+                <div><span class="item-name"><%= link_to child_label(child), admin_wishlist_path(wishlist) %></span>
+                <%= cell_sub wishlist.interests.first(3).join(" · ").presence || "no interests yet" %></div>
+              </div>
+            </td>
+            <td>
+              <span><%= link_to household.display_name, admin_household_path(household), class: "text-reset" %></span>
+              <%= cell_sub [ household.county, household.caregiver&.full_name ].compact_blank.join(" · ") %>
+            </td>
+            <td class="text-end"><span class="num"><%= wishlist.chosen_count %> / <%= wishlist.listed_count %></span></td>
+            <td class="text-end"><span class="num"><%= money(wishlist.asked_cents) %></span></td>
+            <td class="text-end"><span class="num"><%= money(wishlist.chosen_cents) %></span></td>
+            <td class="text-end"><span class="num"><%= money(@table.share_for(wishlist)) %></span></td>
+            <td><%= wishlist_badge wishlist %></td>
+            <td><span class="num"><%= ago_or_dash wishlist.last_gift_at %></span></td>
+          </tr>
+        <% end %>
+        <%= render "admin/shared/empty_row", columns: 8, what: "wishlists" if @wishlists.empty? %>
+      </tbody>
+    </table>
+  </div>
+  <%= render "admin/shared/table_footer", pagy: @pagy %>
+</div>

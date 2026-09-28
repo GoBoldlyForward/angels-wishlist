@@ -1,0 +1,165 @@
+<% families_breadcrumbs "Inbox", "Needs review" %>
+
+<%= render "admin/shared/page_header", title: "Needs review",
+           lede: "Everything waiting on a staff decision: households to verify, lists and lines to review, and donor notes to approve." do %>
+<% end %>
+
+<div class="stat-cards">
+  <%= stat_card "Households to verify", @queues.households.size, icon: "shield-check", color: "amber",
+                note: "submitted and not yet verified" %>
+  <%= stat_card "Lists to review", @queues.wishlists.size, icon: "list-check", color: "blue",
+                note: "nothing reaches donors until approved" %>
+  <%= stat_card "Lines to review", @queues.line_items.size, icon: "gift", color: "gold",
+                note: "priced above the catalog" %>
+  <%= stat_card "Donor notes", @queues.donor_notes.size, icon: "chat-left-heart", color: "green",
+                note: "held until staff read them" %>
+</div>
+
+<section class="inbox-queue" id="households">
+  <div class="data-table-wrapper">
+    <div class="panel-card-head"><h2>Households to verify</h2><%= link_to "All households", admin_households_path(tab: "pending") %></div>
+    <div class="table-scroll">
+      <table class="table">
+        <thead><tr><th>Household</th><th>Caregiver</th><th>Agency</th><th class="text-end">Children</th><th>Submitted</th><th></th></tr></thead>
+        <tbody>
+          <% @queues.households.each do |household| %>
+            <tr>
+              <td>
+                <span class="item-name"><%= link_to household.display_name, admin_household_path(household) %></span>
+                <%= cell_sub household.county %>
+              </td>
+              <td><span><%= household.caregiver&.full_name %></span><%= cell_sub household.caregiver&.email %></td>
+              <td><%= household.placing_organization&.name || muted_dash("not recorded") %></td>
+              <td class="text-end"><span class="num"><%= household.children_count %></span></td>
+              <td><span class="num"><%= ago_or_dash household.created_at %></span></td>
+              <td class="text-end">
+                <%= button_to verify_admin_household_path(household), method: :patch, class: "btn btn-sm btn-outline-success" do %>
+                  <i class="bi bi-shield-check me-1"></i>Verify
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+          <% if @queues.households.empty? %>
+            <tr><td colspan="6" class="text-muted">No household is waiting to be verified.</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="inbox-queue" id="wishlists">
+  <div class="data-table-wrapper">
+    <div class="panel-card-head"><h2>Lists to review</h2><%= link_to "All lists in review", admin_wishlists_path(tab: "review") %></div>
+    <div class="table-scroll">
+      <table class="table">
+        <thead><tr><th>Child</th><th>Household</th><th class="text-end">Gifts</th><th class="text-end">Asked</th><th>Note for donors</th><th></th></tr></thead>
+        <tbody>
+          <% @queues.wishlists.each do |wishlist| %>
+            <% household = wishlist.child.household %>
+            <tr>
+              <td><span class="item-name"><%= link_to child_label(wishlist.child), admin_wishlist_path(wishlist) %></span></td>
+              <td>
+                <span><%= link_to household.display_name, admin_household_path(household), class: "text-reset" %></span>
+                <%= cell_sub status_badge(household.verification_status) %>
+              </td>
+              <td class="text-end"><span class="num"><%= wishlist.listed_count %></span></td>
+              <td class="text-end"><span class="num"><%= money(wishlist.asked_cents) %></span></td>
+              <td><span class="inbox-excerpt"><%= wishlist.caregiver_note.presence || "No note." %></span></td>
+              <td class="text-end text-nowrap">
+                <% if household.verification_verified? %>
+                  <%= button_to approve_admin_wishlist_path(wishlist), method: :patch, class: "btn btn-sm btn-outline-success" do %>
+                    <i class="bi bi-check2 me-1"></i>Approve
+                  <% end %>
+                <% else %>
+                  <%= link_to "Verify the household first", admin_household_path(household), class: "btn btn-sm btn-outline-secondary" %>
+                <% end %>
+                <%= link_to "Review", admin_wishlist_path(wishlist), class: "btn btn-sm btn-outline-secondary" %>
+              </td>
+            </tr>
+          <% end %>
+          <% if @queues.wishlists.empty? %>
+            <tr><td colspan="6" class="text-muted">No list is waiting for review.</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="inbox-queue" id="line-items">
+  <div class="data-table-wrapper">
+    <div class="panel-card-head"><h2>Lines to review</h2><%= link_to "All lines needing review", admin_line_items_path(tab: "review") %></div>
+    <div class="table-scroll">
+      <table class="table">
+        <thead><tr><th>Gift</th><th>Child</th><th class="text-end">Price</th><th class="text-end">Catalog price</th><th></th></tr></thead>
+        <tbody>
+          <% @queues.line_items.each do |line_item| %>
+            <% child = line_item.wishlist.child %>
+            <tr>
+              <td>
+                <span class="item-name"><%= link_to line_item.name, admin_line_item_path(line_item) %></span>
+                <%= cell_sub line_item.spec.presence || "No brand or size" %>
+              </td>
+              <td><span><%= child_label(child) %></span><%= cell_sub child.household.display_name %></td>
+              <td class="text-end"><span class="num"><%= money(line_item.price_in_cents) %></span></td>
+              <td class="text-end"><span class="num"><%= line_item.catalog_item ? money(line_item.catalog_item.price_in_cents) : muted_dash %></span></td>
+              <td class="text-end text-nowrap">
+                <%= button_to approve_admin_line_item_path(line_item), method: :patch, class: "btn btn-sm btn-outline-success" do %>
+                  <i class="bi bi-check2 me-1"></i>Approve price
+                <% end %>
+                <%= link_to "Edit", edit_admin_line_item_path(line_item), class: "btn btn-sm btn-outline-secondary" %>
+              </td>
+            </tr>
+          <% end %>
+          <% if @queues.line_items.empty? %>
+            <tr><td colspan="5" class="text-muted">No line is waiting for review.</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="inbox-queue" id="donor-notes">
+  <div class="data-table-wrapper">
+    <div class="panel-card-head"><h2>Donor notes to approve</h2></div>
+    <div class="table-scroll">
+      <table class="table">
+        <thead><tr><th>Donor</th><th>Note to the family</th><th>Goes to</th><th>Given</th><th></th></tr></thead>
+        <tbody>
+          <% @queues.donor_notes.each do |donation| %>
+            <% households = @queues.households_for(donation) %>
+            <tr>
+              <td>
+                <span class="item-name"><%= donation.public_display_name %></span>
+                <%= cell_sub donation.donor.full_name if donation.anonymous? || donation.public_display_name != donation.donor.full_name %>
+              </td>
+              <td><div class="drawer-quote inbox-note"><%= donation.note_to_family %></div></td>
+              <td>
+                <% if households.any? %>
+                  <%= safe_join(households.map { |household| link_to(household.display_name, admin_household_path(household)) }, tag.br) %>
+                <% else %>
+                  <%= muted_dash "No household. This was a general gift." %>
+                <% end %>
+              </td>
+              <td><span class="num"><%= ago_or_dash donation.created_at %></span></td>
+              <td class="text-end text-nowrap">
+                <%= button_to approve_admin_donor_note_path(donation), method: :patch, class: "btn btn-sm btn-outline-success" do %>
+                  <i class="bi bi-check2 me-1"></i>Approve
+                <% end %>
+                <%= button_to discard_admin_donor_note_path(donation), method: :patch, class: "btn btn-sm btn-outline-danger",
+                              form: { data: { turbo_confirm: "Discard this note? The family never sees it and it cannot be brought back." } } do %>
+                  <i class="bi bi-trash me-1"></i>Discard
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+          <% if @queues.donor_notes.empty? %>
+            <tr><td colspan="5" class="text-muted">No donor note is waiting.</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

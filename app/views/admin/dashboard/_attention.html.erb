@@ -1,0 +1,9 @@
+<%# locals: icon, color, title, sub, path %>
+<li>
+  <span class="att-icon stat-icon <%= color %>"><i class="bi bi-<%= icon %>"></i></span>
+  <span class="att-body">
+    <b><%= link_to title, path, class: "text-reset text-decoration-none stretched-link" %></b>
+    <span><%= sub %></span>
+  </span>
+  <i class="bi bi-chevron-right" style="color:#d1d5db"></i>
+</li>

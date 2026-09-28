@@ -1,0 +1,148 @@
+<% families_breadcrumbs "Families", [ "Households", admin_households_path ], @household.display_name %>
+<% caregiver = @household.caregiver %>
+
+<%= render "admin/shared/page_header", title: @household.display_name,
+           lede: [ caregiver&.full_name, @household.county ].compact_blank.join(" · ") do %>
+  <%= link_to edit_admin_household_path(@household), class: "btn btn-outline-secondary" do %><i class="bi bi-pencil me-1"></i>Edit<% end %>
+  <% unless @household.archived? %>
+    <% unless @household.verification_verified? %>
+      <%= button_to verify_admin_household_path(@household), method: :patch, class: "btn btn-success" do %>
+        <i class="bi bi-shield-check me-1"></i><%= @household.verification_hold? ? "Lift the hold and verify" : "Verify" %>
+      <% end %>
+    <% end %>
+    <% unless @household.verification_hold? %>
+      <button type="button" class="btn btn-outline-danger" data-bs-toggle="collapse" data-bs-target="#hold-form" aria-expanded="false" aria-controls="hold-form">
+        <i class="bi bi-pause-circle me-1"></i>Place on hold
+      </button>
+    <% end %>
+    <%= button_to archive_admin_household_path(@household), method: :patch, class: "btn btn-outline-secondary",
+                  form: { data: { turbo_confirm: "Archive #{@household.display_name}? Its lists leave the donor site and it is not paid." } } do %>
+      <i class="bi bi-archive me-1"></i>Archive
+    <% end %>
+  <% end %>
+<% end %>
+
+<% if @household.archived? %>
+  <%= family_callout icon: "archive" do %>
+    Archived on <%= l(@household.archived_at.to_date, format: :long) %>. Its lists are off the donor site and it is not paid.
+  <% end %>
+<% end %>
+
+<% if @household.verification_hold? %>
+  <%= family_callout icon: "exclamation-octagon", tone: :danger do %>
+    <b>On hold.</b> <%= @household.hold_reason %>
+  <% end %>
+<% end %>
+
+<% if @household.verification_verified? && @profile.lists_in_review.any? %>
+  <%= family_callout icon: "list-check" do %>
+    This household is verified and has <%= pluralize(@profile.lists_in_review.size, "list") %> waiting for review:
+    <%= safe_join(@profile.lists_in_review.map { |list| link_to("#{list.child.display_name}'s list", admin_wishlist_path(list)) }, ", ") %>.
+    Nothing reaches donors until each list is approved.
+  <% end %>
+<% end %>
+
+<div class="collapse mb-3" id="hold-form">
+  <div class="panel-card detail-card">
+    <%= form_with url: hold_admin_household_path(@household), method: :patch do |form| %>
+      <%= form.label :reason, "Why is this household going on hold?", class: "form-label" %>
+      <%= form.text_area :reason, rows: 2, required: true, class: "form-control",
+                         placeholder: "Placement change reported. Confirming with the case manager." %>
+      <div class="form-text">A household on hold is not paid. Its share waits until the hold is lifted.</div>
+      <%= form.button class: "btn btn-danger mt-2" do %><i class="bi bi-pause-circle me-1"></i>Place on hold<% end %>
+    <% end %>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <div class="panel-card detail-card">
+    <%= family_hero @household.display_name, [ caregiver&.full_name, @household.county ].compact_blank.join(" · "),
+                    initials_avatar(@household.display_name.delete_prefix("The ")) %>
+
+    <%= detail_section "Contact" do %>
+      <%= key_values [
+        [ "Caregiver", caregiver&.full_name ],
+        [ "Email", caregiver && mail_to(caregiver.email) ],
+        [ "Phone", caregiver&.phone ],
+        [ "Preferred language", caregiver&.preferred_language ],
+        [ "County", @household.county ],
+        [ "Mailing address", @household.mailing_address&.to_s ],
+        [ "Joined", safe_join([ l(@household.created_at.to_date, format: :long), (" · returning caregiver" if @household.returning?) ]) ]
+      ] %>
+    <% end %>
+
+    <%= detail_section "Verification" do %>
+      <%= key_values [
+        [ "Status", status_badge(@household.verification_status) ],
+        [ "Agency", @household.placing_organization&.name || muted_dash("not recorded") ],
+        [ "Verified on", date_or_not_yet(@household.verified_at) ],
+        [ "Verified by", (@profile.verified_by&.full_name if @household.verified_at) ]
+      ] %>
+    <% end %>
+
+    <%= detail_section "Payout" do %>
+      <%= key_values [
+        [ "Method", payout_method_label(@household) ],
+        [ "Destination", payout_destination(@household) ],
+        [ "Status", payout_badge(@profile.payout_status, current_event) ],
+        [ "Share", safe_join([ money(@profile.share_in_cents), " ", tag.span("of #{money(@profile.asked_in_cents)} asked", class: "text-muted") ]) ],
+        [ "Scheduled", current_event&.payout_at && l(current_event.payout_at.to_date, format: :long) ],
+        [ "Cannot be paid", @household.payout_blocker && tag.span(@household.payout_blocker, class: "text-danger") ]
+      ] %>
+      <div class="drawer-note mt-2">The share is this household's part of everything raised, spread evenly across every live list. Donors chose <%= money(@profile.chosen_in_cents) %> of gifts from its lists.</div>
+    <% end %>
+
+    <%= detail_section "Spending agreement" do %>
+      <% if @profile.enrollment&.spending_agreed? %>
+        <%= key_values [ [ "Agreed on", l(@profile.enrollment.spending_agreed_at.to_date, format: :long) ] ] %>
+      <% else %>
+        <div class="drawer-note">The caregiver has not agreed to how the funds will be spent.</div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="panel-card detail-card">
+    <%= detail_section "Children" do %>
+      <% if @profile.children.empty? %>
+        <div class="drawer-note">No children on this household yet.</div>
+      <% else %>
+        <div class="table-scroll">
+          <table class="table table-sm align-middle mb-0">
+            <thead>
+              <tr><th>Child</th><th>Legal first name</th><th>List</th><th class="text-end">Asked</th><th class="text-end">Chosen</th></tr>
+            </thead>
+            <tbody>
+              <% @profile.children.each do |child| %>
+                <% wishlist = @profile.wishlist_for(child) %>
+                <tr>
+                  <td>
+                    <span class="item-name">
+                      <%= wishlist ? link_to(child_label(child), admin_wishlist_path(wishlist)) : child_label(child) %>
+                    </span>
+                  </td>
+                  <td><%= child.legal_first_name.presence || muted_dash %></td>
+                  <td><%= wishlist ? wishlist_badge(wishlist) : muted_dash("no list") %></td>
+                  <td class="text-end"><span class="num"><%= wishlist ? money(wishlist.asked_cents) : muted_dash %></span></td>
+                  <td class="text-end"><span class="num"><%= wishlist ? money(wishlist.chosen_cents) : muted_dash %></span></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+    <% end %>
+
+    <%= detail_section "Love Box" do %>
+      <% if @profile.enrollment.nil? %>
+        <div class="drawer-note">This household is not enrolled in <%= current_event&.name || "an event" %>.</div>
+      <% elsif @profile.enrollment.love_box.blank? %>
+        <div class="drawer-note">The caregiver has not chosen a Love Box yet.</div>
+      <% else %>
+        <%= key_values @profile.love_box.groups.map { |group| [ group.label, @profile.love_box.summary_for(group) ] } %>
+        <% unless @profile.enrollment.submitted? %>
+          <div class="drawer-note mt-2">Intake is not submitted, so this box is not on the packing list yet.</div>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

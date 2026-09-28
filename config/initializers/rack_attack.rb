@@ -17,8 +17,8 @@ class Rack::Attack
     end
   end
 
-  throttle("signups/ip", limit: 5, period: 1.hour) do |req|
-    req.ip if req.path == "/users" && req.post?
+  throttle("signups/ip", limit: 20, period: 1.hour) do |req|
+    req.ip if req.path == "/caregiver/intake/home" && req.post?
   end
 
   # Password reset is an email-sending endpoint, so it is throttled harder.
@@ -28,7 +28,7 @@ class Rack::Attack
 
   # Checkout hits Stripe, so a loop here costs money.
   throttle("checkout/ip", limit: 10, period: 10.minutes) do |req|
-    req.ip if req.path.start_with?("/checkout") && req.post?
+    req.ip if req.path.end_with?("/checkout") && req.post?
   end
 
   self.throttled_responder = lambda do |_request|

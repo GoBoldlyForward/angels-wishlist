@@ -69,7 +69,7 @@ module Caregiver
       end
 
       assert_response :unprocessable_entity
-      assert_select "#capNote", "That price would put this list over the $200 cap. $40 left on it."
+      assert_select ".field-error", "That price would put this list over the $200 cap. $40 left on it."
       assert_select "input[name=?][value=?]", "gift[name]", "Scooter"
       assert_select ".picked-row", 1
       assert_select ".total-row b", "$160"
@@ -80,7 +80,7 @@ module Caregiver
         post caregiver_intake_list_gifts_path(@list), params: { gift: { name: "Stickers", price: "4" } }
       end
 
-      assert_select "#capNote", "That price must be $5 or more."
+      assert_select ".field-error", "That price must be $5 or more."
     end
 
     test "a list at the cap says so" do

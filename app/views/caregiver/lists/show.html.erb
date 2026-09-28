@@ -95,10 +95,8 @@
       <span class="muted">List total</span><b><%= money(total) %></b>
     </div>
     <div class="bar done"><i style="width:<%= [ total * 100 / cap, 100 ].min %>%"></i></div>
-    <p class="<%= class_names("tiny mt-2", @gift.refusal ? "c-brand" : "muted") %>" id="capNote">
-      <% if @gift.refusal %>
-        <%= @gift.refusal %>
-      <% elsif room.zero? %>
+    <p class="tiny mt-2 muted" id="capNote">
+      <% if room.zero? %>
         This list is at the <%= money(cap) %> cap. Remove something to add another gift.
       <% else %>
         Lists are capped at <%= money(cap) %> per child. <%= money(room) %> left on this one.

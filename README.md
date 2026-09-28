@@ -26,17 +26,20 @@ bin/rails db:seed
 bin/dev
 ```
 
+Without Stripe keys the app runs in test mode: a banner says so, checkout records the donation
+without charging, and payouts are marked sent without moving money.
+
 `bin/dev` runs the server and the Dart Sass watcher together. The seed builds one chapter, one
 partner skin, one event dated around today, and the twenty children across ten households that the
 prototype holds, with each list fitted to the $200 cap. Sign in as `staff@atlantaangels.example.org` with `password123`; every seeded
-caregiver uses the same password. Every seeded write runs as the user who would have made it, so
+caregiver uses the same password. Set `SEED_PASSWORD` to choose another. Every seeded write runs as the user who would have made it, so
 the audit trail reads as caregivers building lists, Sam verifying and approving, and donors giving.
 
 ## The three scopes
 
 | Scope | Prefix | Who | What lives there |
 | --- | --- | --- | --- |
-| `Public` | none | donors, unauthenticated | the storefront, categories, cart, checkout |
+| `Public` | none, or `/with/<partner>` | donors, unauthenticated | the storefront, categories, cart, checkout |
 | `Caregiver` | `/caregiver` | the authenticated caregiver | their household, children, lists, payout |
 | `Admin` | `/admin` | staff | verification, list review, the ledger, payouts |
 
@@ -68,33 +71,35 @@ and a controller namespace of the same name collides with it.
 | --- | --- |
 | Line item funded | `donation_id` present |
 | Line item funded at | the donation's `created_at` |
-| Wishlist asked / raised / remaining | sums over its line items |
-| Household asked / raised | sums over its wishlists for the event |
+| Wishlist asked / chosen / remaining | sums over its line items |
+| Household asked / chosen | sums over its wishlists for the event |
 | Event phase (draft, open, closed, paid out) | `opened_at`, `closes_at`, `payout_at` against now |
 | Child age | `birthdate` |
 | Donation charged | gift plus general gift plus fee |
 | Fee covered | fee greater than zero |
-| Payout default | the household's raised total for that event |
-| Payout overridden | amount differs from raised |
-| Unapplied general giving | the event's pool minus what top-ups have spent |
+| Event raised | gift plus general gift over succeeded donations |
+| Event funded ratio | raised divided by what the counted lists ask, at most 1 |
+| Wishlist share, household share | what was asked times the funded ratio |
 | Who verified or approved | PaperTrail `whodunnit`, the acting user's id, resolved by `Version#actor` |
 
 ## Rules worth knowing
 
-- Editing a live wishlist sends it back to `in_review`. PaperTrail records what changed.
-- A line item with a blank `spec` is pooled, and any donor funding that gift can cover it. A line
-  with a spec gives that child their own line.
-- A typed gift joins a catalog tile only on an unambiguous name match, because a wrong guess puts
-  one child's request inside another product's counter.
-- A list may exceed the per-child cap. The caregiver flow warns and lets them continue.
-- A payout defaults to what the household's lists raised. Staff may override it with a note saying
-  why, and general giving is the pool those overrides draw on.
-- Donors never see a legal name, a photograph, a size, a school, an address, or anything about the
-  case. Those columns live on households and children and are never serialized to the storefront.
+The full list is in [`docs/build-plan.md`](docs/build-plan.md). The ones that shape the code:
 
-The cap and payout rules above describe the models as they stand. The program now caps a list at
-$200 and spreads everything raised evenly across every list. Step 1 of the build plan brings the
-models in line.
+- A list asks for at most the event's cap per child, $200 in the seeds. A gift that would exceed
+  it is invalid.
+- Everything raised is one pool. Every counted list is funded to the same percentage, and a
+  household's payout is the sum of its lists' shares. Which gifts donors chose changes the
+  storefront's counters and the receipt, never a share.
+- A list is public only when it is live, its event is open, and its household is verified. Every
+  public page reads through `Wishlist.visible_to_donors`.
+- A line item with a blank `spec` is pooled, and a donor funding that gift covers the oldest open
+  one. A line with a spec gives that child their own line.
+- A typed gift joins a catalog tile only on an unambiguous name match.
+- A funded gift cannot be changed. A caregiver's change to a live list sends it back to
+  `in_review`. PaperTrail records what changed.
+- Donors never see a legal name, a birthdate, a household or caregiver name, an address, or
+  anything about the case.
 
 ## Soft delete
 
@@ -133,4 +138,6 @@ heroku run bin/rails console -a angels-wishlist
       Payment Intents for donations, Connect for caregiver payouts.
 - [ ] **Mail.** Choose a provider and a sending domain. Production has no outgoing mail settings.
 - [ ] **Decisions.** Sixteen questions in the build plan are waiting on Atlanta Angels. The build
-      proceeds on a stated assumption for each.
+      follows a stated assumption for each.
+- [ ] **Demo data.** The seeds replace every record and refuse to run in production unless
+      `SEED_DEMO_DATA=yes` is set. Clear the demo data before real households arrive.

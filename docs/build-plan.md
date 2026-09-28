@@ -16,20 +16,31 @@ and both describe rules the program no longer follows. Neither should be built f
 | Step | State |
 | --- | --- |
 | Foundation: schema, models, seeds, tests, deploy | Built |
-| 1. Bring the foundation in line with the prototype | Started. The seeds fit the cap. The models are unchanged |
-| 2. Staff setup: organizations, events, categories, catalog | Not started |
-| 3. Caregiver intake | Not started |
-| 4. Staff review | Not started |
-| 5. Donor storefront and checkout | Not started |
-| 6. Close and payouts | Not started |
-| 7. Communications | Not started |
+| 1. Bring the foundation in line with the prototype | Built |
+| 2. Staff setup: organizations, events, categories, catalog | Built |
+| 3. Caregiver intake | Built |
+| 4. Staff review | Built |
+| 5. Donor storefront and checkout | Built. Runs in test mode until Stripe keys are set |
+| 6. Close and payouts | Built. Transfers run in test mode until Stripe keys are set |
+| 7. Communications | Written. Nothing is sent until a mail provider is set |
 
-**Built:** all twelve program tables, their models and derived values, seeds generated from the
-prototype's data, model tests, Devise, Ahoy, PaperTrail, Active Storage, rate limits, and three
-authenticated scopes that each render one placeholder page.
+**Deployed:** Heroku app `angels-wishlist`, deploying from `main` after CI passes.
 
-**Deployed:** Heroku app `angels-wishlist`, deploying from `main` after CI passes. The production
-database is empty and has no Stripe or S3 credentials.
+### What is switched off until it is configured
+
+| Needs | Until then |
+| --- | --- |
+| `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` | A banner says test mode. Checkout records the donation without charging. Caregiver onboarding and transfers succeed at once without moving money |
+| `SMTP_ADDRESS`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `MAIL_FROM` | Every message is skipped and logged. Password reset emails do not arrive |
+| An S3 bucket and its credentials | Catalog items show the photos bundled with the app. Uploading a photo or a logo fails |
+
+### Where the build departs from this plan
+
+- **Caregivers choose a password at the start of intake.** The plan calls for an emailed link,
+  which needs a mail provider. Once mail works, password reset covers returning caregivers.
+- **Checkout uses Stripe's hosted payment page**, so no card field touches this application. It
+  creates the Payment Intent the plan describes.
+- **Staff detail views are pages**, where the prototype slides a drawer over the index.
 
 ## Rules of the program
 
@@ -143,6 +154,14 @@ Unique on household and event. Audited with PaperTrail.
   how many picks it allows, and whether the second pick is only for more than five children.
 - `per_child_cap_in_cents` is seeded at $200.
 
+### Changed: smaller additions
+
+- `enrollments.intake_step`: the furthest intake step a caregiver has reached.
+- `catalog_items.stock_photo`: a photo bundled with the app, shown until one is uploaded.
+- `donations.cart` (jsonb): the gifts a donor chose, held until the payment settles.
+- `wishlists.review_note`: why staff returned a list to the caregiver.
+- `payouts.method` may be empty, for a household with no payout method.
+
 ### Unchanged but reinterpreted: payouts
 
 `amount_in_cents` holds the household's computed share. `adjustment_note` stays in the table and
@@ -177,26 +196,13 @@ largest remainders so the shares add up to the pool.
 
 ### 1. Bring the foundation in line with the prototype
 
-The models were written against the earlier rules. Correct them before anything is built on top.
+The models follow the rules above. A gift that would exceed the cap is invalid. The pool is
+spread by `Event#shares`, and a payout is a household's share. `Enrollment` holds the spending
+agreement and the Love Box. `Wishlist.visible_to_donors` is the one scope every public page reads
+through. A funded line is locked, and a caregiver's change to a live list returns it to review.
 
-| Area | Now | Change to |
-| --- | --- | --- |
-| Cap | `Wishlist#over_cap?` flags a list and allows it | A line that would put its list over the cap is invalid |
-| Payout amount | Defaults to what the household's own lists raised | The household's share of the pool |
-| General giving | `Event` tracks a pool that staff overrides draw on | Part of the one pool. Remove the top-up methods |
-| Payout override | A differing amount requires a note | No override. See decision 2 |
-| Visibility | `Wishlist#shoppable?` checks the list and the event | Also requires a verified, active household |
-| Edits to a live list | A changed note or interest returns it to review | A changed, added, or removed line does too |
-| Funded lines | Editable | Locked once funded |
-| Enrollment | No table | Add it, with the spending agreement and the Love Box |
-| Love Box options | None | Seed the eleven groups from the prototype onto the event |
-| Aliases | Set by whoever creates the child | Assigned from a name pool, unique among active children |
-
-The seeds already fit every list to the $200 cap. The prototype's own data does not, so
-`db/seeds.rb` keeps funded gifts, then gifts naming a brand or size, then the least expensive.
-
-**Done when** the model tests cover the cap, the funded ratio, a withdrawn list leaving the total,
-rounding that sums to the pool, and a list from an unverified household staying private.
+The seeds fit every list to the $200 cap. The prototype's own data does not, so `db/seeds.rb`
+keeps funded gifts, then gifts naming a brand or size, then the least expensive.
 
 ### 2. Staff setup
 

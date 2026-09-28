@@ -1,0 +1,38 @@
+<%# locals: row (Admin::PayoutRun::Row) %>
+<tr>
+  <td>
+    <div class="cell-media">
+      <%= initials_avatar row.household.display_name.delete_prefix("The ") %>
+      <div class="item-name">
+        <%= row.built? ? link_to(row.household.display_name, admin_payout_path(row.payout)) : row.household.display_name %>
+        <%= cell_sub row.household.caregiver.full_name %>
+      </div>
+    </div>
+  </td>
+  <td><%= row.children.to_sentence.presence || "—" %></td>
+  <td class="text-end"><span class="num"><%= money_exact row.asked_in_cents %></span></td>
+  <td class="text-end">
+    <span class="num"><%= money_exact row.share_in_cents %></span>
+    <% if row.stale? || row.settled? && row.amount_in_cents != row.share_in_cents %>
+      <%= cell_sub "#{row.settled? ? 'sent' : 'built at'} #{money_exact(row.amount_in_cents)}" %>
+    <% end %>
+  </td>
+  <td><%= row.method_label %></td>
+  <td><%= row.destination.presence || "—" %></td>
+  <td>
+    <%= status_badge row.status %>
+    <% unless row.built? %><%= cell_sub "not built yet" %><% end %>
+  </td>
+  <td><%= row.blocker.presence || "—" %></td>
+  <td class="text-end text-nowrap">
+    <% if row.sendable? && row.payout.via_stripe? %>
+      <%= button_to "Send", send_funds_admin_payout_path(row.payout), method: :patch, class: "btn btn-primary btn-sm",
+                    form: { data: { turbo_confirm: "Send #{money_exact(row.amount_in_cents)} to #{row.household.display_name} by direct deposit?" } } %>
+    <% elsif row.sendable? %>
+      <%= link_to "Record gift card", admin_payout_path(row.payout), class: "btn btn-outline-secondary btn-sm" %>
+    <% elsif row.built? && row.payout.sent? %>
+      <%= button_to "Mark delivered", mark_delivered_admin_payout_path(row.payout), method: :patch,
+                    class: "btn btn-outline-secondary btn-sm" %>
+    <% end %>
+  </td>
+</tr>

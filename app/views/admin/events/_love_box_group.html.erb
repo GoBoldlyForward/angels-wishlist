@@ -1,0 +1,43 @@
+<%# locals: group (LoveBox::Group), index %>
+<% name = "event[love_box_groups][#{index}]" %>
+<% dom = "love_box_group_#{index}" %>
+<div class="border rounded p-3 mb-3" data-admin-love-box-target="group">
+  <%= hidden_field_tag "#{name}[id]", group.id, id: "#{dom}_id" %>
+  <div class="row g-2">
+    <div class="col-md-8">
+      <%= label_tag "#{dom}_label", "Group", class: "form-label" %>
+      <%= text_field_tag "#{name}[label]", group.label, id: "#{dom}_label", class: "form-control", placeholder: "Family drink" %>
+    </div>
+    <div class="col-md-4">
+      <%= label_tag "#{dom}_picks", "How many picks", class: "form-label" %>
+      <%= number_field_tag "#{name}[picks]", group.picks, id: "#{dom}_picks", class: "form-control", min: 1, max: 10 %>
+    </div>
+    <div class="col-12">
+      <%= label_tag "#{dom}_options", "Options, one per line", class: "form-label" %>
+      <%= text_area_tag "#{name}[options]", group.options.join("\n"), id: "#{dom}_options", class: "form-control",
+                        rows: [ group.options.size, 3 ].max %>
+    </div>
+    <div class="col-12">
+      <%= label_tag "#{dom}_hint", "Hint shown to the caregiver", class: "form-label" %>
+      <%= text_field_tag "#{name}[hint]", group.hint, id: "#{dom}_hint", class: "form-control" %>
+    </div>
+    <div class="col-md-5">
+      <div class="form-check">
+        <%= check_box_tag "#{name}[large_household_only]", "1", group.large_household_only,
+                          id: "#{dom}_large", class: "form-check-input" %>
+        <%= label_tag "#{dom}_large", "Second pick only for more than five children", class: "form-check-label" %>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="form-check">
+        <%= check_box_tag "#{name}[asks_count]", "1", group.asks_count, id: "#{dom}_count", class: "form-check-input" %>
+        <%= label_tag "#{dom}_count", "Asks for a count", class: "form-check-label" %>
+      </div>
+    </div>
+    <div class="col-md-3 text-end">
+      <button type="button" class="btn btn-outline-danger btn-sm" data-action="admin-love-box#remove">
+        <i class="bi bi-trash"></i> Remove group
+      </button>
+    </div>
+  </div>
+</div>

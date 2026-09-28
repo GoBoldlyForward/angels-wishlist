@@ -1,0 +1,61 @@
+<% content_for :breadcrumbs do %>
+  <li class="breadcrumb-item"><%= link_to "Donations", admin_donations_path %></li>
+  <li class="breadcrumb-item active">Record an offline gift</li>
+<% end %>
+
+<%= render "admin/shared/page_header", title: "Record an offline gift",
+           lede: "A check, cash, or a gift that arrived another way. It joins the pool for #{current_event.name} as a general gift." %>
+
+<div class="row">
+  <div class="col-lg-7">
+    <div class="panel-card p-4">
+      <%= form_with model: @offline_gift, scope: :offline_gift, url: admin_donations_path do |form| %>
+        <%= render "admin/shared/error_summary", record: @offline_gift %>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <%= form.label :donor_name, "Donor's name", class: "form-label" %>
+            <%= form.text_field :donor_name, class: "form-control", required: true %>
+          </div>
+          <div class="col-md-6">
+            <%= form.label :email, "Donor's email", class: "form-label" %>
+            <%= form.email_field :email, class: "form-control", required: true %>
+            <div class="form-text">The receipt goes here. An existing donor with this email is reused.</div>
+          </div>
+          <div class="col-md-4">
+            <%= form.label :amount_in_dollars, "Amount", class: "form-label" %>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <%= form.text_field :amount_in_dollars, class: "form-control", inputmode: "decimal", required: true %>
+            </div>
+            <div class="form-text">$5 or more. No fee is added.</div>
+          </div>
+          <div class="col-md-4">
+            <%= form.label :given_on, "Date received", class: "form-label" %>
+            <%= form.date_field :given_on, class: "form-control", max: Date.current, required: true %>
+          </div>
+          <div class="col-md-4">
+            <%= form.label :payment_method_label, "How it arrived", class: "form-label" %>
+            <%= form.text_field :payment_method_label, class: "form-control", placeholder: "Check", required: true %>
+          </div>
+          <div class="col-md-8">
+            <%= form.label :display_name, "Display name", class: "form-label" %>
+            <%= form.text_field :display_name, class: "form-control" %>
+            <div class="form-text">How the donor is shown. Left blank, their name is used.</div>
+          </div>
+          <div class="col-md-4 d-flex align-items-center">
+            <div class="form-check mt-3">
+              <%= form.check_box :anonymous, class: "form-check-input" %>
+              <%= form.label :anonymous, "Give anonymously", class: "form-check-label" %>
+            </div>
+          </div>
+        </div>
+
+        <div class="drawer-actions mt-4">
+          <%= form.submit "Record the gift", class: "btn btn-primary" %>
+          <%= link_to "Cancel", admin_donations_path, class: "btn btn-outline-secondary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

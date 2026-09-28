@@ -1,0 +1,64 @@
+<% content_for :breadcrumbs do %>
+  <li class="breadcrumb-item"><%= link_to "Events", admin_events_path %></li>
+  <li class="breadcrumb-item active"><%= @event.name %></li>
+<% end %>
+
+<%= render "admin/shared/page_header", title: @event.name, lede: @event.organization.name do %>
+  <%= link_to edit_admin_event_path(@event), class: "btn btn-outline-secondary btn-sm" do %>
+    <i class="bi bi-pencil"></i> Edit
+  <% end %>
+<% end %>
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="panel-card p-4">
+      <%= detail_section "The season" do %>
+        <%= key_values [
+          [ "Phase", status_badge(@event.phase, label: @event.phase.to_s.humanize) ],
+          [ "Opens", (l(@event.opened_at, format: :long) if @event.opened_at) ],
+          [ "Closes", (l(@event.closes_at, format: :long) if @event.closes_at) ],
+          [ "Payouts", (l(@event.payout_at, format: :long) if @event.payout_at) ],
+          [ "Cap per child", money(@event.per_child_cap_in_cents) ]
+        ] %>
+      <% end %>
+
+      <%= detail_section "So far" do %>
+        <%= key_values [
+          [ "Lists", @event.wishlists.count ],
+          [ "Asked", money_exact(@event.goal_in_cents) ],
+          [ "Raised", money_exact(@event.raised_in_cents) ],
+          [ "Funded to", "#{@event.percent_funded}%" ]
+        ] %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="panel-card p-4">
+      <%= detail_section "What the Love Box offers" do %>
+        <% if @event.love_box_groups.any? %>
+          <table class="table table-sm mb-0">
+            <thead><tr><th>Group</th><th>Picks</th><th>Options</th></tr></thead>
+            <tbody>
+              <% @event.love_box_groups.each do |group| %>
+                <tr>
+                  <td class="item-name">
+                    <%= group.label %>
+                    <% if group.asks_count %><%= cell_sub "asks for a count" %><% end %>
+                  </td>
+                  <td class="text-nowrap">
+                    <%= group.picks %>
+                    <% if group.large_household_only && group.picks > 1 %><%= cell_sub "1 unless more than five children" %><% end %>
+                  </td>
+                  <td><%= group.options.join(" · ") %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% else %>
+          <div class="drawer-note">This event offers no Love Box choices yet.</div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

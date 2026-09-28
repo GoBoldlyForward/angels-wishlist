@@ -1,0 +1,50 @@
+<% content_for :breadcrumbs do %>
+  <li class="breadcrumb-item"><%= link_to "Donors", admin_donors_path %></li>
+  <li class="breadcrumb-item active">Impact statement</li>
+<% end %>
+
+<%= render "admin/shared/page_header", title: "Impact statement",
+           lede: "The January thank-you for #{current_event.name}: what the season did, from #{current_event.organization.name}." %>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="panel-card p-4">
+      <%= form_with model: @impact_statement, scope: :impact_statement, url: admin_impact_statement_path,
+                    data: { turbo_confirm: "Send this to #{pluralize(@impact_statement.recipient_count, 'donor')}? It cannot be unsent." } do |form| %>
+        <%= render "admin/shared/error_summary", record: @impact_statement %>
+
+        <div class="mb-3">
+          <%= form.label :message, "Your message", class: "form-label" %>
+          <%= form.text_area :message, rows: 12, class: "form-control", required: true %>
+          <div class="form-text">Plain text. The greeting, the thanks, and the privacy line are added around it.</div>
+        </div>
+
+        <div class="drawer-actions">
+          <%= form.submit "Send to #{pluralize(@impact_statement.recipient_count, 'donor')}", class: "btn btn-primary",
+                          disabled: @impact_statement.recipient_count.zero? %>
+          <%= link_to "Cancel", admin_donors_path, class: "btn btn-outline-secondary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="panel-card p-4">
+      <%= detail_section "Who receives it" do %>
+        <%= key_values [
+          [ "Donors", @impact_statement.recipient_count ],
+          [ "Event", current_event.name ],
+          [ "Raised", money_exact(current_event.raised_in_cents) ]
+        ] %>
+        <div class="drawer-note mt-3">
+          Every donor with a completed donation to this event gets one email, however many times they gave.
+          A donor whose only donation was refunded, disputed, or never completed is left out.
+        </div>
+      <% end %>
+      <div class="privacy-note">
+        <i class="bi bi-shield-lock"></i>
+        <span>Leave out names, photos, schools, and anything else that could identify a child or a household.</span>
+      </div>
+    </div>
+  </div>
+</div>

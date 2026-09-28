@@ -1,0 +1,42 @@
+<% content_for :breadcrumbs do %><li class="breadcrumb-item active">Events</li><% end %>
+
+<%= render "admin/shared/page_header", title: "Events",
+           lede: "One event is one season: when lists open and close, when payouts go out, the cap per child, and what the Love Box offers." do %>
+  <%= link_to new_admin_event_path, class: "btn btn-primary btn-sm" do %>
+    <i class="bi bi-plus-lg"></i> New event
+  <% end %>
+<% end %>
+
+<div class="data-table-wrapper">
+  <div class="table-scroll">
+    <table class="table table-hover">
+      <thead>
+        <tr><th>Event</th><th>Opens</th><th>Closes</th><th>Payouts</th><th class="text-end">Cap per child</th><th>Phase</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% @events.each do |event| %>
+          <tr>
+            <td class="item-name">
+              <%= link_to event.name, admin_event_path(event) %>
+              <% if event == current_event %><%= cell_sub "the current event" %><% end %>
+            </td>
+            <td><%= event.opened_at ? l(event.opened_at, format: :long) : "—" %></td>
+            <td><%= event.closes_at ? l(event.closes_at, format: :long) : "—" %></td>
+            <td><%= event.payout_at ? l(event.payout_at, format: :long) : "—" %></td>
+            <td class="text-end"><span class="num"><%= money event.per_child_cap_in_cents %></span></td>
+            <td><%= status_badge event.phase, label: event.phase.to_s.humanize %></td>
+            <td class="text-end"><%= link_to "Edit", edit_admin_event_path(event), class: "btn btn-outline-secondary btn-sm" %></td>
+          </tr>
+        <% end %>
+        <% if @events.empty? %>
+          <tr><td colspan="7">
+            <div class="empty-state"><i class="bi bi-calendar-event"></i>
+              <h3>No events yet</h3>
+              <p>Create the first one to open a season.</p>
+            </div>
+          </td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

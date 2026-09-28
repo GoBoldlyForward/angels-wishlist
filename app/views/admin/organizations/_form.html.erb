@@ -1,0 +1,72 @@
+<%# locals: form_object (Admin::OrganizationForm) %>
+<div class="row">
+  <div class="col-lg-8">
+    <div class="panel-card p-4">
+      <%= form_with model: form_object, scope: :organization,
+                    url: form_object.persisted? ? admin_organization_path(form_object) : admin_organizations_path,
+                    method: form_object.persisted? ? :patch : :post do |form| %>
+        <%= render "admin/shared/error_summary", record: form_object %>
+
+        <div class="row g-3">
+          <div class="col-md-8">
+            <%= form.label :name, class: "form-label" %>
+            <%= form.text_field :name, class: "form-control", required: true %>
+          </div>
+          <div class="col-md-4">
+            <%= form.label :short_name, class: "form-label" %>
+            <%= form.text_field :short_name, class: "form-control" %>
+          </div>
+          <div class="col-md-4">
+            <%= form.label :kind, class: "form-label" %>
+            <%= form.select :kind, Organization.kinds.keys.map { |kind| [ kind.humanize, kind ] }, {}, class: "form-select" %>
+          </div>
+          <div class="col-md-8">
+            <%= form.label :parent_id, "Part of", class: "form-label" %>
+            <%= form.collection_select :parent_id, Organization.where.not(id: form_object.id).order(:name), :id, :name,
+                                       { include_blank: "Nothing. It stands alone" }, class: "form-select" %>
+          </div>
+          <div class="col-md-8">
+            <%= form.label :website_url, "Website", class: "form-label" %>
+            <%= form.url_field :website_url, class: "form-control", placeholder: "https://" %>
+          </div>
+          <div class="col-md-4 d-flex align-items-center">
+            <div class="form-check mt-3">
+              <%= form.check_box :active, class: "form-check-input" %>
+              <%= form.label :active, class: "form-check-label" %>
+            </div>
+          </div>
+          <div class="col-12">
+            <%= form.label :co_brand_line, "Co-brand line", class: "form-label" %>
+            <%= form.text_field :co_brand_line, class: "form-control", placeholder: "Wish List · with Atlanta Angels" %>
+            <div class="form-text">Shown under a partner's name in the header of its storefront.</div>
+          </div>
+        </div>
+
+        <%= detail_section "Storefront, for a partner" do %>
+          <div class="row g-3 mt-1">
+            <div class="col-md-6">
+              <%= form.label :theme_stylesheet, "Theme", class: "form-label" %>
+              <%= form.select :theme_stylesheet, ApplicationHelper::THEME_STYLESHEETS.map { |sheet| [ sheet.delete_prefix("theme-").humanize, sheet ] },
+                              { include_blank: "The chapter's own" }, class: "form-select" %>
+              <div class="form-text">Kept only when the kind is partner.</div>
+            </div>
+            <div class="col-md-6">
+              <span class="form-label d-block">Storefront address</span>
+              <% if form_object.persisted? && form_object.kind == "partner" %>
+                <% storefront = root_path(storefront: form_object.record.slug) %>
+                <%= link_to storefront, storefront, target: "_blank", rel: "noopener" %>
+              <% else %>
+                <span class="text-muted">/with/ and the partner's name, once it is saved.</span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <div class="drawer-actions mt-4">
+          <%= form.submit form_object.persisted? ? "Save the organization" : "Add the organization", class: "btn btn-primary" %>
+          <%= link_to "Cancel", admin_organizations_path, class: "btn btn-outline-secondary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

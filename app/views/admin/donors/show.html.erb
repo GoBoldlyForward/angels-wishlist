@@ -1,0 +1,76 @@
+<% content_for :breadcrumbs do %>
+  <li class="breadcrumb-item"><%= link_to "Donors", admin_donors_path %></li>
+  <li class="breadcrumb-item active"><%= @donor.full_name %></li>
+<% end %>
+
+<%= render "admin/shared/page_header", title: @donor.full_name, lede: @donor.email do %>
+  <% if @donor.latest_succeeded %>
+    <%= button_to resend_receipt_admin_donation_path(@donor.latest_succeeded), class: "btn btn-outline-secondary btn-sm" do %>
+      <i class="bi bi-envelope"></i> Resend receipt
+    <% end %>
+  <% end %>
+<% end %>
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="panel-card p-4">
+      <div class="drawer-hero">
+        <%= initials_avatar @donor.full_name %>
+        <div>
+          <h3><%= @donor.full_name %></h3>
+          <p><%= @donor.type.label %> · <%= @donor.email %></p>
+        </div>
+      </div>
+
+      <% if @donor.anonymous? %>
+        <div class="privacy-note mb-3">
+          <i class="bi bi-eye-slash"></i>
+          <span>Shown as Anonymous on the donor site and to households. The name and email here are for the receipt and are never published.</span>
+        </div>
+      <% end %>
+
+      <%= detail_section "This season" do %>
+        <%= key_values [
+          [ "Given", money_exact(@donor.given_in_cents) ],
+          [ "General giving", money_exact(@donor.general_in_cents) ],
+          [ "Fees covered", money_exact(@donor.fees_in_cents) ],
+          [ "Donations", @donor.donations.size ],
+          [ "Gifts chosen", @donor.chosen_gifts.size ],
+          [ "Shown as", @donor.shown_as ]
+        ] %>
+      <% end %>
+
+      <%= detail_section "What they chose" do %>
+        <% if @donor.chosen_gifts.any? %>
+          <%= key_values @donor.chosen_gifts.map { |line| [ line.wishlist.child.display_name, safe_join([ line.name, " · ", money_exact(line.price_in_cents) ]) ] } %>
+        <% else %>
+          <div class="drawer-note">No gifts chosen from a list. Everything this donor gave went where it is needed most.</div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="data-table-wrapper">
+      <div class="panel-card-head"><h2>Donations</h2></div>
+      <div class="table-scroll">
+        <table class="table table-hover">
+          <thead>
+            <tr><th>Reference</th><th>Date</th><th>What they chose</th><th class="text-end">Charged</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <% @donor.donations.each do |donation| %>
+              <tr>
+                <td class="item-name"><%= link_to donation.uuid.first(8), admin_donation_path(donation) %></td>
+                <td><%= l donation.created_at.to_date, format: :long %></td>
+                <td><% Admin::DonationChoice.new(donation).parts.each do |part| %><div><%= part %></div><% end %></td>
+                <td class="text-end"><span class="num"><%= money_exact donation.charged_in_cents %></span></td>
+                <td><%= status_badge donation.status %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,108 @@
+<% household = @payout.household %>
+<% content_for :breadcrumbs do %>
+  <li class="breadcrumb-item"><%= link_to "Payouts", admin_payouts_path %></li>
+  <li class="breadcrumb-item active"><%= household.display_name %></li>
+<% end %>
+
+<%= render "admin/shared/page_header", title: household.display_name,
+           lede: "#{money_exact(@payout.amount_in_cents)} for #{@payout.event.name}" do %>
+  <% if @row.sendable? && @payout.via_stripe? %>
+    <%= button_to send_funds_admin_payout_path(@payout), method: :patch, class: "btn btn-primary btn-sm",
+                  form: { data: { turbo_confirm: "Send #{money_exact(@payout.amount_in_cents)} to #{household.display_name} by direct deposit?" } } do %>
+      <i class="bi bi-send"></i> <%= @payout.failed? ? "Send again" : "Send" %>
+    <% end %>
+  <% elsif @payout.sent? %>
+    <%= button_to mark_delivered_admin_payout_path(@payout), method: :patch, class: "btn btn-outline-secondary btn-sm" do %>
+      <i class="bi bi-check2-circle"></i> Mark delivered
+    <% end %>
+  <% end %>
+<% end %>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="panel-card p-4">
+      <div class="drawer-hero">
+        <%= initials_avatar household.display_name.delete_prefix("The ") %>
+        <div>
+          <h3><%= money_exact @payout.amount_in_cents %> <%= status_badge @payout.status %></h3>
+          <p><%= @row.method_label %> · scheduled for <%= @payout.scheduled_for ? l(@payout.scheduled_for.to_date, format: :long) : "no date yet" %></p>
+        </div>
+      </div>
+
+      <% if @payout.failed? %>
+        <div class="alert alert-danger" role="alert">
+          <strong>The transfer did not go through.</strong> <%= @payout.hold_reason %>
+          <% if @row.sendable? %>It can be sent again.<% end %>
+        </div>
+      <% elsif @row.dispatch.refusal && !@row.settled? %>
+        <div class="alert alert-warning" role="alert">
+          <strong>This payout cannot be sent.</strong> <%= @row.dispatch.refusal %>
+        </div>
+      <% end %>
+
+      <%= detail_section "The payout" do %>
+        <%= key_values [
+          [ "Amount", money_exact(@payout.amount_in_cents) ],
+          [ "Share today", money_exact(@row.share_in_cents) ],
+          [ "Asked", money_exact(@row.asked_in_cents) ],
+          [ "Method", @row.method_label ],
+          [ "Destination", @row.destination ],
+          [ "Sent", (l(@payout.sent_at, format: :long) if @payout.sent_at) ],
+          [ "Stripe transfer", @payout.stripe_transfer_id ],
+          [ "Gift card tracking", @payout.gift_card_tracking_number ]
+        ] %>
+        <div class="drawer-note mt-3">The amount is always the household's share of the pool. It cannot be changed by hand.</div>
+      <% end %>
+
+      <%= detail_section "Children and their lists" do %>
+        <% if @row.lists.any? %>
+          <table class="table table-sm mb-0">
+            <thead><tr><th>Child</th><th class="text-end">Asked</th><th class="text-end">Share</th></tr></thead>
+            <tbody>
+              <% @row.lists.each do |list| %>
+                <tr>
+                  <td><%= list.child_name %></td>
+                  <td class="text-end"><span class="num"><%= money_exact list.asked_in_cents %></span></td>
+                  <td class="text-end"><span class="num"><%= money_exact list.share_in_cents %></span></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% else %>
+          <div class="drawer-note">This household no longer has a list that counts toward the pool.</div>
+        <% end %>
+      <% end %>
+
+      <% if @row.sendable? && @payout.via_gift_card? %>
+        <%= detail_section "Record the mailed gift card" do %>
+          <%= form_with scope: :payout, url: send_funds_admin_payout_path(@payout), method: :patch,
+                        data: { turbo_confirm: "Record a #{money_exact(@payout.amount_in_cents)} gift card as mailed to #{household.display_name}?" } do |form| %>
+            <div class="row g-2 align-items-end">
+              <div class="col-md-7">
+                <%= form.label :gift_card_tracking_number, "Tracking number", class: "form-label" %>
+                <%= form.text_field :gift_card_tracking_number, class: "form-control", required: true %>
+              </div>
+              <div class="col-md-5">
+                <%= form.submit "Mark as sent", class: "btn btn-primary" %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="panel-card p-4">
+      <%= detail_section "Household" do %>
+        <%= key_values [
+          [ "Home", link_to(household.display_name, admin_household_path(household)) ],
+          [ "Caregiver", household.caregiver.full_name ],
+          [ "Email", mail_to(household.caregiver.email) ],
+          [ "County", household.county ],
+          [ "Verification", status_badge(household.verification_status) ]
+        ] %>
+      <% end %>
+    </div>
+  </div>
+</div>

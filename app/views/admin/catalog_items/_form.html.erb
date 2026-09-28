@@ -1,0 +1,70 @@
+<%# locals: form_object (Admin::CatalogItemForm) %>
+<div class="row">
+  <div class="col-lg-8">
+    <div class="panel-card p-4">
+      <%= form_with model: form_object, scope: :catalog_item, multipart: true,
+                    url: form_object.persisted? ? admin_catalog_item_path(form_object) : admin_catalog_items_path,
+                    method: form_object.persisted? ? :patch : :post do |form| %>
+        <%= render "admin/shared/error_summary", record: form_object %>
+
+        <div class="row g-3">
+          <div class="col-md-8">
+            <%= form.label :name, class: "form-label" %>
+            <%= form.text_field :name, class: "form-control", required: true %>
+          </div>
+          <div class="col-md-4">
+            <%= form.label :price_in_dollars, "Price", class: "form-label" %>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <%= form.text_field :price_in_dollars, class: "form-control", inputmode: "decimal", required: true %>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <%= form.label :category_id, "Category", class: "form-label" %>
+            <%= form.collection_select :category_id, Category.ordered, :id, :name, { prompt: "Choose a category" },
+                                       class: "form-select", required: true %>
+          </div>
+          <div class="col-md-3">
+            <%= form.label :min_age, "Youngest age", class: "form-label" %>
+            <%= form.number_field :min_age, class: "form-control", min: 0, max: 18 %>
+          </div>
+          <div class="col-md-3">
+            <%= form.label :max_age, "Oldest age", class: "form-label" %>
+            <%= form.number_field :max_age, class: "form-control", min: 0, max: 18 %>
+          </div>
+          <div class="col-md-3">
+            <%= form.label :icon, class: "form-label" %>
+            <%= form.text_field :icon, class: "form-control", placeholder: "🎁" %>
+            <div class="form-text">An emoji, shown when there is no photo.</div>
+          </div>
+          <div class="col-md-9 d-flex align-items-center">
+            <div class="form-check mt-3">
+              <%= form.check_box :active, class: "form-check-input" %>
+              <%= form.label :active, "Active: caregivers' gifts can match it and donors can see it", class: "form-check-label" %>
+            </div>
+          </div>
+          <div class="col-12">
+            <%= form.label :photo, class: "form-label" %>
+            <div class="cell-media">
+              <%= render "thumb", item: form_object %>
+              <%= form.file_field :photo, class: "form-control", accept: "image/png,image/jpeg,image/webp" %>
+            </div>
+            <div class="form-text">
+              PNG, JPEG, or WebP, under 10 MB.
+              <% if !form_object.photo.attached? && form_object.stock_photo.present? %>The bundled photo is shown until one is uploaded.<% end %>
+            </div>
+          </div>
+          <div class="col-12">
+            <%= form.label :photo_attribution, "Photo credit", class: "form-label" %>
+            <%= form.text_field :photo_attribution, class: "form-control" %>
+          </div>
+        </div>
+
+        <div class="drawer-actions mt-4">
+          <%= form.submit form_object.persisted? ? "Save the item" : "Add to the catalog", class: "btn btn-primary" %>
+          <%= link_to "Cancel", admin_catalog_items_path, class: "btn btn-outline-secondary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

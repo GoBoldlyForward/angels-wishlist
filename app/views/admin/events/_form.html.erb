@@ -1,0 +1,75 @@
+<%# locals: form_object (Admin::EventForm), url, method %>
+<%= form_with model: form_object, scope: :event, url: url, method: method do |form| %>
+  <%= render "admin/shared/error_summary", record: form_object %>
+
+  <div class="row g-3">
+    <div class="col-lg-5">
+      <div class="panel-card p-4">
+        <%= detail_section "The season" do %>
+          <div class="mb-3">
+            <%= form.label :name, class: "form-label" %>
+            <%= form.text_field :name, class: "form-control", placeholder: "Christmas 2026", required: true %>
+          </div>
+          <div class="mb-3">
+            <%= form.label :opened_at, "Opens to donors", class: "form-label" %>
+            <%= form.datetime_local_field :opened_at, class: "form-control" %>
+          </div>
+          <div class="mb-3">
+            <%= form.label :closes_at, "Lists close", class: "form-label" %>
+            <%= form.datetime_local_field :closes_at, class: "form-control" %>
+          </div>
+          <div class="mb-3">
+            <%= form.label :payout_at, "Payouts go out", class: "form-label" %>
+            <%= form.datetime_local_field :payout_at, class: "form-control" %>
+          </div>
+          <div class="form-text mb-3">Times are Eastern.</div>
+        <% end %>
+
+        <%= detail_section "The cap" do %>
+          <%= form.label :per_child_cap_in_dollars, "Most a list may ask for, per child", class: "form-label" %>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <%= form.text_field :per_child_cap_in_dollars, class: "form-control", inputmode: "decimal", required: true %>
+          </div>
+          <% if form_object.largest_list_in_cents.positive? %>
+            <div class="privacy-note mt-3">
+              <i class="bi bi-exclamation-triangle"></i>
+              <span>
+                The largest list asks for <%= money_exact form_object.largest_list_in_cents %>.
+                A cap below that leaves existing lists as they are and stops them taking another gift.
+              </span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="panel-card p-4" data-controller="admin-love-box">
+        <%= detail_section "What the Love Box offers" do %>
+          <%= form.hidden_field :love_box_edited, value: "1" %>
+          <p class="small text-muted">Each group is one choice a caregiver makes. Put one option on each line.</p>
+
+          <div data-admin-love-box-target="list">
+            <% form_object.love_box_groups.each_with_index do |group, index| %>
+              <%= render "love_box_group", group: group, index: index %>
+            <% end %>
+          </div>
+
+          <template data-admin-love-box-target="template">
+            <%= render "love_box_group", group: LoveBox::Group.from(id: "", label: ""), index: "NEW_GROUP" %>
+          </template>
+
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-action="admin-love-box#add">
+            <i class="bi bi-plus-lg"></i> Add a group
+          </button>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-actions mt-4">
+    <%= form.submit form_object.persisted? ? "Save the event" : "Create the event", class: "btn btn-primary" %>
+    <%= link_to "Cancel", form_object.persisted? ? admin_event_path(form_object) : admin_events_path, class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>

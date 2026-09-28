@@ -1,0 +1,8 @@
+<% content_for :breadcrumbs do %>
+  <li class="breadcrumb-item"><%= link_to "Catalog", admin_catalog_items_path %></li>
+  <li class="breadcrumb-item active">New catalog item</li>
+<% end %>
+
+<%= render "admin/shared/page_header", title: "New catalog item" %>
+
+<%= render "form", form_object: @form %>

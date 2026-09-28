@@ -1,0 +1,14 @@
+<%# locals: (gift:) -%>
+<% if gift.in_cart? %>
+  <%= button_to cart_gift_path(gift.key), method: :delete, class: "add-btn in",
+                form: { data: { turbo_frame: "_top" } },
+                aria: { label: "Take #{gift.name} for #{gift.child.alias_name} out of your cart" } do %>
+    <i class="fa-solid fa-check" aria-hidden="true"></i>
+  <% end %>
+<% else %>
+  <%= button_to cart_gifts_path, params: { gift: gift.key }, class: "add-btn",
+                form: { data: { turbo_frame: "_top" } },
+                aria: { label: "Add #{gift.name} for #{gift.child.alias_name} to your cart" } do %>
+    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+  <% end %>
+<% end %>

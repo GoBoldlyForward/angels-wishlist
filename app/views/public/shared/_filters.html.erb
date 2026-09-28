@@ -1,0 +1,41 @@
+<%# locals: (filters:, url:, only: %i[gender age price], categories: []) -%>
+<div class="filters" data-controller="shop-filter" data-action="click@window->shop-filter#closeOutside keydown.esc@window->shop-filter#closeAll">
+  <% filters.groups(only: only).each do |group| %>
+    <details class="fdrop" data-shop-filter-target="drop" data-action="toggle->shop-filter#closeOthers">
+      <summary class="fpill <%= "on" if filters.value(group.key) %>">
+        <i class="fa-solid <%= group.icon %>" aria-hidden="true"></i><%= filters.label(group) %>
+        <i class="fa-solid fa-chevron-down caret" aria-hidden="true"></i>
+      </summary>
+      <div class="fmenu">
+        <% ({ nil => group.any_label }).merge(group.options).each do |value, label| %>
+          <% chosen = filters.value(group.key) == value %>
+          <%= link_to url.call(filters.with(group.key, value)), class: class_names("fopt", on: chosen),
+                      aria: { current: (chosen ? "true" : nil) } do %>
+            <span><%= label %></span>
+            <% if chosen %><i class="fa-solid fa-check tick" aria-hidden="true"></i><% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </details>
+  <% end %>
+
+  <% if categories.any? %>
+    <details class="fdrop" data-shop-filter-target="drop" data-action="toggle->shop-filter#closeOthers">
+      <summary class="fpill">
+        <i class="fa-solid fa-shapes" aria-hidden="true"></i>All categories
+        <i class="fa-solid fa-chevron-down caret" aria-hidden="true"></i>
+      </summary>
+      <div class="fmenu">
+        <% categories.each do |category| %>
+          <%= link_to category_path(category, filters.to_h), class: "fopt" do %>
+            <i class="fa-solid <%= category.icon %> fopt-ic" aria-hidden="true"></i><span><%= category.name %></span>
+          <% end %>
+        <% end %>
+      </div>
+    </details>
+  <% end %>
+
+  <% if filters.any?(only: only) %>
+    <%= link_to "Clear all", url.call({}), class: "btn-plain btn-sm" %>
+  <% end %>
+</div>

@@ -1,0 +1,6 @@
+<div class="modal" role="dialog" aria-modal="true" aria-label="Details" hidden
+     data-shop-modal-target="dialog" data-action="keydown->shop-modal#keepFocus">
+  <div class="scrim on modal-scrim" data-action="click->shop-modal#close"></div>
+  <%= turbo_frame_tag "modal", class: "modal-box", data: { shop_modal_target: "frame",
+                                                           action: "turbo:frame-load->shop-modal#open" } %>
+</div>

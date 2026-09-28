@@ -1,0 +1,76 @@
+<% left = @child.left %>
+<%= render layout: "public/shared/detail", locals: { title: @child.to_s } do %>
+  <div class="modal-hd">
+    <div class="detail-head">
+      <%= avatar @child.alias_name, size: "avatar-lg t-xl" %>
+      <div>
+        <h1 class="t-xl"><%= @child %></h1>
+        <div class="kid-meta"><%= @child.meta %></div>
+      </div>
+    </div>
+    <%= render "public/shared/close" %>
+  </div>
+
+  <div class="modal-bd">
+    <% if @child.interests.any? %>
+      <div class="tags detail-tags">
+        <% @child.interests.each do |interest| %><span class="tag"><%= interest %></span><% end %>
+      </div>
+    <% end %>
+
+    <% if @child.note.present? %>
+      <div class="panel panel-warm caregiver-note">
+        <div class="note">
+          <i class="fa-solid fa-quote-left" aria-hidden="true"></i>
+          <div>
+            <em><%= @child.note %></em>
+            <div class="tiny c-brand note-from">From their caregiver</div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="bar <%= "done" if @child.percent_chosen >= 100 %>"><i style="width:<%= @child.percent_chosen %>%"></i></div>
+    <div class="fund-line detail-progress">
+      <span><b><%= money @child.chosen_in_cents %></b> of <%= money @child.asked_in_cents %> chosen</span>
+      <span><%= @child.percent_chosen %>%</span>
+    </div>
+
+    <% @child.gifts.each do |gift| %>
+      <div class="mini <%= "is-funded" if gift.funded? %>">
+        <%= gift_art gift.catalog_item, css_class: "icon" %>
+        <div class="mini-body">
+          <div class="t-base w-600 ink"><%= gift.name %></div>
+          <div class="tiny muted">
+            <% if gift.funded? %>
+              Chosen by <%= gift.chosen_by %>
+            <% elsif gift.spec %>
+              <i class="fa-solid fa-tag t-2xs" aria-hidden="true"></i> <%= gift.spec %>
+            <% else %>
+              <%= gift.category&.name || "Written in by their caregiver" %>
+            <% end %>
+          </div>
+          <%= render "public/shared/link_chip", gift: gift unless gift.funded? %>
+        </div>
+        <span class="price t-base"><%= money gift.price_in_cents %></span>
+        <% if gift.funded? %>
+          <i class="fa-solid fa-circle-check c-green funded-check" role="img" aria-label="Funded"></i>
+        <% else %>
+          <%= render "public/shared/add_button", gift: gift %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if left.any? %>
+      <%= button_to "Fund the rest of #{@child.alias_name}'s list · #{money @child.left_in_cents}",
+                    child_funding_path(@child.key), class: "btn btn-primary btn-block fund-rest",
+                    form: { data: { turbo_frame: "_top" } } %>
+    <% end %>
+
+    <div class="disclosure">
+      <%= @child.alias_name %> is a stand-in name that <%= current_chapter&.name || "Atlanta Angels" %> assigned,
+      and their caregiver wrote this list. Their household is verified. What you fund shows on your receipt
+      and goes into the pool that is spread evenly across every child's list.
+    </div>
+  </div>
+<% end %>

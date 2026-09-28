@@ -1,0 +1,30 @@
+<%# locals: (catalog:, filters:) -%>
+<% minimum = Donation::MINIMUM_GENERAL_GIFT_IN_CENTS / 100 %>
+<div class="sec give">
+  <div class="panel give-panel">
+    <h2 class="t-xl">Give an amount instead</h2>
+    <p>
+      If nothing on the lists is quite right, or you have an amount in mind rather than an item, this
+      goes to the same place: the pool that is spread evenly across every child's list.
+    </p>
+    <div class="filters give-presets">
+      <% Storefront::Content::GENERAL_GIFT_PRESETS_IN_DOLLARS.each do |dollars| %>
+        <%= button_to number_to_currency(dollars, precision: 0), cart_general_gifts_path,
+                      params: { amount: dollars }, class: "chip",
+                      aria: { label: "Add a #{number_to_currency(dollars, precision: 0)} gift to your cart" } %>
+      <% end %>
+    </div>
+    <%= form_with url: cart_general_gifts_path, class: "row2 give-custom" do |form| %>
+      <div class="field">
+        <%= form.label :amount, "Any amount, #{number_to_currency(minimum, precision: 0)} or more", class: "f" %>
+        <%= form.number_field :amount, class: "i", min: minimum, step: 1, placeholder: 75, required: true,
+                                       inputmode: "numeric" %>
+      </div>
+      <%= form.button "Add to cart", class: "btn btn-primary give-add" %>
+    <% end %>
+    <div class="disclosure">
+      This one is not tied to a gift on a list. It goes into the same pool as every other gift and is
+      spread evenly across every child's list at close.
+    </div>
+  </div>
+</div>

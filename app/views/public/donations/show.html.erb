@@ -1,0 +1,105 @@
+<% content_for :title, "Thank you | Wish List" %>
+<% content_for(:head) { tag.meta(name: "robots", content: "noindex") } %>
+<% chapter = current_chapter&.name || "Atlanta Angels" %>
+<% finished = @receipt.succeeded? %>
+
+<main class="container confirmation-page">
+  <div class="confirmation-head">
+    <div class="emoji-xl" aria-hidden="true"><%= finished ? "🎁" : "⏳" %></div>
+    <% if @receipt.pending? %>
+      <h1 class="text-balance">We are confirming your payment.</h1>
+      <p class="muted">
+        This page shows your gift as soon as the payment goes through, and your receipt follows by email.
+        If you left the payment page before finishing, nothing was charged.
+      </p>
+    <% elsif @receipt.failed? %>
+      <h1 class="text-balance">This payment did not go through.</h1>
+      <p class="muted">Nothing was charged. The gifts you chose are open again on the lists.</p>
+    <% elsif @receipt.returned? %>
+      <h1 class="text-balance">This gift was returned to you.</h1>
+      <p class="muted">The <%= money @receipt.given_in_cents %> went back to your card, and the gifts are open again.</p>
+    <% else %>
+      <h1 class="text-balance">Thank you. You gave <%= money @receipt.given_in_cents %>.</h1>
+      <p class="muted">
+        A receipt is on its way to your inbox with every line itemized.
+        <% if @receipt.fee_in_cents.positive? %>
+          Your card was charged <%= money_exact @receipt.charged_in_cents %>, which covers card processing.
+        <% end %>
+      </p>
+    <% end %>
+  </div>
+
+  <div class="panel">
+    <h2 class="t-md confirmation-title"><%= finished ? "You gave" : "You chose" %></h2>
+
+    <% @receipt.chosen_by_child.each do |gifts| %>
+      <% gifts.each do |gift| %>
+        <div class="mini">
+          <%= gift_art gift.catalog_item, css_class: "icon" %>
+          <div class="mini-body">
+            <div class="t-base w-600 ink"><%= gift.name %></div>
+            <div class="tiny muted"><%= "#{gift.spec} · " if gift.spec %>For <%= gift.child %></div>
+          </div>
+          <span class="price t-base"><%= money gift.price_in_cents %></span>
+        </div>
+      <% end %>
+    <% end %>
+
+    <% @receipt.pooled.each do |gift| %>
+      <div class="mini">
+        <span class="icon t5" aria-hidden="true">💛</span>
+        <div class="mini-body">
+          <div class="t-base w-600 ink"><%= gift.name %></div>
+          <div class="tiny muted">
+            Someone else chose this gift for <%= gift.child.alias_name %> just before you, so this amount went
+            into the pool as a general gift.
+          </div>
+        </div>
+        <span class="price t-base"><%= money gift.price_in_cents %></span>
+      </div>
+    <% end %>
+
+    <% if @receipt.general_gift_in_cents.positive? %>
+      <div class="mini">
+        <span class="icon t5" aria-hidden="true">💛</span>
+        <div class="mini-body">
+          <div class="t-base w-600 ink">General gift</div>
+          <div class="tiny muted">Goes into the same pool as every other gift</div>
+        </div>
+        <span class="price t-base"><%= money @receipt.general_gift_in_cents %></span>
+      </div>
+    <% end %>
+
+    <% if @receipt.note %>
+      <div class="panel panel-warm confirmation-note">
+        <em>"<%= @receipt.note %>"</em>
+        <div class="tiny c-brand note-from">
+          From <%= @receipt.display_name %>, held until <%= chapter %> has read it
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <% unless @receipt.failed? || @receipt.returned? %>
+    <div class="panel panel-green confirmation-next">
+      <div class="note">
+        <i class="fa-solid fa-calendar-check c-green" aria-hidden="true"></i>
+        <div>
+          <% if @closes_at %>
+            <b class="ink">Next: <%= @closes_at.strftime("%B %-d") %>.</b>
+            The lists close, and everything raised is pooled and spread evenly across every child's list, so
+            every list is funded to the same share. Each household is paid its share that week.
+          <% else %>
+            <b class="ink">Next.</b>
+            When the lists close, everything raised is pooled and spread evenly across every child's list.
+          <% end %>
+          You receive a thank-you and an impact statement from <%= chapter %> in January.
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="confirmation-back">
+    <%= link_to "Back to the lists", root_path(anchor: "shop"), class: "btn btn-ghost" %>
+  </div>
+</main>

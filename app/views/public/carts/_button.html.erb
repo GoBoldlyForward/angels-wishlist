@@ -1,0 +1,6 @@
+<%= link_to cart_path, class: "cart-btn", id: "cartBtn",
+            aria: { label: "Cart, #{pluralize(cart.count, 'item')}", haspopup: "dialog" },
+            data: { action: "click->cart-drawer#open", cart_drawer_target: "button", cart_count: cart.count } do %>
+  <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> Cart
+  <span class="cart-count" id="cartCount"><%= cart.count %></span>
+<% end %>

@@ -1,0 +1,42 @@
+<%# locals: (catalog:) -%>
+<% almost = catalog.almost_finished %>
+<% if almost.any? %>
+  <%= render layout: "shelf", locals: { kicker: "Almost there", title: "One gift from a finished list",
+                                        blurb: "A single line stands between these kids and a complete list." } do %>
+    <%= render partial: "public/shared/gift_tile", collection: almost, as: :gift %>
+  <% end %>
+<% end %>
+
+<% untouched = catalog.untouched %>
+<% if untouched.any? %>
+  <%= render layout: "shelf", locals: { kicker: "Still waiting", tone: "gold", title: "Nobody has funded these yet",
+                                        blurb: "No gift on these lists has been chosen yet. Somebody has to go first." } do %>
+    <%= render partial: "public/shared/child_card", collection: untouched, as: :child %>
+  <% end %>
+<% end %>
+
+<% cheap = catalog.under_forty %>
+<% if cheap.any? %>
+  <%= render layout: "shelf", locals: { kicker: "Easy yes", tone: "green", title: "Everything under $40",
+                                        blurb: "Small gifts finish lists." } do %>
+    <%= render partial: "public/shared/product_tile", collection: cheap, as: :product %>
+  <% end %>
+<% end %>
+
+<% teens = catalog.teenagers %>
+<% if teens.any? %>
+  <%= render layout: "shelf", locals: { kicker: "The hard part", title: "Teenagers get skipped",
+                                        blurb: "Younger kids get picked first every year. These lists are practical, and they matter more." } do %>
+    <%= render partial: "public/shared/child_card", collection: teens, as: :child %>
+  <% end %>
+<% end %>
+
+<% fresh = catalog.new_this_week %>
+<% if fresh.any? %>
+  <%= render layout: "shelf", locals: { kicker: "Just added", tone: "gold", title: "New lists this week",
+                                        blurb: "Lists that went live in the last seven days." } do %>
+    <%= render partial: "public/shared/child_card", collection: fresh, as: :child %>
+  <% end %>
+<% end %>
+
+<% if [ almost, untouched, cheap, teens, fresh ].any?(&:any?) %><hr class="shelf-rule"><% end %>

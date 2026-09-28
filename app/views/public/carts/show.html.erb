@@ -1,0 +1,16 @@
+<% content_for :title, "Your cart | Wish List" %>
+
+<main class="container page-narrow">
+  <%= link_to root_path(anchor: "shop"), class: "btn-plain" do %>
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> &nbsp;Keep shopping
+  <% end %>
+  <h1 class="page-title">Your cart</h1>
+  <p class="muted page-lede">Each gift is listed at the price the caregiver gave.</p>
+
+  <div class="panel">
+    <%= render "public/carts/lines" %>
+  </div>
+  <div class="panel cart-page-summary">
+    <%= render "public/carts/summary" %>
+  </div>
+</main>

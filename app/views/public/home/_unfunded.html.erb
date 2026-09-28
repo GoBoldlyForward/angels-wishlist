@@ -1,0 +1,39 @@
+<%# locals: (catalog:, filters:) -%>
+<% almost = catalog.almost_finished %>
+<% open = catalog.open_gifts(filters) %>
+<% products = Storefront::Product.most_needed_first(Storefront::Product.group(open)) %>
+
+<% if almost.any? %>
+  <div class="sec">
+    <div class="sec-head">
+      <div>
+        <h2>One gift from a finished list</h2>
+        <p>These children have a single line left. Closing it finishes their whole list.</p>
+      </div>
+    </div>
+    <div class="rail">
+      <%= render partial: "public/shared/gift_tile", collection: almost, as: :gift %>
+    </div>
+  </div>
+<% end %>
+
+<%= render "public/shared/filters", filters: filters, categories: catalog.categories,
+           url: ->(query) { root_path(query.merge(tab: "unfunded", anchor: "shop")) } %>
+
+<div class="sec">
+  <div class="sec-head">
+    <div>
+      <h2>Everything still unfunded</h2>
+      <p><%= pluralize open.size, "gift" %> across <%= pluralize products.size, "product" %>, most-needed first.</p>
+    </div>
+  </div>
+  <div class="grid">
+    <% if products.any? %>
+      <%= render partial: "public/shared/product_tile", collection: products, as: :product %>
+    <% elsif filters.any? %>
+      <p class="muted">Nothing unfunded matches those filters.</p>
+    <% else %>
+      <p class="muted">Every gift is funded. That has never happened before.</p>
+    <% end %>
+  </div>
+</div>

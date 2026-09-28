@@ -1,0 +1,11 @@
+<% if cart.empty? %>
+  <%= link_to "Browse the lists", root_path(anchor: "shop"), class: "btn btn-ghost btn-block",
+              data: { action: "cart-drawer#close" } %>
+<% else %>
+  <div class="total-row"><span class="muted">Total</span><b><%= money cart.total_in_cents %></b></div>
+  <%= link_to "Review and give", checkout_path, class: "btn btn-primary btn-block" %>
+  <p class="tiny muted cart-fineprint">
+    Donations to <%= current_chapter&.name || "Atlanta Angels" %>, pooled and shared evenly across every
+    child's list. Nothing ships.
+  </p>
+<% end %>

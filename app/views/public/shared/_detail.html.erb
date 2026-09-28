@@ -1,0 +1,16 @@
+<%# locals: (title:) -%>
+<% content_for :title, "#{title} | Wish List" %>
+<% if turbo_frame_request? %>
+  <%= turbo_frame_tag "modal" do %>
+    <%= yield %>
+  <% end %>
+<% else %>
+  <main class="container detail-page">
+    <%= link_to root_path(anchor: "shop"), class: "btn-plain" do %>
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> &nbsp;All gifts
+    <% end %>
+    <div class="modal-box detail-box">
+      <%= yield %>
+    </div>
+  </main>
+<% end %>

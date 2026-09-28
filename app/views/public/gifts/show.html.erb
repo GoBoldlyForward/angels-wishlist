@@ -1,0 +1,104 @@
+<% pooled = @product.pooled_left %>
+<% specific = @product.specific_left %>
+<% carted = @product.carted %>
+<% funded = @product.funded %>
+<%= render layout: "public/shared/detail", locals: { title: @product.name } do %>
+  <div class="modal-hd">
+    <div class="detail-head">
+      <%= gift_art @product.catalog_item, css_class: "prod-art" %>
+      <div>
+        <h1 class="t-xl"><%= @product.name %></h1>
+        <div class="kid-meta">
+          <%= @product.category&.name || "Written in by a caregiver" %> ·
+          <%= @product.open.size %> still needed of <%= @product.gifts.size %> asked for
+        </div>
+      </div>
+    </div>
+    <%= render "public/shared/close" %>
+  </div>
+
+  <div class="modal-bd">
+    <% if pooled.any? %>
+      <% prices = pooled.map(&:price_in_cents) %>
+      <div class="panel pool-panel">
+        <h2 class="t-md">Fund one for any child who asked</h2>
+        <p class="tiny muted">
+          Waiting: <%= pooled.map { |gift| gift.child.to_s }.join(" · ") %>.
+          We apply each one to the child who has been waiting longest.
+        </p>
+        <%= form_with url: gift_funding_path(@product.key), class: "stepper-row",
+                      data: { turbo_frame: "_top", controller: "shop-stepper",
+                              shop_stepper_prices_value: prices.to_json } do |form| %>
+          <div class="stepper">
+            <button class="step-btn" type="button" hidden aria-label="One fewer"
+                    data-shop-stepper-target="less" data-action="shop-stepper#less">
+              <i class="fa-solid fa-minus" aria-hidden="true"></i>
+            </button>
+            <%= form.label :quantity, "How many to fund", class: "sr-only" %>
+            <%= form.number_field :quantity, value: 1, min: 1, max: pooled.size, class: "step-n", required: true,
+                                             data: { shop_stepper_target: "quantity",
+                                                     action: "input->shop-stepper#refresh" } %>
+            <button class="step-btn" type="button" hidden aria-label="One more"
+                    data-shop-stepper-target="more" data-action="shop-stepper#more">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="stepper-total">
+            <div class="tiny muted">of <%= pooled.size %> still needed</div>
+            <div class="price" data-shop-stepper-target="total"><%= money prices.first %></div>
+          </div>
+          <%= form.button class: "btn btn-primary" do %>
+            Add <span data-shop-stepper-target="count">1</span> to cart
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if specific.any? %>
+      <h2 class="t-base requests-title">
+        <%= @product.custom? ? "This request" : (pooled.any? ? "Or fund a specific request" : "Specific requests") %>
+      </h2>
+      <% unless @product.custom? %><p class="tiny muted requests-lede">These caregivers named a brand or a size.</p><% end %>
+      <% specific.each do |gift| %>
+        <div class="mini">
+          <%= gift_art gift.catalog_item, css_class: "icon" %>
+          <div class="mini-body">
+            <div class="t-base w-600 ink"><%= gift.spec || gift.name %></div>
+            <div class="tiny muted">
+              For <%= link_to gift.child, child_path(gift.child.key), class: "link" %>
+            </div>
+            <%= render "public/shared/link_chip", gift: gift %>
+          </div>
+          <span class="price t-base"><%= money gift.price_in_cents %></span>
+          <%= render "public/shared/add_button", gift: gift %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <% if carted.any? %>
+      <div class="panel panel-warm carted-panel">
+        <div class="note">
+          <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+          <div>
+            <%= carted.size %> in your cart for <%= carted.map { |gift| gift.child.alias_name }.to_sentence %>.
+            <%= button_to "Remove them", gift_funding_path(@product.key), method: :delete, class: "rm",
+                          form: { data: { turbo_frame: "_top" } } %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <% if funded.any? %>
+      <p class="tiny muted funded-note">
+        <%= funded.size %> already chosen by <%= @product.chosen_by.to_sentence %>.
+      </p>
+    <% end %>
+
+    <div class="disclosure">
+      This request was added by the child's caregiver, and their household is verified by
+      <%= current_chapter&.name || "Atlanta Angels" %>. What you fund shows on your receipt and goes into the
+      pool that is spread evenly across every child's list. A named brand is the request we pass along, not a
+      guarantee of what gets bought.
+    </div>
+  </div>
+<% end %>

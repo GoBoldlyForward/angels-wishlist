@@ -1,0 +1,150 @@
+/* What the donor storefront adds to wishlist.css: the pieces the prototype
+   set inline or drew with JavaScript, now that the server renders them. */
+
+.sr-only {
+  border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden;
+  padding: 0; position: absolute; white-space: nowrap; width: 1px;
+}
+
+turbo-frame { display: block; }
+
+/* ── Pages ── */
+.page-narrow { max-width: 720px; padding-bottom: 60px; padding-top: 30px; }
+.page-title { font-size: clamp(1.7rem, 3.6vw, 2.2rem); margin: 16px 0 6px; }
+.page-lede { margin: 0 0 26px; }
+.section-narrow { max-width: 860px; }
+.section-title { font-size: clamp(1.7rem, 3.4vw, 2.2rem); margin: 14px 0 10px; }
+.section-title-lg { font-size: clamp(1.7rem, 3.4vw, 2.3rem); margin-bottom: 14px; }
+.tag-accent, .tag-new { background: var(--accent-wash); color: var(--accent-deep); }
+.tag-new { margin-left: auto; }
+.empty-state { padding: 50px 20px; text-align: center; }
+.empty-state h2 { margin: 14px 0 8px; }
+.empty-state p { margin: 0 0 18px; }
+
+/* ── Tabs and filters as links ── */
+#shop { scroll-margin-top: 58px; }
+a.tab, a.fopt, a.chip, a.kid-card, a.tile, a.cart-btn { text-decoration: none; }
+details.fdrop > summary { list-style: none; }
+details.fdrop > summary::-webkit-details-marker { display: none; }
+details.fdrop[open] .fmenu { display: block; }
+details.fdrop[open] .fpill { background: #fff; border-color: var(--ink); color: var(--ink); }
+details.fdrop[open] .fpill > i:first-child,
+details.fdrop[open] .fpill .caret { color: var(--faint); }
+details.fdrop[open] .caret { transform: rotate(180deg); }
+.fopt:focus-visible, summary.fpill:focus-visible { box-shadow: var(--ring); outline: none; }
+.filters form.button_to { display: inline-flex; }
+.sec-icon { color: var(--brand); margin-right: 9px; }
+.grid-wide { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+
+/* ── Tiles that hold both a link and a button ── */
+.tile-link { color: inherit; display: flex; flex: 1; flex-direction: column; text-decoration: none; }
+.tile-link:focus-visible { box-shadow: var(--ring); outline: none; }
+.tile-foot-own { margin-top: 0; padding: 0 15px 16px; }
+.tile-for-icon { opacity: .5; }
+.add-btn:focus-visible, .rm:focus-visible, .x:focus-visible, .step-btn:focus-visible,
+.cart-btn:focus-visible, .item-link:focus-visible {
+  box-shadow: var(--ring); outline: none;
+}
+
+/* ── Give any amount ── */
+.give { padding-top: 30px; }
+.give-panel { max-width: 760px; padding: 30px; }
+.give-panel h2 { margin-bottom: 10px; }
+.give-panel > p { margin: 0 0 22px; }
+.give-presets { padding: 0 0 16px; }
+.give-custom { align-items: end; }
+.give-custom .field { margin: 0; }
+.give-add { height: 47px; }
+.give-panel .disclosure { margin-top: 20px; }
+
+/* ── How it works ── */
+.why-intro { max-width: 640px; }
+.why-next { margin: 52px 0 0; }
+
+/* ── Cart ── */
+.cart-empty { padding: 50px 10px; text-align: center; }
+.cart-empty p { margin: 12px 0 0; }
+.line-body { flex: 1; min-width: 0; }
+.cart-fineprint { margin: 11px 0 0; text-align: center; }
+.cart-page-summary { margin-top: 16px; }
+
+/* ── Product and child views ── */
+.modal-scrim { position: absolute; }
+body.has-dialog { overflow: hidden; }
+.detail-page { max-width: 720px; padding-bottom: 60px; padding-top: 26px; }
+.detail-box { border: 1px solid var(--line); box-shadow: var(--sh-md); margin-top: 14px; max-height: none; overflow: visible; width: 100%; }
+.detail-head { align-items: center; display: flex; gap: 15px; }
+.avatar-lg { height: 58px; width: 58px; }
+.detail-tags { margin-bottom: 16px; }
+.caregiver-note { margin-bottom: 20px; padding: 16px 18px; }
+.note-from { font-style: normal; margin-top: 6px; }
+.detail-progress { margin: 8px 0 20px; }
+.pool-panel { margin-bottom: 16px; padding: 20px; }
+.pool-panel h2 { margin-bottom: 5px; }
+.pool-panel p { margin: 0 0 16px; }
+.stepper-total { flex: 1; }
+.requests-title { margin: 22px 0 4px; }
+.requests-lede { margin: 0 0 12px; }
+.modal-bd .mini, .checkout-group .mini, .confirmation-page .mini { margin-bottom: 9px; }
+.mini-body { flex: 1; min-width: 0; }
+.mini.is-funded { opacity: .6; }
+.mini form.button_to, .funded-check { margin-left: 10px; }
+.carted-panel { margin-top: 18px; padding: 14px 16px; }
+.carted-panel .rm { margin-left: 6px; }
+.funded-note { margin: 16px 0 0; }
+.modal-bd .disclosure { margin-top: 16px; }
+.fund-rest { margin-top: 18px; }
+form.button_to:has(> .btn-block) { display: block; }
+
+input.step-n {
+  appearance: textfield; background: none; border: none; color: var(--ink); font: inherit;
+  font-size: var(--fs-md); font-weight: 700; min-width: 0; padding: 0; text-align: center; width: 46px;
+}
+input.step-n::-webkit-inner-spin-button, input.step-n::-webkit-outer-spin-button { appearance: none; margin: 0; }
+input.step-n:focus-visible { box-shadow: var(--ring); border-radius: 8px; outline: none; }
+
+/* ── Category funding block ── */
+.cat-cta h2 { margin-bottom: 4px; }
+.cat-cta-lede { margin: 0 0 16px; }
+.cat-stepper { margin-bottom: 14px; }
+.cat-cover { margin-top: 10px; }
+.cat-cta-count { margin: 12px 0 0; text-align: center; }
+.other-categories { padding-bottom: 30px; }
+.chip-icon { margin-right: 7px; opacity: .6; }
+.chip-count { color: var(--faint); margin-left: 6px; }
+
+/* ── Checkout ── */
+.checkout-page { max-width: 960px; padding-bottom: 60px; padding-top: 30px; }
+.checkout-grid { align-items: start; gap: 26px; grid-template-columns: 1.4fr 1fr; }
+.checkout-group { margin-bottom: 18px; }
+.checkout-group-head { align-items: baseline; display: flex; gap: 12px; justify-content: space-between; margin-bottom: 14px; }
+.checkout-flow { margin-top: 22px; }
+.checkout-form { position: sticky; top: 80px; }
+.checkout-form .flash { margin: 0 0 18px; }
+.fee-choice { align-items: flex-start; cursor: pointer; display: flex; gap: 10px; margin-bottom: 18px; }
+.fee-choice input { margin-top: 4px; }
+.checkout-test { margin: 12px 0 0; text-align: center; }
+.checkout-disclosure { margin-top: 16px; }
+
+/* ── Confirmation ── */
+.confirmation-page { max-width: 760px; padding-bottom: 70px; padding-top: 50px; }
+.confirmation-head { margin-bottom: 32px; text-align: center; }
+.confirmation-head h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); margin: 14px 0 10px; }
+.confirmation-head p { margin: 0 auto; max-width: 520px; }
+.confirmation-title { margin-bottom: 14px; }
+.confirmation-note { margin-top: 14px; padding: 14px 16px; }
+.confirmation-next { margin-top: 20px; }
+.confirmation-back { margin-top: 30px; text-align: center; }
+
+@media (max-width: 820px) {
+  .checkout-grid { grid-template-columns: 1fr; }
+  .checkout-form { position: static; }
+}
+
+@media (max-width: 640px) {
+  .season-legs { flex-wrap: wrap; }
+  .season-leg { flex: 1 1 40%; }
+  .season-top { flex-wrap: wrap; }
+  .modal { padding: 10px; }
+  .stepper-row .btn { width: 100%; }
+}

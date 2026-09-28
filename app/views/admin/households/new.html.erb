@@ -1,0 +1,7 @@
+<% families_breadcrumbs "Families", [ "Households", admin_households_path ], "Add household" %>
+
+<%= render "admin/shared/page_header", title: "Add household",
+           lede: "For a caregiver who asked staff to start for them. The household waits for verification like any other." do %>
+<% end %>
+
+<%= render "form", form: @form, url: admin_households_path, method: :post %>

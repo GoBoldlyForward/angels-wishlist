@@ -1,0 +1,79 @@
+<% child = @line_item.wishlist.child %>
+<% household = child.household %>
+<% families_breadcrumbs "Families", [ "Line items", admin_line_items_path ], @line_item.name %>
+
+<%= render "admin/shared/page_header", title: @line_item.name,
+           lede: "For #{child_label(child)} · #{household.display_name}" do %>
+  <% unless @line_item.funded? || @line_item.withdrawn_status? %>
+    <%= link_to edit_admin_line_item_path(@line_item), class: "btn btn-outline-secondary" do %><i class="bi bi-pencil me-1"></i>Edit<% end %>
+  <% end %>
+  <% if @line_item.needs_review_status? %>
+    <%= button_to approve_admin_line_item_path(@line_item), method: :patch, class: "btn btn-success" do %>
+      <i class="bi bi-check2 me-1"></i>Approve price
+    <% end %>
+  <% end %>
+  <% unless @line_item.funded? || @line_item.withdrawn_status? %>
+    <%= button_to withdraw_admin_line_item_path(@line_item), method: :patch, class: "btn btn-outline-danger",
+                  form: { data: { turbo_confirm: "Withdraw #{@line_item.name} from #{child.display_name}'s list?" } } do %>
+      <i class="bi bi-x-circle me-1"></i>Withdraw
+    <% end %>
+  <% end %>
+<% end %>
+
+<% if @line_item.funded? %>
+  <%= family_callout icon: "lock" do %>
+    A donor has chosen this gift, so it is locked. It cannot be edited or withdrawn.
+  <% end %>
+<% end %>
+
+<div class="detail-grid">
+  <div class="panel-card detail-card">
+    <%= family_hero @line_item.name,
+                    @line_item.spec.presence || (@line_item.funded? ? "No brand or size was named" : "No brand or size named, so it sits in the pool"),
+                    gift_thumb(@line_item.catalog_item) %>
+
+    <%= detail_section "The gift" do %>
+      <%= key_values [
+        [ "Status", line_item_badge(@line_item) ],
+        [ "Price", safe_join([ money(@line_item.price_in_cents), (tag.span(" (catalog price is #{money(@line_item.catalog_item.price_in_cents)})", class: "text-danger") if @line_item.above_catalog_price?) ]) ],
+        [ "Brand or size", @line_item.spec ],
+        [ "Catalog item", @line_item.catalog_item&.name || muted_dash("not in the catalog") ],
+        [ "Category", @line_item.catalog_item&.category&.name ],
+        [ "Added", l(@line_item.created_at.to_date, format: :long) ],
+        [ "Caregiver link", @line_item.link_url.present? && link_to(link_host(@line_item.link_url), @line_item.link_url, target: "_blank", rel: "noopener nofollow") ]
+      ] %>
+    <% end %>
+  </div>
+
+  <div class="panel-card detail-card">
+    <%= detail_section "Who it is for" do %>
+      <%= key_values [
+        [ "Child", link_to(child_label(child), admin_wishlist_path(@line_item.wishlist)) ],
+        [ "Household", link_to(household.display_name, admin_household_path(household)) ],
+        [ "Caregiver", household.caregiver&.full_name ],
+        [ "County", household.county ],
+        [ "Their wishlist", "#{money(@wishlist.chosen_cents)} chosen of #{money(@wishlist.asked_cents)} asked" ]
+      ] %>
+    <% end %>
+
+    <%= detail_section "Funding" do %>
+      <% if @line_item.funded? %>
+        <% donation = @line_item.donation %>
+        <%= key_values [
+          [ "Funded by", donation.donor.full_name ],
+          [ "Shown as", donation.public_display_name ],
+          [ "Funded on", l(donation.created_at.to_date, format: :long) ],
+          [ "Donation", link_to(donation.uuid.first(8), admin_donation_path(donation), class: "num") ]
+        ] %>
+      <% elsif @line_item.withdrawn_status? %>
+        <div class="drawer-note">Withdrawn. Donors no longer see it and it does not count toward what the list asked.</div>
+      <% elsif @line_item.needs_review_status? %>
+        <div class="drawer-note">Waiting on staff. The price is above the catalog's, so donors do not see this line until it is approved.</div>
+      <% elsif @line_item.pooled? %>
+        <div class="drawer-note">Still open. No brand or size was named, so a donor funding this gift covers the oldest open line for it.</div>
+      <% else %>
+        <div class="drawer-note">Still open. A specific brand or size was named, so this line is funded on its own.</div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<% families_breadcrumbs "Inbox", "Audit trail" %>
+
+<%= render "admin/shared/page_header", title: "Audit trail",
+           lede: "Who verified, approved, held, and changed what. Newest first." do %>
+<% end %>
+
+<%= render "admin/shared/table_controls", table: @table, placeholder: "Search a record type or a changed value..." %>
+
+<div class="data-table-wrapper">
+  <div class="table-scroll">
+    <table class="table">
+      <thead>
+        <tr>
+          <%= sortable_header @table, :when, "When" %>
+          <th>Who</th>
+          <th>What happened</th>
+          <%= sortable_header @table, :record, "Record" %>
+          <th>What changed</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @versions.each do |version| %>
+          <% subject = @subjects.for(version) %>
+          <tr>
+            <td class="text-nowrap">
+              <span class="num"><%= l(version.created_at, format: :short) %></span>
+              <%= cell_sub "#{time_ago_in_words(version.created_at)} ago" %>
+            </td>
+            <td>
+              <% if version.actor %>
+                <span><%= version.actor.full_name %></span>
+                <%= cell_sub version.actor.is_admin? ? "Staff" : version.actor.role.humanize %>
+              <% else %>
+                <%= muted_dash "The system" %>
+              <% end %>
+            </td>
+            <td><%= version_event_badge version %></td>
+            <td>
+              <span class="item-name"><%= subject.page ? link_to(subject.label, [ :admin, subject.page ]) : subject.label %></span>
+              <%= cell_sub subject.kind %>
+            </td>
+            <td class="audit-changes">
+              <% version.changeset.except("updated_at", "created_at", "id").each do |field, (before, after)| %>
+                <%= changeset_line field, before, after %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        <%= render "admin/shared/empty_row", columns: 5, what: "changes" if @versions.empty? %>
+      </tbody>
+    </table>
+  </div>
+  <%= render "admin/shared/table_footer", pagy: @pagy %>
+</div>

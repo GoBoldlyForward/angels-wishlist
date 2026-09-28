@@ -1,0 +1,17 @@
+<%# locals: (box:, editable: true) %>
+<div class="panel" style="margin-bottom:16px">
+  <div class="list-head">
+    <span class="avatar" style="background:var(--brand)"><i class="fa-solid fa-gift"></i></span>
+    <div>
+      <div class="kid-name t-md">Your Love Box</div>
+      <div class="tiny muted">One per household</div>
+    </div>
+    <% if editable %><%= link_to "Edit box", caregiver_intake_love_box_path, class: "btn btn-ghost btn-sm push" %><% end %>
+  </div>
+  <% box.groups.each do |group| %>
+    <div class="fund-line" style="margin-bottom:7px; gap:12px">
+      <span class="muted"><%= group.label %></span>
+      <b class="t-sm" style="text-align:right"><%= box.summary_for(group) || "—" %></b>
+    </div>
+  <% end %>
+</div>

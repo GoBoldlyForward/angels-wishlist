@@ -2,13 +2,15 @@
 <html lang="en">
   <head>
     <title><%= content_for(:title) || "For caregivers | Wish List" %></title>
+    <meta name="description" content="Foster and kinship caregivers: build a wish list for each child in your home, and get the funds to buy the gifts yourself.">
     <%= render "layouts/head" %>
     <%= render "layouts/storefront_styles", organization: current_chapter %>
+    <%= stylesheet_link_tag "caregiver", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     <%= pinpoint_widget %>
   </head>
 
-  <body>
+  <body data-controller="caregiver-dialog">
     <header class="hdr">
       <div class="container hdr-in">
         <%= link_to caregiver_root_path, class: "brand" do %>
@@ -18,6 +20,7 @@
         <nav class="hdr-nav">
           <%= link_to "See the donor view", root_path, class: "hdr-link hide-sm" %>
           <%= yield :header_actions %>
+          <a class="hdr-link" href="#help" data-action="caregiver-dialog#open"><i class="fa-solid fa-circle-question"></i> &nbsp;Need help?</a>
           <% if user_signed_in? %>
             <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "hdr-link btn-plain" %>
           <% else %>
@@ -43,6 +46,7 @@
         </div>
       </div>
     </footer>
+    <%= render "caregiver/shared/help" %>
     <%= yield :overlays %>
   </body>
 </html>

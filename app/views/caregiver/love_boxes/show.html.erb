@@ -1,0 +1,71 @@
+<% content_for :title, "Love Box | Wish List" %>
+<% chapter = current_chapter&.name || "Atlanta Angels" %>
+<% missing = Array(@missing).map(&:id) %>
+
+<%= render "caregiver/shared/steps" %>
+
+<%= form_with url: caregiver_intake_love_box_path, method: :patch do %>
+  <main class="container flow-screen">
+    <%= render "caregiver/shared/step_header", title: "Customize your family's Love Box",
+               lede: "Every family also gets a holiday Love Box. Pick what fits your home, and say no thank you to anything you would not use." %>
+
+    <% if missing.any? %>
+      <%= render "caregiver/shared/errors", messages: [ "Your choices so far are saved. #{pluralize(missing.size, 'choice')} still to make below." ] %>
+    <% end %>
+
+    <div class="panel form-card">
+      <% @box.groups.each do |group| %>
+        <% allowed = @box.picks_allowed(group) %>
+        <% picks = @box.picks_for(group) %>
+        <div class="field" <% if group.asks_count %>data-controller="intake-love-box" data-intake-love-box-declined-value="<%= LoveBox::DECLINED %>"<% end %>>
+          <label class="f" for="love_box_<%= group.id %>_0"><%= group.label %></label>
+          <div class="<%= "row2" if allowed == 2 %>">
+            <% allowed.times do |slot| %>
+              <%= select_tag "love_box[#{group.id}][picks][]",
+                             options_for_select(group.options, picks[slot]),
+                             id: "love_box_#{group.id}_#{slot}",
+                             class: class_names("i", "is-invalid": slot.zero? && missing.include?(group.id) && picks.empty?),
+                             include_blank: slot.zero? ? "Choose one" : "Second pick, if you want one",
+                             aria: { label: (slot.zero? ? nil : "#{group.label}, second pick") },
+                             data: (group.asks_count && slot.zero? ? { intake_love_box_target: "pick", action: "intake-love-box#toggle" } : {}) %>
+            <% end %>
+          </div>
+          <% if group.asks_count %>
+            <div class="row2 mt-3" style="align-items:end" data-intake-love-box-target="row" <%= "hidden" unless @box.needs_count?(group) %>>
+              <div>
+                <label class="f" for="love_box_<%= group.id %>_count">How many?</label>
+                <%= number_field_tag "love_box[#{group.id}][count]", (@box.count_for(group) if @box.count_for(group).positive?),
+                                     id: "love_box_#{group.id}_count", min: 1, max: 20, inputmode: "numeric",
+                                     class: class_names("i", "is-invalid": missing.include?(group.id) && picks.any?),
+                                     placeholder: picks.first.to_s.start_with?("One") ? "Number of caregivers" : "People in your home",
+                                     data: { intake_love_box_target: "count" } %>
+              </div>
+            </div>
+          <% end %>
+          <% if missing.include?(group.id) %>
+            <p class="field-error"><%= picks.any? ? "Tell us how many." : "Choose one." %></p>
+          <% end %>
+          <% if group.hint.present? %>
+            <p class="hint"><%= group.hint %></p>
+          <% elsif group.large_household_only && allowed == 2 %>
+            <p class="hint">Households with more than five kids pick two.</p>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="disclosure form-card mt-4">
+      The Love Box is put together by <%= chapter %> volunteers and delivered with your holiday visit.
+      It is separate from the gift funds, so nothing here comes out of your lists.
+    </div>
+  </main>
+
+  <div class="sticky-foot">
+    <div class="container sticky-in flow-screen">
+      <span class="tiny muted">One box per household.</span>
+      <button class="btn btn-primary" type="submit">
+        <%= current_enrollment.submitted? ? "Save" : "Build their lists" %> <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+<% end %>

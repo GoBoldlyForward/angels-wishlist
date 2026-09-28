@@ -1,0 +1,26 @@
+<div class="modal" id="help" role="dialog" aria-modal="true" aria-labelledby="help-title"
+     data-caregiver-dialog-target="modal" data-action="keydown.esc@window->caregiver-dialog#close">
+  <a class="scrim on" href="#" aria-label="Close" data-action="caregiver-dialog#close"></a>
+  <div class="modal-box">
+    <div class="modal-hd">
+      <h3 class="t-lg" id="help-title">We can do this with you</h3>
+      <a class="x" href="#" aria-label="Close" data-action="caregiver-dialog#close"><i class="fa-solid fa-xmark"></i></a>
+    </div>
+    <div class="modal-bd">
+      <p>
+        <% if ENV["CAREGIVER_HELP_PHONE"].present? %>
+          Call your Angels coordinator at <%= ENV["CAREGIVER_HELP_PHONE"] %> and they will build the lists with you
+          over the phone.
+        <% else %>
+          Call your Angels coordinator and they will build the lists with you over the phone.
+        <% end %>
+        Plenty of families do it that way.
+      </p>
+      <p class="muted" style="margin-bottom:0">
+        If you are between placements or a child leaves
+        <%= current_event&.closes_at ? "before #{event_day(current_event.closes_at)}" : "before lists close" %>,
+        tell us and we will work it out with you.
+      </p>
+    </div>
+  </div>
+</div>

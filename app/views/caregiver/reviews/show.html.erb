@@ -1,0 +1,72 @@
+<% content_for :title, "Review | Wish List" %>
+<% chapter = current_chapter&.name || "Atlanta Angels" %>
+<% closes = event_day(current_event.closes_at) %>
+
+<%= render "caregiver/shared/steps" %>
+
+<main class="container flow-screen">
+  <%= render "caregiver/shared/step_header", title: "One last look",
+             lede: "Once you submit, #{chapter} verifies your household and your lists go live to donors." %>
+
+  <div class="review-grid">
+    <div>
+      <% @lists.each do |list| %>
+        <% child = list.child %>
+        <% gifts = listed_gifts(list) %>
+        <div class="panel" style="margin-bottom:16px">
+          <div class="list-head">
+            <%= avatar(child.display_name) %>
+            <div>
+              <div class="kid-name t-md"><%= child %></div>
+              <div class="tiny muted"><%= child.gender.to_s.humanize %> · <%= pluralize(gifts.size, "gift") %> · <%= money(gifts.sum(&:price_in_cents)) %></div>
+            </div>
+            <%= link_to "Edit list", caregiver_intake_list_path(list), class: "btn btn-ghost btn-sm push" %>
+          </div>
+          <% if list.interests.any? %>
+            <div class="tags" style="margin-bottom:12px">
+              <% list.interests.each do |interest| %><span class="tag"><%= interest %></span><% end %>
+            </div>
+          <% end %>
+          <% if list.caregiver_note.present? %><p class="t-sm" style="margin:0 0 12px">“<%= list.caregiver_note %>”</p><% end %>
+          <%= render partial: "caregiver/shared/gift", collection: gifts, as: :gift %>
+          <% if gifts.empty? %><p class="tiny muted m-0">Nothing on this list yet.</p><% end %>
+          <div class="disclosure" style="margin-top:12px">
+            Donors see: <%= donor_facts(list, current_household) %>.
+            They do not see <%= child.legal_first_name.presence || "the first name" %>, the birthdate, your name, or your address.
+          </div>
+        </div>
+      <% end %>
+
+      <%= render "caregiver/shared/love_box", box: @box %>
+    </div>
+
+    <div class="review-side">
+      <div class="panel">
+        <h3 class="t-md" style="margin-bottom:14px">Summary</h3>
+        <div class="fund-line" style="margin-bottom:9px"><span>Children</span><b><%= @lists.size %></b></div>
+        <div class="fund-line" style="margin-bottom:9px"><span>Gifts listed</span><b><%= @lists.sum { |list| listed_gifts(list).size } %></b></div>
+        <div class="fund-line" style="margin-bottom:14px"><span>If fully funded</span><b><%= money(@lists.sum { |list| gifts_total_in_cents(list) }) %></b></div>
+        <hr style="border:none; border-top:1px solid var(--line-soft); margin:0 0 14px">
+        <div class="t-sm">
+          <b class="ink">Paid by</b><br>
+          <%= payout_summary(current_household) %>
+          <div><%= link_to "Change", caregiver_intake_payout_path, class: "link" %></div>
+        </div>
+
+        <% if @blockers.any? %>
+          <div class="panel panel-warm" style="margin-top:18px; padding:16px">
+            <b class="ink t-sm">Before you can submit</b>
+            <ul class="blockers t-sm"><% @blockers.each do |blocker| %><li><%= blocker %></li><% end %></ul>
+          </div>
+          <button class="btn btn-primary btn-block" style="margin-top:20px" type="button" disabled>Submit my lists</button>
+        <% else %>
+          <%= button_to "Submit my lists", caregiver_intake_submission_path, class: "btn btn-primary btn-block",
+                        form: { style: "display:block; margin-top:20px" } %>
+        <% end %>
+        <p class="tiny muted" style="text-align:center; margin-top:10px">
+          You can edit any list <%= closes ? "until #{closes}" : "until lists close" %>.
+        </p>
+      </div>
+    </div>
+  </div>
+</main>

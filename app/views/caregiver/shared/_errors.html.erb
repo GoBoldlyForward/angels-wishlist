@@ -1,0 +1,10 @@
+<% if messages.any? %>
+  <div class="flash flash-alert form-errors" role="alert">
+    <% if messages.one? %>
+      <%= messages.first %>
+    <% else %>
+      <b class="ink"><%= local_assigns[:heading] || "A few things need a look." %></b>
+      <ul><% messages.each do |message| %><li><%= message %></li><% end %></ul>
+    <% end %>
+  </div>
+<% end %>

@@ -51,6 +51,7 @@
                              min: LineItem::MINIMUM_PRICE_IN_CENTS / 100, step: 1, placeholder: "$", inputmode: "numeric", required: true %>
         </div>
       </div>
+      <% if @gift.refusal %><p class="field-error" role="alert"><%= @gift.refusal %></p><% end %>
       <div class="field mt-3 m-0">
         <%= f.label :link, "Link to it, if you have one", class: "f" %>
         <%= f.text_field :link, value: @gift.link, class: "i", placeholder: "Paste the page where you would buy it", inputmode: "url", autocomplete: "off" %>
@@ -94,7 +95,7 @@
       <span class="muted">List total</span><b><%= money(total) %></b>
     </div>
     <div class="bar done"><i style="width:<%= [ total * 100 / cap, 100 ].min %>%"></i></div>
-    <p class="<%= class_names("tiny mt-2", @gift.refusal ? "c-brand" : "muted") %>" id="capNote" <%= 'role="alert"'.html_safe if @gift.refusal %>>
+    <p class="<%= class_names("tiny mt-2", @gift.refusal ? "c-brand" : "muted") %>" id="capNote">
       <% if @gift.refusal %>
         <%= @gift.refusal %>
       <% elsif room.zero? %>

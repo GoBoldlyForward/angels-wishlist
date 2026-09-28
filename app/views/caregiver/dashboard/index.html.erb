@@ -1,1 +1,118 @@
-<h1 class="h3">My lists</h1>
+<% content_for :title, "My lists | Wish List" %>
+<% chapter = current_chapter&.name || "Atlanta Angels" %>
+<% open_for_edits = !current_event.closed? %>
+<% closes = event_day(current_event.closes_at) %>
+
+<main class="container flow-screen" style="padding-bottom:60px">
+  <%= render "caregiver/shared/step_header", title: "Your lists for #{current_event.name}",
+             lede: open_for_edits ? "You can change anything here #{closes ? "until lists close on #{closes}" : "until lists close"}." : "Lists are closed, so nothing here can be changed now." %>
+
+  <div class="review-grid">
+    <div>
+      <% @lists.each do |list| %>
+        <% child = list.child %>
+        <% state = Intake::ListState.new(list, current_enrollment) %>
+        <% gifts = listed_gifts(list) %>
+        <% asked = gifts.sum(&:price_in_cents) %>
+        <% chosen = gifts.select(&:funded?).sum(&:price_in_cents) %>
+        <section class="panel" style="margin-bottom:16px" id="list-<%= list.id %>">
+          <div class="list-head">
+            <%= avatar(child.display_name) %>
+            <div>
+              <div class="kid-name t-md"><%= child.legal_first_name %></div>
+              <div class="tiny muted">Donors see <%= child %>, <%= child.gender %></div>
+            </div>
+            <span class="status status-<%= state.key %> push"><%= state.label %></span>
+          </div>
+
+          <% if state.returned? %>
+            <div class="panel panel-warm" style="margin-bottom:14px; padding:16px">
+              <div class="note"><i class="fa-solid fa-rotate-left"></i>
+                <div><b class="ink">Staff asked for a change.</b> <%= list.review_note %></div></div>
+            </div>
+          <% else %>
+            <p class="tiny muted" style="margin:0 0 12px"><%= state.explanation %></p>
+          <% end %>
+
+          <% if list.interests.any? %>
+            <div class="tags" style="margin-bottom:12px">
+              <% list.interests.each do |interest| %><span class="tag"><%= interest %></span><% end %>
+            </div>
+          <% end %>
+          <% if list.caregiver_note.present? %><p class="t-sm" style="margin:0 0 12px">“<%= list.caregiver_note %>”</p><% end %>
+
+          <%= render partial: "caregiver/shared/gift", collection: gifts, as: :gift, locals: { show_chosen: true } %>
+          <% if gifts.empty? %><p class="tiny muted m-0">Nothing on this list yet.</p><% end %>
+
+          <div class="fund-line" style="margin:14px 0 7px">
+            <span>Donors have chosen <%= money(chosen) %></span><b><%= money(asked) %> asked</b>
+          </div>
+          <div class="bar done"><i style="width:<%= asked.zero? ? 0 : chosen * 100 / asked %>%"></i></div>
+
+          <% if state.editable? && open_for_edits %>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px">
+              <%= link_to "Edit list", caregiver_intake_list_path(list), class: "btn btn-ghost btn-sm" %>
+              <% if state.ready_to_send? %>
+                <%= button_to state.returned? ? "Send it back in" : "Send it in", caregiver_intake_list_submission_path(list), class: "btn btn-primary btn-sm" %>
+              <% end %>
+            </div>
+          <% end %>
+        </section>
+      <% end %>
+
+      <% if open_for_edits %>
+        <p class="tiny" style="margin:0 0 16px">
+          <%= link_to "Change a child's interests or sentence, or add a child", caregiver_intake_children_path, class: "link" %>
+        </p>
+      <% end %>
+
+      <%= render "caregiver/shared/love_box", box: @box, editable: open_for_edits %>
+    </div>
+
+    <div class="review-side">
+      <div class="panel">
+        <h3 class="t-md" style="margin-bottom:14px"><%= current_household.display_name %></h3>
+
+        <div class="fund-line" style="margin-bottom:6px; align-items:center">
+          <span>Household</span>
+          <span class="status status-<%= current_household.verification_status %>">
+            <%= { "pending" => "Being confirmed", "verified" => "Verified", "hold" => "On hold" }.fetch(current_household.verification_status) %>
+          </span>
+        </div>
+        <p class="tiny muted" style="margin:0 0 14px">
+          <% if current_household.verification_verified? %>
+            <%= chapter %> has confirmed your household.
+          <% elsif current_household.verification_hold? %>
+            Your household is on hold. Your Angels coordinator will be in touch.
+          <% else %>
+            <%= chapter %> is confirming your household. It usually takes a day.
+          <% end %>
+        </p>
+
+        <hr style="border:none; border-top:1px solid var(--line-soft); margin:0 0 14px">
+        <div class="t-sm" style="margin-bottom:14px">
+          <b class="ink">Paid by</b><br>
+          <%= payout_summary(current_household) %>
+          <% if current_household.payout_via_stripe? && current_household.stripe_account_id.blank? %>
+            <div class="field-error">Stripe is not connected yet.</div>
+          <% end %>
+          <% if open_for_edits %><div><%= link_to "Change", caregiver_intake_payout_path, class: "link" %></div><% end %>
+        </div>
+
+        <hr style="border:none; border-top:1px solid var(--line-soft); margin:0 0 14px">
+        <div class="fund-line" style="margin-bottom:9px"><span>Lists sent in</span><b><%= event_day(current_enrollment.submitted_at) %></b></div>
+        <div class="fund-line" style="margin-bottom:9px"><span>Lists close</span><b><%= closes || "To be set" %></b></div>
+        <div class="fund-line" style="margin-bottom:14px"><span>Your share is sent</span><b><%= event_day(current_event.payout_at) || "To be set" %></b></div>
+
+        <% if open_for_edits %>
+          <%= link_to "Update your home details", caregiver_intake_home_path, class: "link tiny" %>
+        <% end %>
+      </div>
+
+      <div class="panel" style="margin-top:16px">
+        <h3 class="t-md" style="margin-bottom:4px">What happens from here</h3>
+        <%= render "caregiver/shared/next_steps", event: current_event, household: current_household %>
+      </div>
+    </div>
+  </div>
+</main>

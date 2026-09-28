@@ -1,0 +1,21 @@
+<footer class="ftr">
+  <div class="container ftr-in">
+    <div style="display:flex; align-items:center; gap:10px">
+      <%= image_tag "logo-mark.svg", alt: "", style: "height:28px" %>
+      <div>
+        <% if current_storefront&.partner? %>
+          <div class="t-base w-700 ink"><%= current_storefront.name %> &nbsp;·&nbsp; <%= current_chapter.name %></div>
+          <div class="tiny">Gifts are donations to <%= current_chapter.name %>, a 501(c)(3).</div>
+        <% else %>
+          <div class="t-base w-700 ink"><%= current_chapter&.name || "Atlanta Angels" %></div>
+          <div class="tiny">Consistent relationships are the solution.</div>
+        <% end %>
+      </div>
+    </div>
+    <div class="tiny" style="max-width:520px">
+      Names shown are stand-ins we assign. No photographs, legal names, schools, addresses, or
+      placement details are published. Gifts are donations to <%= current_chapter&.name || "Atlanta Angels" %>,
+      a 501(c)(3), designated to the holiday wish list program, and are tax-deductible.
+    </div>
+  </div>
+</footer>

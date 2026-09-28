@@ -1,1 +1,28 @@
-<h1 class="h3">Wish List</h1>
+<section class="hero">
+  <div class="container">
+    <h1 class="text-balance">Choose the types of gifts, situations, and families you want to fund.</h1>
+    <p class="text-balance">
+      Every gift here was added by a caregiver for a specific child in their home. You choose what to
+      fund, and everything raised is shared evenly across every child's list.
+      <%= link_to "Why we do it this way", root_path(anchor: "why"), class: "link" %>
+    </p>
+    <%= render "season", season: @season if @season %>
+  </div>
+</section>
+
+<div class="tabs-wrap" id="shop">
+  <div class="container">
+    <%= render "tabs", tab: @tab, catalog: @catalog %>
+  </div>
+</div>
+
+<main class="container" id="tabBody">
+  <% if @catalog.empty? && @tab != "give" %>
+    <%= render "empty", season: @season %>
+  <% else %>
+    <%= render @tab, catalog: @catalog, filters: @filters %>
+  <% end %>
+</main>
+
+<%= render "faq" %>
+<%= render "why" %>

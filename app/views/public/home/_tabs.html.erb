@@ -1,0 +1,16 @@
+<%# locals: (tab:, catalog:) -%>
+<% tabs = [
+     [ "browse", "fa-shapes", "Browse gifts", nil ],
+     [ "children", "fa-children", "By child", catalog.children.size ],
+     [ "unfunded", "fa-hourglass-half", "Still unfunded", catalog.open_gifts.size ],
+     [ "give", "fa-heart", "Give any amount", nil ]
+   ] %>
+<nav class="tabs" aria-label="Ways to give">
+  <% tabs.each do |key, icon, label, count| %>
+    <%= link_to root_path(tab: (key unless key == "browse"), anchor: "shop"),
+                class: class_names("tab", on: tab == key), aria: { current: (tab == key ? "page" : nil) } do %>
+      <i class="fa-solid <%= icon %>" aria-hidden="true"></i> <%= label %>
+      <% if count %><span class="pill"><%= count %></span><% end %>
+    <% end %>
+  <% end %>
+</nav>

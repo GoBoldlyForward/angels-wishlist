@@ -51,6 +51,21 @@ class LineItemTest < ActiveSupport::TestCase
 
     assert_equal [ open_line.id ], wishlist.line_items.shoppable.pluck(:id)
   end
+  test "a funded gift cannot be changed or removed" do
+    line = build_line_item
+    line.fund!(build_donation(event: line.wishlist.event))
+
+    assert_not line.update(price_in_cents: 9_000)
+    assert_not line.destroy
+    assert line.reload.persisted?
+  end
+
+  test "a gift under five dollars is refused" do
+    line = build_wishlist.line_items.build(name: "Stickers", price_in_cents: 300)
+
+    assert_not line.valid?
+  end
+
   test "changing a line status records who changed it" do
     line = build_line_item(status: "needs_review")
     staff = users(:staff)

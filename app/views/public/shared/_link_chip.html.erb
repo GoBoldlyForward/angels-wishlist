@@ -1,0 +1,7 @@
+<%# locals: (gift:) -%>
+<% if gift.link_url %>
+  <%= link_to gift.link_url, class: "item-link", target: "_blank", rel: "noopener nofollow" do %>
+    <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+    What their caregiver linked <span class="muted"><%= gift.link_host %></span>
+  <% end %>
+<% end %>

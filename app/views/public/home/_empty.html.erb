@@ -1,0 +1,14 @@
+<%# locals: (season:) -%>
+<div class="sec">
+  <div class="panel empty-state">
+    <div class="emoji-lg" aria-hidden="true">🎁</div>
+    <% if season && !season.open? %>
+      <h2>The lists are closed for this season</h2>
+      <p class="muted">Thank you to everyone who gave. The lists open again next year.</p>
+    <% else %>
+      <h2>No lists are open yet</h2>
+      <p class="muted">Caregivers are still writing them. You can give any amount in the meantime.</p>
+      <%= link_to "Give any amount", root_path(tab: "give", anchor: "shop"), class: "btn btn-primary" %>
+    <% end %>
+  </div>
+</div>

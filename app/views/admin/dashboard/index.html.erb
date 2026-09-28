@@ -1,1 +1,113 @@
-<h1 class="h3">Staff</h1>
+<% families_breadcrumbs "Program", "Overview" %>
+
+<% if @overview.nil? %>
+  <%= render "admin/shared/page_header", title: "Overview", lede: "There is no event yet." do %>
+    <%= link_to admin_events_path, class: "btn btn-primary" do %><i class="bi bi-calendar-event me-1"></i>Set up an event<% end %>
+  <% end %>
+<% else %>
+  <% event = @overview.event %>
+  <%= render "admin/shared/page_header", title: "Overview",
+             lede: "#{event.name}. #{pluralize(@overview.days_remaining.to_i, 'day')} until lists close#{" on #{l(event.closes_at.to_date, format: :long)}" if event.closes_at}, #{pluralize(@overview.lists_live, 'list')} live across #{pluralize(@overview.households_count, 'household')}." do %>
+  <% end %>
+
+  <div class="stat-cards five">
+    <%= stat_card "Raised", money(@overview.raised_in_cents), icon: "currency-dollar", color: "gold",
+                  note: "#{@overview.percent_funded}% of the #{money(@overview.goal_in_cents)} goal" %>
+    <%= stat_card "Gifts chosen", "#{@overview.lines_chosen} / #{@overview.lines_listed}", icon: "gift", color: "green",
+                  note: "#{pluralize(@overview.lines_open, 'line')} still open" %>
+    <%= stat_card "Lists live", "#{@overview.lists_live} / #{@overview.lists_count}", icon: "patch-check", color: "blue",
+                  note: "#{@overview.lists_in_review} in review" %>
+    <%= stat_card "Households", @overview.households_count, icon: "house-heart", color: "amber",
+                  note: "#{@overview.households_not_verified} not verified" %>
+    <%= stat_card "Days left", @overview.days_remaining.to_i, icon: "calendar-event", color: "red",
+                  note: event.closes_at ? "lists close #{event.closes_at.strftime('%b %-d')}" : "no closing date set" %>
+  </div>
+
+  <div class="overview-grid">
+    <div class="panel-card">
+      <div class="panel-card-head"><h2>Needs your attention</h2><%= link_to "Open the inbox", admin_inbox_path %></div>
+      <ul class="attention-list">
+        <% @overview.unpayable_households.first(Admin::Overview::HOUSEHOLDS_SHOWN).each do |household| %>
+          <%= render "attention", icon: "bank", color: "red", path: admin_household_path(household),
+                     title: "#{household.display_name} cannot be paid", sub: household.payout_blocker %>
+        <% end %>
+        <% more = @overview.unpayable_households.size - Admin::Overview::HOUSEHOLDS_SHOWN %>
+        <% if more.positive? %>
+          <%= render "attention", icon: "bank", color: "red", path: admin_households_path,
+                     title: "#{pluralize(more, 'more household')} cannot be paid", sub: "Open Households to see each one" %>
+        <% end %>
+
+        <% inbox = @overview.inbox %>
+        <% if (waiting = inbox.households.count).positive? %>
+          <%= render "attention", icon: "shield-check", color: "amber", path: admin_inbox_path(anchor: "households"),
+                     title: "#{pluralize(waiting, 'household')} to verify",
+                     sub: "Submitted and waiting on the placing agency" %>
+        <% end %>
+        <% if (waiting = inbox.wishlists.count).positive? %>
+          <%= render "attention", icon: "list-check", color: "amber", path: admin_inbox_path(anchor: "wishlists"),
+                     title: "#{pluralize(waiting, 'list')} to review",
+                     sub: "Nothing on them reaches donors until staff approve" %>
+        <% end %>
+        <% if (waiting = inbox.line_items.count).positive? %>
+          <%= render "attention", icon: "gift", color: "amber", path: admin_inbox_path(anchor: "line-items"),
+                     title: "#{pluralize(waiting, 'line')} to review",
+                     sub: "Priced above the catalog" %>
+        <% end %>
+        <% if (waiting = inbox.donor_notes.count).positive? %>
+          <%= render "attention", icon: "chat-left-heart", color: "amber", path: admin_inbox_path(anchor: "donor-notes"),
+                     title: "#{pluralize(waiting, 'donor note')} to approve",
+                     sub: "Held until staff read them" %>
+        <% end %>
+
+        <% if @overview.nothing_chosen_count.positive? %>
+          <%= render "attention", icon: "exclamation-circle", color: "amber", path: admin_wishlists_path(tab: "live"),
+                     title: "#{pluralize(@overview.nothing_chosen_count, 'live list')} with nothing chosen",
+                     sub: "No donor has picked a gift from them yet" %>
+        <% end %>
+        <% if (@overview.disputed_donations + @overview.pending_donations).positive? %>
+          <%= render "attention", icon: "credit-card", color: "blue", path: admin_donations_path,
+                     title: "#{@overview.disputed_donations} disputed and #{@overview.pending_donations} pending donations",
+                     sub: "A disputed donation leaves the pool and its gifts reopen" %>
+        <% end %>
+        <% unless @overview.needs_attention? %>
+          <li><span class="att-body"><b>Nothing needs you right now</b><span>Every household can be paid and the inbox is empty.</span></span></li>
+        <% end %>
+      </ul>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div class="panel-card">
+        <div class="panel-card-head"><h2>Where the open lines are</h2><%= link_to "All line items", admin_line_items_path(tab: "open") %></div>
+        <% busiest = @overview.open_lines_by_category.map(&:last).max.to_i %>
+        <% @overview.open_lines_by_category.each do |name, count| %>
+          <div class="mix-row">
+            <span class="mix-label"><%= name %></span>
+            <span class="mix-bar"><i style="width:<%= (count * 100.0 / [ busiest, 1 ].max).round %>%"></i></span>
+            <span class="mix-val"><%= count %></span>
+          </div>
+        <% end %>
+        <% if @overview.open_lines_by_category.empty? %>
+          <div class="mix-row"><span class="text-muted">No open lines.</span></div>
+        <% end %>
+      </div>
+
+      <% if @overview.lists_with_nothing_chosen.any? %>
+        <div class="panel-card">
+          <div class="panel-card-head"><h2>Nothing chosen yet</h2><%= link_to "All wishlists", admin_wishlists_path %></div>
+          <ul class="attention-list">
+            <% @overview.lists_with_nothing_chosen.each do |wishlist| %>
+              <li>
+                <%= initials_avatar(wishlist.child.display_name) %>
+                <span class="att-body">
+                  <b><%= link_to child_label(wishlist.child), admin_wishlist_path(wishlist), class: "text-reset text-decoration-none stretched-link" %></b>
+                  <span><%= money(wishlist.asked_cents) %> asked · <%= wishlist.child.household.display_name %></span>
+                </span>
+                <i class="bi bi-chevron-right" style="color:#d1d5db"></i>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

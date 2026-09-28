@@ -1,0 +1,9 @@
+<%# locals: record (anything with errors) %>
+<% if record.errors.any? %>
+  <div class="alert alert-danger" role="alert">
+    <strong>This could not be saved.</strong>
+    <ul class="mb-0 mt-1 ps-3">
+      <% record.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+    </ul>
+  </div>
+<% end %>

@@ -1,0 +1,9 @@
+<% content_for :breadcrumbs do %>
+  <li class="breadcrumb-item"><%= link_to "Events", admin_events_path %></li>
+  <li class="breadcrumb-item active">New event</li>
+<% end %>
+
+<%= render "admin/shared/page_header", title: "New event",
+           lede: "It starts with the standard Love Box. Change anything the season needs." %>
+
+<%= render "form", form_object: @form, url: admin_events_path, method: :post %>

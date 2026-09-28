@@ -1,0 +1,10 @@
+Hi <%= @household.caregiver.first_name %>,
+
+We need one change before <%= @wishlist.child.legal_first_name.presence || "your child" %>'s list can go live:
+
+<%= @wishlist.review_note %>
+
+Make the change and submit it again here:
+<%= caregiver_root_url %>
+
+<%= @household.organization.name %>

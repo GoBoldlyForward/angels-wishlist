@@ -1,0 +1,8 @@
+<%# locals: item (a CatalogItem or its form). An upload, then the bundled photo, then the icon. %>
+<% if item.photo.attached? %>
+  <%= image_tag item.photo, class: "thumb", alt: "", loading: "lazy" %>
+<% elsif item.stock_photo.present? %>
+  <%= image_tag item.stock_photo, class: "thumb", alt: "", loading: "lazy" %>
+<% else %>
+  <span class="thumb-emoji"><%= item.icon.presence || "🎁" %></span>
+<% end %>

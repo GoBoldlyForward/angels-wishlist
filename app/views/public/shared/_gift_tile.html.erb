@@ -1,0 +1,20 @@
+<%# locals: (gift:) -%>
+<div class="tile">
+  <%= link_to child_path(gift.child.key), class: "tile-link", data: { turbo_frame: "modal" } do %>
+    <div class="art-wrap">
+      <%= gift_art gift.catalog_item, css_class: "tile-art" %>
+      <span class="cat-tag"><%= gift.category ? gift.category.name.split.first : "Request" %></span>
+    </div>
+    <div class="tile-body">
+      <div class="tile-name"><%= gift.name %></div>
+      <div class="tile-for">
+        <span class="dot" style="background: <%= avatar_swatch(gift.child.alias_name) %>"><%= gift.child.alias_name.first %></span>
+        For <%= gift.child %>
+      </div>
+    </div>
+  <% end %>
+  <div class="tile-foot tile-foot-own">
+    <span class="price"><%= money gift.price_in_cents %></span>
+    <%= render "public/shared/add_button", gift: gift %>
+  </div>
+</div>

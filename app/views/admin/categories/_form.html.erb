@@ -1,0 +1,44 @@
+<%# locals: category %>
+<div class="row">
+  <div class="col-lg-7">
+    <div class="panel-card p-4">
+      <%= form_with model: category, url: category.persisted? ? admin_category_path(category) : admin_categories_path do |form| %>
+        <%= render "admin/shared/error_summary", record: category %>
+
+        <div class="row g-3">
+          <div class="col-md-8">
+            <%= form.label :name, class: "form-label" %>
+            <%= form.text_field :name, class: "form-control", required: true %>
+          </div>
+          <div class="col-md-4">
+            <%= form.label :position, class: "form-label" %>
+            <%= form.number_field :position, class: "form-control", min: 1 %>
+            <div class="form-text">Left blank, it goes last.</div>
+          </div>
+          <div class="col-md-8">
+            <%= form.label :icon, class: "form-label" %>
+            <%= form.text_field :icon, class: "form-control", placeholder: "fa-shirt" %>
+            <div class="form-text">A Font Awesome class name.</div>
+          </div>
+          <div class="col-md-4">
+            <%= form.label :tint, class: "form-label" %>
+            <%= form.select :tint, %w[t1 t2 t3 t4 t5 t6], {}, class: "form-select" %>
+          </div>
+          <div class="col-12">
+            <%= form.label :headline, class: "form-label" %>
+            <%= form.text_field :headline, class: "form-control" %>
+          </div>
+          <div class="col-12">
+            <%= form.label :blurb, class: "form-label" %>
+            <%= form.text_area :blurb, rows: 3, class: "form-control" %>
+          </div>
+        </div>
+
+        <div class="drawer-actions mt-4">
+          <%= form.submit category.persisted? ? "Save the category" : "Add the category", class: "btn btn-primary" %>
+          <%= link_to "Cancel", admin_categories_path, class: "btn btn-outline-secondary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+<h1>Choose a password</h1>
+
+<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put, class: "panel", style: "margin-top:22px" }) do |f| %>
+  <%= render "devise/shared/error_messages", resource: resource %>
+  <%= f.hidden_field :reset_password_token %>
+  <div class="field">
+    <%= f.label :password, "New password", class: "f" %>
+    <%= f.password_field :password, autofocus: true, autocomplete: "new-password", class: "i" %>
+  </div>
+  <div class="field">
+    <%= f.label :password_confirmation, "Type it again", class: "f" %>
+    <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "i" %>
+  </div>
+  <%= f.submit "Save and sign in", class: "btn btn-primary btn-block" %>
+<% end %>

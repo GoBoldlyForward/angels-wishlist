@@ -1,0 +1,48 @@
+<% child = @line_item.wishlist.child %>
+<% families_breadcrumbs "Families", [ "Line items", admin_line_items_path ],
+                        [ @line_item.name_was || @line_item.name, admin_line_item_path(@line_item) ], "Edit" %>
+
+<%= render "admin/shared/page_header", title: "Edit #{@line_item.name_was || @line_item.name}",
+           lede: "For #{child_label(child)} · #{child.household.display_name}" do %>
+<% end %>
+
+<%= form_with model: @form, scope: :line_item, url: admin_line_item_path(@line_item), method: :patch,
+              class: "panel-card detail-card" do |f| %>
+  <%= family_form_errors @form %>
+
+  <div class="row g-3">
+    <div class="col-md-8">
+      <%= f.label :name, "Gift", class: "form-label" %>
+      <%= f.text_field :name, class: "form-control", required: true %>
+    </div>
+    <div class="col-md-4">
+      <%= f.label :price, class: "form-label" %>
+      <div class="input-group">
+        <span class="input-group-text">$</span>
+        <%= f.text_field :price, class: "form-control", inputmode: "decimal", required: true %>
+      </div>
+      <div class="form-text">$5 or more, and the list stays within the <%= money(@line_item.wishlist.event.per_child_cap_in_cents) %> cap.</div>
+    </div>
+    <div class="col-md-6">
+      <%= f.label :spec, "Brand or size", class: "form-label" %>
+      <%= f.text_field :spec, class: "form-control", placeholder: "Youth medium, blue" %>
+      <div class="form-text">Left blank, the line stays in the pool. Donors see what is written here.</div>
+    </div>
+    <div class="col-md-6">
+      <%= f.label :link_url, "Link", class: "form-label" %>
+      <%= f.url_field :link_url, class: "form-control", placeholder: "https://" %>
+    </div>
+    <div class="col-md-12">
+      <%= f.label :catalog_item_id, "Catalog item", class: "form-label" %>
+      <%= f.select :catalog_item_id,
+                   @form.catalog_items.map { |item| [ "#{item.name} · #{item.category.name} · #{money(item.price_in_cents)}", item.id ] },
+                   { include_blank: "Not in the catalog" }, class: "form-select" %>
+      <div class="form-text">Lines on the same catalog item share one tile on the donor site.</div>
+    </div>
+  </div>
+
+  <div class="drawer-actions mt-3">
+    <%= f.button class: "btn btn-primary" do %><i class="bi bi-check2 me-1"></i>Save line<% end %>
+    <%= link_to "Cancel", admin_line_item_path(@line_item), class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>

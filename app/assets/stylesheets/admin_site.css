@@ -1,0 +1,42 @@
+/* What the application adds on top of the prototype's admin stylesheet. */
+
+form.button_to { display: inline; }
+.dropdown-menu form.button_to { display: block; }
+
+/* ── Detail pages: the prototype's drawer sections, laid out as a page ── */
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+.detail-card { padding: 20px; overflow: visible; }
+.detail-card .drawer-section:last-child { margin-bottom: 0; }
+.detail-card .kv { grid-template-columns: 150px 1fr; }
+.detail-card .table thead th { background: transparent; }
+.privacy-note.danger { color: #991b1b; background: #fef2f2; border-color: #fecaca; }
+.section-title { font-size: 15px; font-weight: 600; color: var(--ink); margin: 26px 0 12px; }
+.attention-list li { position: relative; }
+
+/* ── Inbox and audit trail ── */
+.inbox-queue { margin-bottom: 22px; scroll-margin-top: 72px; }
+.inbox-queue .panel-card-head { border-bottom: 1px solid var(--line); }
+.inbox-excerpt { display: inline-block; max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
+.inbox-note { max-width: 460px; white-space: normal; }
+.audit-changes { font-size: 12.5px; line-height: 1.6; max-width: 520px; overflow-wrap: anywhere; }
+
+/* ── Love Box packing list ── */
+.packing-totals { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.packing-boxes { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 14px; }
+.packing-kv { grid-template-columns: 1fr auto !important; }
+
+@media (max-width: 1200px) {
+  .detail-grid { grid-template-columns: 1fr; }
+}
+
+@media print {
+  .sidebar, .topbar, .page-header-actions, .alert { display: none !important; }
+  .main-content { margin-left: 0 !important; }
+  .page-content { padding: 0 !important; }
+  body { background: #fff !important; }
+  .stat-cards { display: none; }
+  .packing-totals { grid-template-columns: repeat(3, 1fr); }
+  .packing-boxes { grid-template-columns: repeat(2, 1fr); }
+  .packing-card { break-inside: avoid; box-shadow: none; }
+  a { color: inherit !important; text-decoration: none !important; }
+}

@@ -1,0 +1,72 @@
+<% families_breadcrumbs "Families", "Households" %>
+<% summary = @table.summary %>
+
+<%= render "admin/shared/page_header", title: "Households",
+           lede: "Who we verify, who we pay, and how. None of this is ever shown to a donor." do %>
+  <%= link_to new_admin_household_path, class: "btn btn-primary" do %><i class="bi bi-plus-lg me-1"></i>Add household<% end %>
+<% end %>
+
+<div class="stat-cards">
+  <%= stat_card "Households", summary[:households], icon: "house-heart", color: "blue",
+                note: pluralize(summary[:children], "child") %>
+  <%= stat_card "Verified", summary[:verified], icon: "shield-check", color: "green",
+                note: "cleared with the placing agency" %>
+  <%= stat_card "Payout ready", summary[:payable], icon: "bank", color: "gold",
+                note: current_event&.payout_at ? "paid #{l(current_event.payout_at.to_date, format: :long)}" : "no payout date set" %>
+  <%= stat_card "Blocked", summary[:households] - summary[:payable], icon: "exclamation-triangle", color: "red",
+                note: "cannot be paid as things stand" %>
+</div>
+
+<%= render "admin/shared/table_controls", table: @table, placeholder: "Search households, caregivers, counties, agencies..." %>
+
+<div class="data-table-wrapper">
+  <div class="table-scroll">
+    <table class="table">
+      <thead>
+        <tr>
+          <%= sortable_header @table, :name, "Household" %>
+          <%= sortable_header @table, :caregiver, "Caregiver" %>
+          <%= sortable_header @table, :agency, "Agency" %>
+          <%= sortable_header @table, :children, "Children", align: :end %>
+          <%= sortable_header @table, :share, "Share", align: :end %>
+          <%= sortable_header @table, :chosen, "Chosen" %>
+          <%= sortable_header @table, :verification, "Verification" %>
+          <%= sortable_header @table, :payout, "Payout" %>
+        </tr>
+      </thead>
+      <tbody>
+        <% @households.each do |household| %>
+          <tr>
+            <td>
+              <div class="cell-media"><%= initials_avatar(household.display_name.delete_prefix("The ")) %>
+                <div><span class="item-name"><%= link_to household.display_name, admin_household_path(household) %></span>
+                <%= cell_sub household.county %></div>
+              </div>
+            </td>
+            <td><span><%= household.caregiver&.full_name %></span><%= cell_sub household.caregiver&.email %></td>
+            <td>
+              <% if household.placing_organization %>
+                <span class="tag-soft"><%= household.placing_organization.name %></span>
+              <% else %>
+                <%= muted_dash "not recorded" %>
+              <% end %>
+            </td>
+            <td class="text-end"><span class="num"><%= household.children_count %></span></td>
+            <td class="text-end">
+              <span class="num"><%= money(@table.share_for(household)) %></span>
+              <%= cell_sub "of #{money(household.asked_cents)} asked" %>
+            </td>
+            <td><%= progress_cell(household.asked_cents.zero? ? 0 : (household.chosen_cents * 100.0 / household.asked_cents).round) %></td>
+            <td><%= status_badge household.verification_status %></td>
+            <td>
+              <%= payout_badge @table.payout_status_for(household), current_event %>
+              <%= cell_sub payout_destination(household) %>
+            </td>
+          </tr>
+        <% end %>
+        <%= render "admin/shared/empty_row", columns: 8, what: "households" if @households.empty? %>
+      </tbody>
+    </table>
+  </div>
+  <%= render "admin/shared/table_footer", pagy: @pagy %>
+</div>

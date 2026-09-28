@@ -1,0 +1,61 @@
+<%# locals: table, placeholder (optional). Tabs, search, filters, and sort for an index. %>
+<div class="page-tabs">
+  <ul class="nav nav-tabs">
+    <% table.tabs.each do |tab| %>
+      <li class="nav-item">
+        <%= link_to url_for(table.link_params(tab: tab.key, page: nil)), class: [ "nav-link", ("active" if tab == table.tab) ] do %>
+          <%= tab.label %>
+          <span class="badge <%= tab.tone ? "bg-#{tab.tone} bg-opacity-10 text-#{tab.tone}" : "bg-secondary bg-opacity-10 text-secondary" %>"><%= table.tab_counts[tab.key] %></span>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</div>
+
+<%= form_with url: url_for, method: :get, data: { turbo_frame: "_top" } do |form| %>
+  <%= form.hidden_field :tab, value: table.tab.key %>
+  <% if table.sort %>
+    <%= form.hidden_field :sort, value: table.sort.key %>
+    <%= form.hidden_field :dir, value: table.direction %>
+  <% end %>
+
+  <div class="toolbar">
+    <div class="toolbar-search">
+      <i class="bi bi-search search-icon"></i>
+      <%= form.search_field :q, value: table.query, class: "form-control", placeholder: local_assigns[:placeholder] || "Search...", "aria-label": "Search" %>
+    </div>
+    <div class="toolbar-right">
+      <% if table.sorts.any? %>
+        <div class="dropdown">
+          <button type="button" class="toolbar-btn dropdown-toggle" data-bs-toggle="dropdown"><i class="bi bi-sort-down"></i> Sort</button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <% table.sorts.each do |sort| %>
+              <li><%= link_to "#{sort.label} ascending", url_for(table.link_params(sort: sort.key, dir: "asc")), class: "dropdown-item" %></li>
+              <li><%= link_to "#{sort.label} descending", url_for(table.link_params(sort: sort.key, dir: "desc")), class: "dropdown-item" %></li>
+            <% end %>
+            <li><hr class="dropdown-divider"></li>
+            <li><%= link_to "Clear sort", url_for(table.link_params(sort: nil, dir: nil)), class: "dropdown-item" %></li>
+          </ul>
+        </div>
+      <% end %>
+      <%= link_to url_for(table.link_params(format: :csv)), class: "toolbar-btn text-decoration-none" do %>
+        <i class="bi bi-download"></i> Export CSV
+      <% end %>
+    </div>
+  </div>
+
+  <% if table.filters.any? %>
+    <div class="filter-bar open">
+      <% table.filters.each do |filter| %>
+        <div class="filter-field">
+          <label for="f_<%= filter.key %>"><%= filter.label %></label>
+          <%= select_tag "f[#{filter.key}]", options_for_select(filter.options, table.filter_value(filter)),
+                         include_blank: "Any", id: "f_#{filter.key}", class: "form-select", onchange: "this.form.requestSubmit()" %>
+        </div>
+      <% end %>
+      <% if table.active_filters.any? || table.query.present? %>
+        <%= link_to "Clear all filters", url_for(tab: table.tab.key), class: "clear-filters" %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

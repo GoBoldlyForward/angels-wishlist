@@ -1,0 +1,10 @@
+<%# locals: (kicker:, title:, blurb:, tone: nil) -%>
+<section class="shelf reveal" data-controller="shop-reveal">
+  <div class="shelf-head">
+    <div>
+      <h2><span class="shelf-kicker <%= tone %>"><%= kicker %></span> <%= title %></h2>
+      <p><%= blurb %></p>
+    </div>
+  </div>
+  <div class="rail"><%= yield %></div>
+</section>

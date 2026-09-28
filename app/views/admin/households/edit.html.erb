@@ -1,0 +1,8 @@
+<% families_breadcrumbs "Families", [ "Households", admin_households_path ],
+                        [ @household.display_name, admin_household_path(@household) ], "Edit" %>
+
+<%= render "admin/shared/page_header", title: "Edit #{@household.display_name}",
+           lede: "Contact details, the placing agency, and how this household is paid." do %>
+<% end %>
+
+<%= render "form", form: @form, url: admin_household_path(@household), method: :patch %>

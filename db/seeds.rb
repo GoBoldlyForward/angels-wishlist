@@ -11,6 +11,13 @@
 
 require "json"
 
+if Rails.env.production? && ENV["SEED_DEMO_DATA"] != "yes"
+  abort "These seeds replace every record with demo data. Set SEED_DEMO_DATA=yes to run them here."
+end
+
+# Every seeded account signs in with this.
+SEED_PASSWORD = ENV.fetch("SEED_PASSWORD", "password123")
+
 DATA = JSON.parse(Rails.root.join("db/seeds/prototype.json").read)
 
 # What only staff know. Intake never asks a caregiver for the placing agency,
@@ -36,6 +43,16 @@ CAREGIVER_NAMES = {
   "Kofi B." => %w[Kofi Boateng], "Renee S." => %w[Renee Sinclair],
   "Mai T." => %w[Mai Tran], "Pam W." => %w[Pam Whitaker]
 }.freeze
+
+# Who is behind each anonymous gift. Staff see both the name and the alias.
+ANONYMOUS_DONORS = [
+  [ "Nathan Poole", "nathan.poole@example.com" ], [ "Bettina Ruiz", "b.ruiz@example.com" ],
+  [ "Chris Yamada", "cyamada@example.com" ], [ "Dana Kirkland", "dana.k@example.com" ],
+  [ "Wes Aldridge", "wesa@example.com" ], [ "Priscilla Bowen", "pbowen@example.com" ],
+  [ "Trent Alcott", "trent.alcott@example.com" ], [ "Joanna Meier", "jmeier@example.com" ],
+  [ "Rafael Cordova", "rcordova@example.com" ], [ "Hannah Steed", "h.steed@example.com" ],
+  [ "Miles Ferrante", "miles.f@example.com" ], [ "Ada Lindqvist", "ada.l@example.com" ]
+].freeze
 
 CAP_IN_DOLLARS = 200
 
@@ -68,7 +85,7 @@ ActiveRecord::Base.transaction do
   puts "Clearing existing records"
   # Users and organizations reference each other, so ordered deletes cannot
   # satisfy both constraints. Truncate resolves the cycle in one statement.
-  tables = %w[versions payouts line_items donations wishlists children households catalog_items
+  tables = %w[versions payouts enrollments line_items donations wishlists children households catalog_items
               categories events organizations users addresses friendly_id_slugs]
   ActiveRecord::Base.connection.execute("TRUNCATE #{tables.join(', ')} RESTART IDENTITY CASCADE")
 
@@ -76,18 +93,18 @@ ActiveRecord::Base.transaction do
   angels = Organization.create!(name: "Atlanta Angels", short_name: "Angels", kind: "chapter",
                                 website_url: "https://atlantaangels.org",
                                 stripe_account_id: "acct_seed_angels",
-                                theme: { brand: "#a29060", on_brand: "#241f16", font_sans: "Work Sans" })
+                                theme: { stylesheet: "theme-angels" })
 
   Organization.create!(name: "Passion City Church", short_name: "Passion", kind: "partner",
                        parent: angels, co_brand_line: "Wish List · with Atlanta Angels",
-                       theme: { brand: "#00b6cd", on_brand: "#06242a", font_sans: "system-ui" })
+                       theme: { stylesheet: "theme-passion" })
 
   agencies = HOUSEHOLD_STAFF_FACTS.values.filter_map { |f| f[:agency] }.uniq.to_h do |name|
     [ name, Organization.create!(name: name, kind: "agency", parent: angels) ]
   end
 
   puts "Staff"
-  staff = User.create!(email: "staff@atlantaangels.example.org", password: "password123",
+  staff = User.create!(email: "staff@atlantaangels.example.org", password: SEED_PASSWORD,
                        first_name: "Sam", last_name: "Reed", role: "staff", is_admin: true,
                        organization: angels)
 
@@ -98,7 +115,8 @@ ActiveRecord::Base.transaction do
                         opened_at: 6.weeks.ago.change(hour: 9),
                         closes_at: 3.weeks.from_now.change(hour: 23),
                         payout_at: (3.weeks.from_now + 1.day).change(hour: 9),
-                        per_child_cap_in_cents: CAP_IN_DOLLARS * 100)
+                        per_child_cap_in_cents: CAP_IN_DOLLARS * 100,
+                        love_box_options: LoveBox::DEFAULT_GROUPS)
 
   puts "Categories and catalog"
   categories = DATA["categories"].each_with_index.to_h do |row, index|
@@ -112,6 +130,7 @@ ActiveRecord::Base.transaction do
                                      price_in_cents: row["price"] * 100,
                                      min_age: row["ages"][0], max_age: row["ages"][1],
                                      icon: row["icon"],
+                                     stock_photo: with_photo.include?(row["id"]) ? "catalog/#{row['id']}.jpg" : nil,
                                      photo_attribution: with_photo.include?(row["id"]) ? "Openverse, CC licensed" : nil) ]
   end
 
@@ -120,7 +139,7 @@ ActiveRecord::Base.transaction do
     facts = HOUSEHOLD_STAFF_FACTS.fetch(row["id"])
     first, last = CAREGIVER_NAMES.fetch(row["caregiver"])
 
-    caregiver = User.create!(email: "#{first}.#{last}@example.com".downcase, password: "password123",
+    caregiver = User.create!(email: "#{first}.#{last}@example.com".downcase, password: SEED_PASSWORD,
                              first_name: first, last_name: last, role: "caregiver",
                              preferred_language: facts[:language])
 
@@ -149,11 +168,19 @@ ActiveRecord::Base.transaction do
       end
     end
 
+    enrollment = Enrollment.new(household: household, event: event, intake_step: "review",
+                                spending_agreed_at: household.created_at, submitted_at: household.created_at)
+    enrollment.love_box_selection.assign(
+      event.love_box_groups.to_h { |group| [ group.id, { picks: [ group.options.sample ], count: rand(2..5) } ] }
+    )
+    PaperTrail.request(whodunnit: caregiver.id) { enrollment.save! }
+
     [ row["id"], household ]
   end
 
   donors = {}
   donations = {}
+  anonymous_gifts = 0
 
   DATA["kids"].each do |kid_row|
     household = households.fetch(kid_row["hh"])
@@ -187,11 +214,12 @@ ActiveRecord::Base.transaction do
 
       display = item["claimedBy"]
       anonymous = display == "Anonymous"
-      key = anonymous ? "anon-#{line.id}" : display
+      name, email = anonymous ? ANONYMOUS_DONORS[anonymous_gifts % ANONYMOUS_DONORS.size] : [ display, nil ]
+      anonymous_gifts += 1 if anonymous
+      key = anonymous ? "anon-#{name}" : display
 
       donor = donors[key] ||= begin
-        name = anonymous ? Faker::Name.name : display
-        email = anonymous ? Faker::Internet.unique.email : DONOR_EMAILS.fetch(display, "#{display.parameterize}@example.com")
+        email ||= DONOR_EMAILS.fetch(display, "#{display.parameterize}@example.com")
         User.create!(email: email, role: "donor",
                      first_name: name.split.first, last_name: name.split.last)
       end

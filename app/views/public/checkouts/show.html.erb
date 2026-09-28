@@ -1,0 +1,136 @@
+<% content_for :title, "Review your cart | Wish List" %>
+<% chapter = current_chapter&.name || "Atlanta Angels" %>
+<% total = cart.total_in_cents %>
+
+<main class="container checkout-page">
+  <%= link_to root_path(anchor: "shop"), class: "btn-plain" do %>
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> &nbsp;Keep shopping
+  <% end %>
+  <h1 class="page-title">Review your cart</h1>
+  <p class="muted page-lede">Each gift is listed at the price the caregiver gave.</p>
+
+  <div class="row2 checkout-grid">
+    <div>
+      <% cart.gifts_by_child.each do |gifts| %>
+        <% child = gifts.first.child %>
+        <div class="panel checkout-group">
+          <div class="checkout-group-head">
+            <h2 class="t-md"><%= child %></h2>
+            <span class="tiny muted"><%= child.meta %></span>
+          </div>
+          <% gifts.each do |gift| %>
+            <div class="mini">
+              <%= gift_art gift.catalog_item, css_class: "icon" %>
+              <div class="mini-body">
+                <div class="t-base w-600 ink"><%= gift.name %></div>
+                <div class="tiny muted"><%= "#{gift.spec} · " if gift.spec %>For <%= child %></div>
+              </div>
+              <span class="price t-base"><%= money gift.price_in_cents %></span>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if cart.general_gifts.any? %>
+        <div class="panel checkout-group">
+          <div class="checkout-group-head">
+            <h2 class="t-md">General gift</h2>
+            <span class="tiny muted">Not tied to one list</span>
+          </div>
+          <% cart.general_gifts.each do |cents| %>
+            <div class="mini">
+              <span class="icon t5" aria-hidden="true">💛</span>
+              <div class="mini-body">
+                <div class="t-base w-600 ink">Give any amount</div>
+                <div class="tiny muted">Goes into the same pool as every other gift</div>
+              </div>
+              <span class="price t-base"><%= money cents %></span>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <div class="panel panel-warm">
+        <h2 class="t-md">What your <%= money total %> actually does</h2>
+        <div class="flow checkout-flow">
+          <% content.checkout_steps.each do |step| %>
+            <div class="flow-step"><b><%= step.title %></b><span><%= step.body %></span></div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <%= form_with model: @checkout, scope: :checkout, url: checkout_path, class: "panel checkout-form",
+                    data: { turbo: false, controller: "checkout-fee",
+                            checkout_fee_total_value: total, checkout_fee_fee_value: cart.fee_in_cents } do |form| %>
+        <% if @checkout.errors[:base].any? %>
+          <div class="flash flash-alert" role="alert"><%= @checkout.errors[:base].to_sentence %></div>
+        <% end %>
+
+        <div class="field">
+          <%= form.label :email, "Your email", class: "f" %>
+          <%= form.email_field :email, class: class_names("i", "is-invalid": @checkout.errors[:email].any?),
+                                       required: true, autocomplete: "email", placeholder: "you@example.com",
+                                       aria: { describedby: "checkout_email_hint" } %>
+          <% if @checkout.errors[:email].any? %>
+            <p class="field-error" role="alert">Email <%= @checkout.errors[:email].first %>.</p>
+          <% end %>
+          <p class="hint" id="checkout_email_hint">Required. Your itemized receipt goes here.</p>
+        </div>
+
+        <div class="field">
+          <%= form.label :display_name, "Your name, as it should appear", class: "f" %>
+          <%= form.text_field :display_name, class: "i", maxlength: 120, autocomplete: "name",
+                                             placeholder: "The Hollis family",
+                                             aria: { describedby: "checkout_name_hint" } %>
+          <% if @checkout.errors[:display_name].any? %>
+            <p class="field-error" role="alert">Name <%= @checkout.errors[:display_name].first %>.</p>
+          <% end %>
+          <p class="hint" id="checkout_name_hint">Or leave it blank to give anonymously.</p>
+        </div>
+
+        <% if @checkout.note_offered? %>
+          <div class="field">
+            <%= form.label :note_to_family, "A short note for the families", class: "f" %>
+            <%= form.text_area :note_to_family, class: class_names("i", "is-invalid": @checkout.errors[:note_to_family].any?),
+                                                rows: 3, maxlength: 1000,
+                                                placeholder: "Thinking of you all this Christmas.",
+                                                aria: { describedby: "checkout_note_hint" } %>
+            <% if @checkout.errors[:note_to_family].any? %>
+              <p class="field-error" role="alert">Note <%= @checkout.errors[:note_to_family].first %>.</p>
+            <% end %>
+            <p class="hint" id="checkout_note_hint">
+              Optional. Held until <%= chapter %> has read it, then passed to the caregivers. Never shows a
+              child's information back to you.
+            </p>
+          </div>
+        <% end %>
+
+        <label class="t-sm fee-choice">
+          <%= form.check_box :cover_fee, data: { checkout_fee_target: "choice", action: "checkout-fee#refresh" } %>
+          <span>
+            Add <%= money_exact cart.fee_in_cents %> to cover card processing, so the full <%= money total %>
+            goes to the program.
+          </span>
+        </label>
+
+        <div class="total-row">
+          <span class="muted">Total charged</span>
+          <b data-checkout-fee-target="total"><%= money_exact @checkout.charged_in_cents %></b>
+        </div>
+        <%= form.button class: "btn btn-primary btn-block btn-xl" do %>
+          Give <span data-checkout-fee-target="total"><%= money_exact @checkout.charged_in_cents %></span>
+        <% end %>
+        <% unless PaymentGateway.live? %>
+          <p class="tiny muted checkout-test">Test mode. No card is collected and nothing is charged.</p>
+        <% end %>
+      <% end %>
+
+      <div class="disclosure checkout-disclosure">
+        <%= chapter %> is a 501(c)(3). Your gift is a tax-deductible donation designated to the holiday wish
+        list program, not a purchase of goods, and no goods or services are provided to you in return.
+      </div>
+    </div>
+  </div>
+</main>

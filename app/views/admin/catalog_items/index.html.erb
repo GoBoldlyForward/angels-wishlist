@@ -1,0 +1,65 @@
+<% content_for :breadcrumbs do %><li class="breadcrumb-item active">Catalog</li><% end %>
+<% lowest, highest = @table.price_range %>
+
+<%= render "admin/shared/page_header", title: "Catalog",
+           lede: "The gifts a caregiver's typed request is matched against, and the tiles donors browse." do %>
+  <%= link_to new_admin_catalog_item_path, class: "btn btn-primary btn-sm" do %>
+    <i class="bi bi-plus-lg"></i> New catalog item
+  <% end %>
+<% end %>
+
+<div class="stat-cards">
+  <%= stat_card "Catalog items", @table.item_count, icon: "bag", color: "blue", note: "#{@table.active_count} active" %>
+  <%= stat_card "Categories", @table.category_count, icon: "tags", color: "gold", note: "shelves on the donor site" %>
+  <%= stat_card "Price range", lowest ? "#{money(lowest)} to #{money(highest)}" : "—", icon: "cash", color: "green",
+                note: "across active items" %>
+  <%= stat_card "No photo", @table.without_photo_count, icon: "image", color: "amber",
+                note: "shown as an icon on a tint" %>
+</div>
+
+<%= render "admin/shared/table_controls", table: @table, placeholder: "Search the catalog..." %>
+
+<div class="data-table-wrapper">
+  <div class="table-scroll">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <%= sortable_header @table, "name", "Item" %>
+          <%= sortable_header @table, "category", "Category" %>
+          <%= sortable_header @table, "price", "Price", align: :end %>
+          <%= sortable_header @table, "ages", "Ages" %>
+          <th>Photo</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @rows.each do |item| %>
+          <tr>
+            <td>
+              <div class="cell-media">
+                <%= render "thumb", item: item %>
+                <div class="item-name"><%= link_to item.name, edit_admin_catalog_item_path(item) %></div>
+              </div>
+            </td>
+            <td><span class="tag-soft"><%= item.category.name %></span></td>
+            <td class="text-end"><span class="num"><%= money_exact item.price_in_cents %></span></td>
+            <td><%= [ item.min_age, item.max_age ].any? ? "#{item.min_age || 0} to #{item.max_age || 18}" : "Any age" %></td>
+            <td>
+              <% if item.photo.attached? %>Uploaded<% elsif item.stock_photo.present? %>Bundled<% else %>None<% end %>
+              <%= cell_sub item.photo_attribution if item.photo_attribution.present? %>
+            </td>
+            <td><%= status_badge item.active ? "live" : "draft", label: item.active ? "Active" : "Inactive" %></td>
+            <td class="text-end text-nowrap">
+              <%= link_to "Edit", edit_admin_catalog_item_path(item), class: "btn btn-outline-secondary btn-sm" %>
+              <%= button_to "Delete", admin_catalog_item_path(item), method: :delete, class: "btn btn-outline-danger btn-sm",
+                            form: { data: { turbo_confirm: "Delete #{item.name} from the catalog? Lists that asked for it keep their gift." } } %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @rows.empty? %><%= render "admin/shared/empty_row", columns: 7, what: "catalog items" %><% end %>
+      </tbody>
+    </table>
+  </div>
+  <%= render "admin/shared/table_footer", pagy: @pagy %>
+</div>

@@ -1,0 +1,82 @@
+<% families_breadcrumbs "Families", "Line items" %>
+<% summary = @table.summary %>
+
+<%= render "admin/shared/page_header", title: "Line items",
+           lede: "Every gift a caregiver put on a child's list. One row is one thing one child asked for." do %>
+<% end %>
+
+<div class="stat-cards">
+  <%= stat_card "Lines on lists", summary[:lines], icon: "list-ul", color: "blue",
+                note: "across #{pluralize(summary[:children], 'child')}" %>
+  <%= stat_card "Funded", summary[:funded], icon: "check2-circle", color: "green",
+                note: "#{summary[:lines].zero? ? 0 : (summary[:funded] * 100.0 / summary[:lines]).round}% of all lines" %>
+  <%= stat_card "Still open", summary[:open], icon: "hourglass-split", color: "amber",
+                note: "#{money(summary[:open_in_cents])} not yet chosen" %>
+  <%= stat_card "Chosen by donors", money(summary[:chosen_in_cents]), icon: "currency-dollar", color: "gold",
+                note: "pooled and spread across every list" %>
+</div>
+
+<%= render "admin/shared/table_controls", table: @table, placeholder: "Search gifts, details, children, households, donors..." %>
+
+<div class="data-table-wrapper">
+  <div class="table-scroll">
+    <table class="table">
+      <thead>
+        <tr>
+          <%= sortable_header @table, :gift, "Gift" %>
+          <%= sortable_header @table, :child, "Child" %>
+          <%= sortable_header @table, :category, "Category" %>
+          <%= sortable_header @table, :price, "Price", align: :end %>
+          <%= sortable_header @table, :status, "Status" %>
+          <%= sortable_header @table, :funder, "Funded by" %>
+          <%= sortable_header @table, :added, "Added" %>
+        </tr>
+      </thead>
+      <tbody>
+        <% @line_items.each do |line_item| %>
+          <% child = line_item.wishlist.child %>
+          <tr>
+            <td>
+              <div class="cell-media"><%= gift_thumb(line_item.catalog_item) %>
+                <div><span class="item-name"><%= link_to line_item.name, admin_line_item_path(line_item) %></span>
+                <span class="cell-sub">
+                  <% if line_item.spec.present? %><%= line_item.spec %><% elsif line_item.funded? %><i>No detail named</i><% else %><i>In the pool</i><% end %>
+                  <%= " · linked" if line_item.link_url.present? %>
+                </span></div>
+              </div>
+            </td>
+            <td>
+              <div class="cell-media"><%= initials_avatar(child.display_name) %>
+                <div><span class="item-name"><%= link_to child_label(child), admin_wishlist_path(line_item.wishlist), class: "text-reset" %></span>
+                <%= cell_sub child.household.display_name %></div>
+              </div>
+            </td>
+            <td>
+              <% if line_item.catalog_item %>
+                <span class="tag-soft"><%= line_item.catalog_item.category.name %></span>
+              <% else %>
+                <%= muted_dash "not in the catalog" %>
+              <% end %>
+            </td>
+            <td class="text-end">
+              <span class="num"><%= money(line_item.price_in_cents) %></span>
+              <%= cell_sub "catalog price is #{money(line_item.catalog_item.price_in_cents)}" if line_item.above_catalog_price? %>
+            </td>
+            <td><%= line_item_badge line_item %></td>
+            <td>
+              <% if line_item.funded? %>
+                <span><%= line_item.funder_display_name %></span>
+                <%= cell_sub line_item.donation.donor.full_name if line_item.donation.anonymous? %>
+              <% else %>
+                <%= muted_dash %>
+              <% end %>
+            </td>
+            <td><span class="num"><%= line_item.created_at.strftime("%b %-d") %></span></td>
+          </tr>
+        <% end %>
+        <%= render "admin/shared/empty_row", columns: 7, what: "line items" if @line_items.empty? %>
+      </tbody>
+    </table>
+  </div>
+  <%= render "admin/shared/table_footer", pagy: @pagy %>
+</div>

@@ -1,0 +1,33 @@
+<% if cart.empty? %>
+  <div class="cart-empty">
+    <div class="emoji-lg" aria-hidden="true">🎁</div>
+    <p class="muted">Nothing in your cart yet.</p>
+  </div>
+<% else %>
+  <% cart.gifts.each_with_index do |gift, index| %>
+    <div class="line" style="--i:<%= index %>">
+      <%= gift_art gift.catalog_item, css_class: "line-art" %>
+      <div class="line-body">
+        <div class="line-name"><%= gift.name %></div>
+        <div class="line-sub"><%= "#{gift.spec} · " if gift.spec %>For <%= gift.child %></div>
+        <%= button_to "Remove", cart_gift_path(gift.key), method: :delete, class: "rm",
+                      form: { data: { turbo_frame: "_top" } },
+                      aria: { label: "Remove #{gift.name} for #{gift.child.alias_name}" } %>
+      </div>
+      <div class="price"><%= money gift.price_in_cents %></div>
+    </div>
+  <% end %>
+  <% cart.general_gifts.each_with_index do |cents, index| %>
+    <div class="line" style="--i:<%= cart.lines.size + index %>">
+      <div class="line-art t5" aria-hidden="true">💛</div>
+      <div class="line-body">
+        <div class="line-name">General gift</div>
+        <div class="line-sub">Goes into the same pool as every other gift</div>
+        <%= button_to "Remove", cart_general_gift_path(index), method: :delete, class: "rm",
+                      form: { data: { turbo_frame: "_top" } },
+                      aria: { label: "Remove the #{money cents} general gift" } %>
+      </div>
+      <div class="price"><%= money cents %></div>
+    </div>
+  <% end %>
+<% end %>

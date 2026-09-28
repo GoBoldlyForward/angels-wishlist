@@ -1,0 +1,140 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "1555353a4e86087d1d0c6b3e05cf04780ab2358fc880a8a8c93ba3da4d4b6ceb",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/admin/table.rb",
+      "line": 88,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"#{sort.order} #{direction} NULLS LAST\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Admin::Table",
+        "method": "order"
+      },
+      "user_input": "direction",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": "The order clause comes from Sort objects defined in code and the direction is checked against a fixed list. Nothing from the request reaches it."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "323d64eb7a3d7d033ff2fe5bcb39ce867a25784b9f993e8cf988d7d4053b2c02",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/admin/line_items/show.html.erb",
+      "line": 43,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(link_host(LineItem.where(:wishlist_id => Wishlist.where(:event => current_event).select(:id)).includes(:wishlist => ({ :child => :household })).find(params[:id]).link_url), LineItem.where(:wishlist_id => Wishlist.where(:event => current_event).select(:id)).includes(:wishlist => ({ :child => :household })).find(params[:id]).link_url, :target => \"_blank\", :rel => \"noopener nofollow\")",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Admin::LineItemsController",
+          "method": "show",
+          "line": 19,
+          "file": "app/controllers/admin/line_items_controller.rb",
+          "rendered": {
+            "name": "admin/line_items/show",
+            "file": "app/views/admin/line_items/show.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "admin/line_items/show"
+      },
+      "user_input": "LineItem.where(:wishlist_id => Wishlist.where(:event => current_event).select(:id)).includes(:wishlist => ({ :child => :household })).find(params[:id]).link_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "The address passes the url validator on its model, which accepts only http and https."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "35d386d8af623f7fb727646a0e11db4ecc7fb36cfe39e27a94eb4ad963e9fbc8",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/admin/organizations/show.html.erb",
+      "line": 28,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(Organization.friendly.find(params[:id]).website_url, Organization.friendly.find(params[:id]).website_url, :target => \"_blank\", :rel => \"noopener\")",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Admin::OrganizationsController",
+          "method": "show",
+          "line": 12,
+          "file": "app/controllers/admin/organizations_controller.rb",
+          "rendered": {
+            "name": "admin/organizations/show",
+            "file": "app/views/admin/organizations/show.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "admin/organizations/show"
+      },
+      "user_input": "Organization.friendly.find(params[:id]).website_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "The address passes the url validator on its model, which accepts only http and https."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "535313a729611f42da27461e711fea30e9e2b23d1305f039d9b9bc108ce97bb7",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/caregiver/shared/_gift.html.erb",
+      "line": 9,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to((Unresolved Model).new.link_url, :target => \"_blank\", :rel => \"noopener\", :class => \"c-brand\")",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Caregiver::ReviewsController",
+          "method": "show",
+          "line": 11,
+          "file": "app/controllers/caregiver/reviews_controller.rb",
+          "rendered": {
+            "name": "caregiver/reviews/show",
+            "file": "app/views/caregiver/reviews/show.html.erb"
+          }
+        },
+        {
+          "type": "template",
+          "name": "caregiver/reviews/show",
+          "line": 31,
+          "file": "app/views/caregiver/reviews/show.html.erb",
+          "rendered": {
+            "name": "caregiver/shared/_gift",
+            "file": "app/views/caregiver/shared/_gift.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "caregiver/shared/_gift"
+      },
+      "user_input": "(Unresolved Model).new.link_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "The address passes the url validator on its model, which accepts only http and https."
+    }
+  ],
+  "brakeman_version": "8.0.6"
+}

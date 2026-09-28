@@ -1,0 +1,33 @@
+<% content_for :title, "The children | Wish List" %>
+
+<%= render "caregiver/shared/steps" %>
+
+<%= form_with url: caregiver_intake_children_path, method: :patch, class: "children" do %>
+  <button type="submit" class="sr-only" tabindex="-1" aria-hidden="true">Continue</button>
+
+  <main class="container flow-screen">
+    <%= render "caregiver/shared/step_header", title: "Who is in your home right now?",
+               lede: "One entry per child. Donors see a stand-in name we assign, the age, and the interests. Nothing else." %>
+
+    <%= render "caregiver/shared/errors", messages: @form.errors.full_messages %>
+
+    <div id="children">
+      <%= render partial: "caregiver/children/child", collection: @form.entries, as: :entry %>
+    </div>
+
+    <div class="form-card">
+      <button type="submit" name="add_child" value="1" class="btn btn-ghost" formnovalidate>
+        <i class="fa-solid fa-plus"></i> Add another child
+      </button>
+    </div>
+  </main>
+
+  <div class="sticky-foot">
+    <div class="container sticky-in flow-screen">
+      <span class="tiny muted child-count">Children in your home:</span>
+      <button class="btn btn-primary" type="submit">
+        <%= current_enrollment.submitted? ? "Save" : "Continue" %> <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,9 @@
+<% content_for :breadcrumbs do %>
+  <li class="breadcrumb-item"><%= link_to "Events", admin_events_path %></li>
+  <li class="breadcrumb-item"><%= link_to @event.name, admin_event_path(@event) %></li>
+  <li class="breadcrumb-item active">Edit</li>
+<% end %>
+
+<%= render "admin/shared/page_header", title: "Edit #{@event.name_was || @event.name}" %>
+
+<%= render "form", form_object: @form, url: admin_event_path(@event), method: :patch %>

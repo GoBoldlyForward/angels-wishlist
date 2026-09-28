@@ -1,0 +1,23 @@
+<% content_for :title, "Your lists are in | Wish List" %>
+<% chapter = current_chapter&.name || "Atlanta Angels" %>
+
+<main class="container flow-screen" style="padding-bottom:60px">
+  <div class="done-hero">
+    <div class="emoji-xl">✨</div>
+    <h1 class="text-balance"><%= pluralize(@lists_count, "list") %> <%= @lists_count == 1 ? "is" : "are" %> in.</h1>
+    <p class="muted">
+      <%= chapter %> is confirming your household now. Once that clears, usually within a day,
+      donors can start giving.
+    </p>
+  </div>
+
+  <div class="panel" style="max-width:720px; margin:0 auto">
+    <h3 class="t-md" style="margin-bottom:16px">What happens from here</h3>
+    <%= render "caregiver/shared/next_steps", event: current_event, household: current_household %>
+    <div class="panel panel-warm" style="margin-top:22px">
+      <div class="note"><i class="fa-solid fa-envelope"></i>
+        <div><b class="ink">We email you at <%= current_user.email %></b> when your lists go live.
+        <%= link_to "See my lists", caregiver_root_path, class: "link" %>.</div></div>
+    </div>
+  </div>
+</main>

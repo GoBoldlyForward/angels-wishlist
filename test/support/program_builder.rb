@@ -36,8 +36,7 @@ module ProgramBuilder
   end
 
   def build_child(household: nil, age: 9, **attrs)
-    Child.create!({ household: household || build_household, display_name: "Maya",
-                    gender: "girl",
+    Child.create!({ household: household || build_household, gender: "girl",
                     birthdate: Date.current.advance(years: -age, days: -30) }.merge(attrs))
   end
 

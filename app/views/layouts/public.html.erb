@@ -1,21 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title><%= content_for(:title) || "Wish List" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
-    <%= yield :head %>
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <title><%= content_for(:title) || "Wish List | #{current_storefront&.name || "Atlanta Angels"}" %></title>
+    <meta name="description" content="Browse gift lists written by caregivers for children navigating foster care in metro Atlanta. Every gift is a donation to Atlanta Angels.">
+    <%= render "layouts/head" %>
+    <%= render "layouts/storefront_styles", organization: current_storefront %>
+    <%= stylesheet_link_tag "storefront", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <%= pinpoint_widget %>
   </head>
 
-  <body class="d-flex flex-column min-vh-100">
-    <%= render "shared/navbar" %>
-    <main class="container flex-grow-1 py-4">
-      <%= render "shared/flash" %>
-      <%= yield %>
-    </main>
-    <%= render "shared/footer" %>
+  <body data-controller="cart-drawer shop-modal"
+        data-cart-drawer-open-value="<%= open_cart? && controller_name != "carts" %>"
+        data-action="keydown.esc->cart-drawer#close keydown.esc->shop-modal#close click->shop-modal#remember turbo:before-cache@document->shop-modal#close turbo:before-cache@document->cart-drawer#close">
+    <%= test_payments_banner %>
+    <% content_for :header_actions do %><%= render "public/carts/button" %><% end %>
+    <%= render "shared/storefront_header" %>
+    <% if flash.any? %><div class="container"><%= render "shared/flash" %></div><% end %>
+    <%= yield %>
+    <%= render "shared/storefront_footer" %>
+    <%= render "public/carts/drawer" %>
+    <%= render "public/shared/modal" %>
+    <%= yield :overlays %>
   </body>
 </html>

@@ -1,0 +1,8 @@
+Hi <%= @household.caregiver.first_name %>,
+
+We have your lists for <%= @enrollment.event.name %>. <%= @household.organization.name %> is confirming your household now, which usually takes a day. Once that clears, donors can start giving.
+
+You can edit any list until <%= l(@enrollment.event.closes_at.to_date, format: :long) %>:
+<%= caregiver_root_url %>
+
+<%= @household.organization.name %>

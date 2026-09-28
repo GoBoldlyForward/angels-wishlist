@@ -1,0 +1,128 @@
+<% content_for :title, "Their lists | Wish List" %>
+<% turbo_refreshes_with method: :morph, scroll: :preserve %>
+<% child = @wishlist.child %>
+<% who = child.legal_first_name.presence || "them" %>
+<% gifts = listed_gifts(@wishlist) %>
+<% cap = @wishlist.event.per_child_cap_in_cents %>
+<% total = gifts.sum(&:price_in_cents) %>
+<% room = [ cap - total, 0 ].max %>
+
+<%= render "caregiver/shared/steps" %>
+
+<main class="container flow-screen">
+  <%= render "caregiver/shared/step_header", title: "What would #{who} want?",
+             lede: "Add five or six things, with a link if you have one. Each line becomes a gift a donor can give toward." %>
+
+  <% if @wishlist.review_note.present? && @wishlist.draft? %>
+    <div class="panel panel-warm form-card mb-4">
+      <div class="note"><i class="fa-solid fa-rotate-left"></i>
+        <div><b class="ink">Staff sent this list back.</b> <%= @wishlist.review_note %></div></div>
+    </div>
+  <% elsif @wishlist.live? %>
+    <div class="panel panel-warm form-card mb-4">
+      <div class="note"><i class="fa-solid fa-eye"></i>
+        <div><b class="ink">This list is live.</b> Any change sends it back to staff for a quick look before donors see it again.</div></div>
+    </div>
+  <% end %>
+
+  <% if @lists.many? %>
+    <div class="form-card mb-4">
+      <div class="chip-scroll">
+        <% @lists.each do |list| %>
+          <%= link_to "#{list.child.legal_first_name.presence || list.child.display_name} · #{money(gifts_total_in_cents(list))}",
+                      caregiver_intake_list_path(list), class: class_names("chip", on: list == @wishlist) %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="panel form-card">
+    <%= form_with scope: :gift, url: caregiver_intake_list_gifts_path(@wishlist),
+                  data: { controller: "intake-gift-form", action: "turbo:submit-end->intake-gift-form#reset" } do |f| %>
+      <div class="add-row">
+        <div class="field m-0">
+          <%= f.label :name, "What is it?", class: "f" %>
+          <%= f.text_field :name, value: @gift.name, class: "i", placeholder: "Skateboard and helmet", required: true,
+                           data: { intake_gift_form_target: "name" } %>
+        </div>
+        <div class="field m-0">
+          <%= f.label :price, "About what it costs", class: "f" %>
+          <%= f.number_field :price, value: @gift.price.presence, class: class_names("i", "is-invalid": @gift.refusal.present?),
+                             min: LineItem::MINIMUM_PRICE_IN_CENTS / 100, step: 1, placeholder: "$", inputmode: "numeric", required: true %>
+        </div>
+      </div>
+      <% if @gift.refusal %><p class="field-error" role="alert"><%= @gift.refusal %></p><% end %>
+      <div class="field mt-3 m-0">
+        <%= f.label :link, "Link to it, if you have one", class: "f" %>
+        <%= f.text_field :link, value: @gift.link, class: "i", placeholder: "Paste the page where you would buy it", inputmode: "url", autocomplete: "off" %>
+        <p class="hint">Optional. Donors see it as the item you had in mind.</p>
+      </div>
+      <button class="btn btn-primary btn-block mt-3" type="submit" <%= "disabled" if room.zero? %>>
+        <i class="fa-solid fa-plus"></i> Add to the list
+      </button>
+    <% end %>
+
+    <div class="list-divider"></div>
+
+    <% if gifts.any? %>
+      <% gifts.each do |gift| %>
+        <div class="picked-row">
+          <div style="flex:1; min-width:0">
+            <div class="w-600 ink t-base"><%= gift.name %></div>
+            <% if gift.link_url.present? %>
+              <%= link_to gift.link_url, class: "item-link", target: "_blank", rel: "noopener" do %>
+                <i class="fa-solid fa-link t-2xs"></i> <%= link_host(gift.link_url) %>
+              <% end %>
+            <% end %>
+            <% if gift.funded? %><div class="tiny c-green"><i class="fa-solid fa-circle-check"></i> Chosen by a donor</div><% end %>
+          </div>
+          <span class="price t-base"><%= money(gift.price_in_cents) %></span>
+          <% if gift.funded? %>
+            <span class="rm ml-3" title="A donor already chose this gift, so it stays on the list"><i class="fa-solid fa-lock"></i></span>
+          <% else %>
+            <%= button_to caregiver_intake_list_gift_path(@wishlist, gift), method: :delete, class: "rm ml-3",
+                          aria: { label: "Remove #{gift.name}" } do %>
+              <i class="fa-solid fa-xmark"></i>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="tiny muted m-0">Nothing on the list yet. Add the first thing above.</p>
+    <% end %>
+
+    <div class="total-row mt-4" style="padding-top:14px; border-top:1px solid var(--line-soft)">
+      <span class="muted">List total</span><b><%= money(total) %></b>
+    </div>
+    <div class="bar done"><i style="width:<%= [ total * 100 / cap, 100 ].min %>%"></i></div>
+    <p class="tiny mt-2 muted" id="capNote">
+      <% if room.zero? %>
+        This list is at the <%= money(cap) %> cap. Remove something to add another gift.
+      <% else %>
+        Lists are capped at <%= money(cap) %> per child. <%= money(room) %> left on this one.
+      <% end %>
+    </p>
+  </div>
+
+  <div class="disclosure form-card mt-4">
+    Donors give toward a line at this price. You get the money, not the object, so if it no longer fits
+    <%= who %> when you shop, buy what does.
+  </div>
+</main>
+
+<div class="sticky-foot">
+  <div class="container sticky-in flow-screen">
+    <span class="tiny muted"><%= pluralize(@lists.size, "list") %> · <%= money(@lists.sum { |list| gifts_total_in_cents(list) }) %> in total</span>
+    <% if Intake::ListState.new(@wishlist, current_enrollment).ready_to_send? %>
+      <%= button_to caregiver_intake_list_submission_path(@wishlist), class: "btn btn-primary" do %>
+        Send this list in <i class="fa-solid fa-arrow-right"></i>
+      <% end %>
+    <% elsif current_enrollment.submitted? %>
+      <%= link_to caregiver_root_path, class: "btn btn-primary" do %>Done <i class="fa-solid fa-arrow-right"></i><% end %>
+    <% else %>
+      <%= button_to finish_caregiver_intake_lists_path, method: :patch, class: "btn btn-primary" do %>
+        Set up how you get paid <i class="fa-solid fa-arrow-right"></i>
+      <% end %>
+    <% end %>
+  </div>
+</div>

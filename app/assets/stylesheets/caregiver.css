@@ -1,0 +1,84 @@
+/* What the caregiver side adds on top of the prototype's stylesheet. */
+
+.sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap}
+
+.flow-screen{max-width:1040px}
+main.flow-screen{padding-bottom:20px}
+
+.hdr-nav .btn-plain{font-size:var(--fs-base); font-weight:550; color:var(--body)}
+
+/* ── Help dialog: opens by script, or by its anchor without one ── */
+.modal:target{display:flex}
+.modal .scrim{position:absolute}
+.modal-bd p:first-child{margin-top:0}
+
+/* ── Stepper: a reached step is a link ── */
+a.step:hover{background:var(--brand-wash); color:var(--ink)}
+a.step.on:hover{background:var(--ink); color:#fff}
+
+/* ── Forms ── */
+.form-errors{max-width:760px; margin:0 auto var(--s4)}
+.form-errors ul{margin:6px 0 0; padding-left:18px}
+input.i[type="date"]{min-height:46px}
+
+/* ── Children ── */
+.children{counter-reset:child}
+.child-form{counter-increment:child}
+.child-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px}
+.child-head h3::before{content:"Child " counter(child)}
+.child-head h3 span:not(:empty)::before{content:" · "}
+.children:not(:has(.child-form:not([hidden]) ~ .child-form:not([hidden]))) .child-form:not([hidden]) .rm{display:none}
+.child-count::after{content:" " counter(child)}
+.tag-x{background:none; border:none; padding:0; font:inherit; color:inherit; cursor:pointer}
+.tag-x i{opacity:.6}
+
+/* ── Payout: the cards are labels around a radio ── */
+.pay-grid{gap:20px; align-items:start; max-width:900px}
+.card-pick input[type="radio"]{position:absolute; opacity:0; pointer-events:none}
+.card-pick:has(input:checked){border-color:var(--brand); box-shadow:var(--ring)}
+.card-pick:has(input:focus-visible){box-shadow:var(--ring)}
+.card-pick ul{margin:0; padding-left:18px}
+.pick-body{display:flex; gap:13px; align-items:flex-start}
+.pick-icon{width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex:none; font-size:var(--fs-lg)}
+.pay-detail{display:none; max-width:640px}
+.pay-form:has(input[value="stripe"]:checked) .pay-detail-stripe,
+.pay-form:has(input[value="gift_card"]:checked) .pay-detail-gift-card{display:block}
+.agree{display:flex; gap:12px; align-items:flex-start; cursor:pointer}
+.agree input{width:20px; height:20px; margin-top:2px; flex:none; accent-color:var(--brand)}
+
+/* ── Review and dashboard ── */
+.review-grid{display:grid; grid-template-columns:1.4fr 1fr; gap:24px; align-items:start}
+.review-grid > *{min-width:0}
+.review-side{position:sticky; top:78px}
+.list-head{display:flex; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap}
+.list-head .push{margin-left:auto}
+.gift-row{margin-bottom:8px; padding:9px 11px}
+.gift-row .grow{flex:1; min-width:0}
+.blockers{margin:0; padding-left:18px}
+
+.status{border-radius:50px; font-size:var(--fs-2xs); font-weight:700; letter-spacing:.04em; text-transform:uppercase; padding:4px 11px; background:var(--line-soft); color:var(--soft); white-space:nowrap}
+.status-live,.status-verified,.status-chosen{background:var(--green-bg); color:var(--green-d)}
+.status-returned,.status-hold{background:var(--accent-wash); color:var(--accent-deep)}
+.status-in_review,.status-pending{background:var(--brand-wash); color:var(--brand-deep)}
+
+.done-hero{text-align:center; margin:40px 0 32px}
+.done-hero h1{font-size:clamp(1.7rem,3.8vw,2.3rem); margin:14px 0 10px}
+.done-hero p{max-width:540px; margin:0 auto}
+.flow.flow-stacked{grid-template-columns:1fr; gap:12px; margin-top:20px}
+
+@media (max-width:860px){
+  .review-grid{grid-template-columns:1fr}
+  .review-side{position:static}
+}
+
+@media (max-width:640px){
+  .hdr-in{gap:8px}
+  .hdr-nav{gap:0}
+  .hdr-link{padding:8px 9px; font-size:var(--fs-sm)}
+  .panel{padding:18px}
+  .sticky-in{gap:10px}
+  .sticky-in .btn{padding:11px 16px}
+  .steps{justify-content:flex-start}
+  .step:not(.on){padding-right:8px}
+  .step:not(.on) .step-name{display:none}
+}

@@ -1,0 +1,26 @@
+/* What the application adds on top of the prototype's stylesheet. */
+
+.test-mode-banner {
+  background: var(--ink);
+  color: #fff;
+  font-size: var(--fs-xs);
+  padding: 7px 16px;
+  text-align: center;
+}
+
+.flash {
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  margin: 16px 0 0;
+  padding: 12px 16px;
+}
+.flash-notice { background: var(--green-bg); color: var(--green-d); }
+.flash-alert  { background: var(--brand-wash); color: var(--ink); border: 1px solid var(--brand-edge); }
+
+.field-error { color: #b3261e; font-size: var(--fs-xs); margin: 6px 0 0; }
+.i.is-invalid { border-color: #b3261e; }
+
+.account-card { margin: 48px auto 72px; max-width: 440px; }
+.account-card h1 { font-size: var(--fs-2xl); margin: 0 0 6px; }
+
+form.button_to { display: inline; }

@@ -1,17 +1,10 @@
 Rails.application.routes.draw do
-  devise_for :users
+  devise_for :users, skip: :registrations
 
   get "up" => "rails/health#show", as: :rails_health_check
+  post "stripe/webhooks" => "stripe_webhooks#create"
 
-  namespace :admin do
-    root "dashboard#index"
-  end
-
-  namespace :caregiver do
-    root "dashboard#index"
-  end
-
-  scope module: "public" do
-    root "home#index"
-  end
+  draw :admin
+  draw :caregiver
+  draw :public
 end

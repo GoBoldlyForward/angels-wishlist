@@ -1,0 +1,53 @@
+<% content_for :breadcrumbs do %><li class="breadcrumb-item active">Payouts</li><% end %>
+
+<%= render "admin/shared/page_header", title: "Payouts",
+           lede: "The payout run for #{current_event.name}. Every list is funded to the same percentage, and a household is paid the sum of its lists' shares." do %>
+  <%= button_to build_admin_payouts_path, class: "btn btn-primary btn-sm",
+                form: { data: { turbo_confirm: "Build payouts from the pool as it stands now? Payouts already sent are left alone." } } do %>
+    <i class="bi bi-arrow-repeat"></i> <%= @run.built? ? "Build payouts again" : "Build payouts" %>
+  <% end %>
+<% end %>
+
+<div class="stat-cards five">
+  <%= stat_card "The pool", money_exact(@run.pool_in_cents), icon: "cash-stack", color: "green",
+                note: "#{money_exact(@run.raised_in_cents)} raised of #{money_exact(@run.asked_in_cents)} asked" %>
+  <%= stat_card "Every list funded to", "#{number_with_precision(@run.funded_percent, precision: 1, strip_insignificant_zeros: true)}%",
+                icon: "pie-chart", color: "blue", note: "the same for every child" %>
+  <%= stat_card "Scheduled", money_exact(@run.scheduled_in_cents), icon: "calendar-check", color: "gold",
+                note: "#{money_exact(@run.sent_in_cents)} already sent" %>
+  <%= stat_card "Blocked", @run.blocked_count, icon: "slash-circle", color: "red",
+                note: "held, unverified, or without a method" %>
+  <%= stat_card "Surplus", money_exact(@run.surplus_in_cents), icon: "piggy-bank", color: "amber",
+                note: "raised beyond what every list asked" %>
+</div>
+
+<%= render "run_statement", run: @run %>
+
+<%= render "admin/shared/table_controls", table: @table, placeholder: "Search households, caregivers, counties..." %>
+
+<div class="data-table-wrapper">
+  <div class="table-scroll">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <%= sortable_header @table, "household", "Household" %>
+          <th>Children</th>
+          <%= sortable_header @table, "asked", "Asked", align: :end %>
+          <th class="text-end">Share</th>
+          <%= sortable_header @table, "method", "Method" %>
+          <th>Destination</th>
+          <%= sortable_header @table, "status", "Status" %>
+          <th>Blocker</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @households.each do |household| %>
+          <%= render "row", row: @run.row_for(household) %>
+        <% end %>
+        <% if @households.empty? %><%= render "admin/shared/empty_row", columns: 9, what: "payouts" %><% end %>
+      </tbody>
+    </table>
+  </div>
+  <%= render "admin/shared/table_footer", pagy: @pagy %>
+</div>

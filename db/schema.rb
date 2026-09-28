@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_26_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_27_120006) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -110,6 +110,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_120000) do
     t.string "photo_attribution"
     t.integer "price_in_cents", null: false
     t.string "slug"
+    t.string "stock_photo"
     t.datetime "updated_at", null: false
     t.index ["active"], name: "index_catalog_items_on_active"
     t.index ["category_id"], name: "index_catalog_items_on_category_id"
@@ -150,6 +151,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_120000) do
   create_table "donations", force: :cascade do |t|
     t.bigint "ahoy_visit_id"
     t.boolean "anonymous", default: false, null: false
+    t.jsonb "cart", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
     t.string "display_name"
@@ -177,10 +179,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_120000) do
     t.index ["uuid"], name: "index_donations_on_uuid", unique: true
   end
 
+  create_table "enrollments", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.bigint "event_id", null: false
+    t.bigint "household_id", null: false
+    t.string "intake_step", default: "home", null: false
+    t.jsonb "love_box", default: {}, null: false
+    t.datetime "spending_agreed_at"
+    t.datetime "submitted_at"
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_enrollments_on_deleted_at"
+    t.index ["event_id"], name: "index_enrollments_on_event_id"
+    t.index ["household_id", "event_id"], name: "index_enrollments_on_household_id_and_event_id", unique: true
+    t.index ["household_id"], name: "index_enrollments_on_household_id"
+  end
+
   create_table "events", force: :cascade do |t|
     t.datetime "closes_at"
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
+    t.jsonb "love_box_options", default: [], null: false
     t.string "name", null: false
     t.datetime "opened_at"
     t.bigint "organization_id", null: false
@@ -285,7 +304,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_120000) do
     t.text "hold_reason"
     t.bigint "household_id", null: false
     t.bigint "mailing_address_id"
-    t.string "method", default: "stripe", null: false
+    t.string "method"
     t.datetime "scheduled_for"
     t.datetime "sent_at"
     t.string "status", default: "blocked", null: false
@@ -531,6 +550,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_120000) do
     t.datetime "deleted_at"
     t.bigint "event_id", null: false
     t.string "interests", default: [], null: false, array: true
+    t.text "review_note"
     t.string "slug"
     t.string "status", default: "draft", null: false
     t.datetime "submitted_at"
@@ -550,6 +570,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_120000) do
   add_foreign_key "donations", "events"
   add_foreign_key "donations", "organizations", column: "storefront_organization_id"
   add_foreign_key "donations", "users", column: "donor_id"
+  add_foreign_key "enrollments", "events"
+  add_foreign_key "enrollments", "households"
   add_foreign_key "events", "organizations"
   add_foreign_key "households", "addresses", column: "mailing_address_id"
   add_foreign_key "households", "organizations"

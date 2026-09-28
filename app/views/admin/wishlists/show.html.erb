@@ -1,0 +1,128 @@
+<% child = @wishlist.child %>
+<% household = child.household %>
+<% families_breadcrumbs "Families", [ "Wishlists", admin_wishlists_path ], "#{child.display_name}'s list" %>
+
+<%= render "admin/shared/page_header", title: "#{child.display_name}'s wishlist",
+           lede: [ household.display_name, household.county ].compact_blank.join(" · ") do %>
+  <% if @review.approvable? %>
+    <%= button_to approve_admin_wishlist_path(@wishlist), method: :patch, class: "btn btn-success" do %>
+      <i class="bi bi-check2 me-1"></i>Approve
+    <% end %>
+  <% end %>
+  <% if @review.returnable? %>
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#return-form" aria-expanded="false" aria-controls="return-form">
+      <i class="bi bi-reply me-1"></i>Return to caregiver
+    </button>
+  <% end %>
+  <% if @review.withdrawable? %>
+    <%= button_to withdraw_admin_wishlist_path(@wishlist), method: :patch, class: "btn btn-outline-danger",
+                  form: { data: { turbo_confirm: "Withdraw #{child.display_name}'s list? It leaves the donor site and its share moves to the other lists." } } do %>
+      <i class="bi bi-x-circle me-1"></i>Withdraw
+    <% end %>
+  <% end %>
+<% end %>
+
+<% if @wishlist.in_review? && @review.household_unverified? %>
+  <%= family_callout icon: "shield-exclamation" do %>
+    This list cannot be approved yet. <%= household.display_name %> has to be verified before any of its lists go live.
+    <%= link_to "Open the household", admin_household_path(household) %>.
+  <% end %>
+<% end %>
+
+<% if @wishlist.draft? && @wishlist.review_note.present? %>
+  <%= family_callout icon: "reply" do %>
+    <b>Returned to the caregiver.</b> <%= @wishlist.review_note %>
+  <% end %>
+<% end %>
+
+<% if @review.returnable? %>
+  <div class="collapse mb-3" id="return-form">
+    <div class="panel-card detail-card">
+      <%= form_with url: return_to_caregiver_admin_wishlist_path(@wishlist), method: :patch do |form| %>
+        <%= form.label :reason, "What does the caregiver need to change?", class: "form-label" %>
+        <%= form.text_area :reason, rows: 2, required: true, class: "form-control",
+                           placeholder: "The note mentions a school. Please take the name out." %>
+        <div class="form-text">The caregiver is emailed this note. The list leaves the donor site until it is submitted again.</div>
+        <%= form.button class: "btn btn-primary mt-2" do %><i class="bi bi-reply me-1"></i>Return to caregiver<% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<div class="detail-grid">
+  <div class="panel-card detail-card">
+    <%= family_hero child_label(child), [ household.display_name, household.county ].compact_blank.join(" · "),
+                    initials_avatar(child.display_name) %>
+
+    <%= detail_section "The wishlist" do %>
+      <%= key_values [
+        [ "Status", wishlist_badge(@wishlist) ],
+        [ "Gifts", "#{@wishlist.chosen_count} chosen of #{@wishlist.listed_count}" ],
+        [ "Asked", safe_join([ money(@wishlist.asked_cents), " ", tag.span("of the #{money(@wishlist.event.per_child_cap_in_cents)} cap", class: "text-muted") ]) ],
+        [ "Chosen by donors", money(@wishlist.chosen_cents) ],
+        [ "Share", money(@wishlist.share_in_cents) ],
+        [ "Submitted", date_or_not_yet(@wishlist.submitted_at) ],
+        [ "Approved", date_or_not_yet(@wishlist.approved_at) ],
+        [ "Last gift", ago_or_dash(@wishlist.last_gift_at) ],
+        [ "Household", link_to(household.display_name, admin_household_path(household)) ],
+        [ "Household status", status_badge(household.verification_status) ]
+      ] %>
+    <% end %>
+
+    <%= detail_section "What a donor sees" do %>
+      <%= key_values [
+        [ "Alias", child.display_name ],
+        [ "Age", child.age ],
+        [ "Girl or boy", (child.gender.humanize unless child.unspecified?) ],
+        [ "County", household.county ]
+      ] %>
+      <div class="drawer-quote mt-2"><%= @wishlist.caregiver_note.presence || "No note yet." %></div>
+      <div class="mt-2">
+        <% @wishlist.interests.each do |interest| %><span class="tag-soft me-1 mb-1"><%= interest %></span><% end %>
+      </div>
+    <% end %>
+
+    <%= detail_section "Staff only" do %>
+      <%= key_values [
+        [ "Legal first name", child.legal_first_name.presence || muted_dash("not recorded") ],
+        [ "Birthdate", child.birthdate && l(child.birthdate, format: :long) ],
+        [ "Caregiver", household.caregiver&.full_name ]
+      ] %>
+    <% end %>
+
+    <%= detail_section "Privacy" do %>
+      <div class="privacy-note"><i class="bi bi-shield-lock"></i>
+        <div>Donors see the alias, the age, girl or boy, the county, the interests, and the one-line note. They never see a legal name, a photograph, a size, a school, or anything about the case.</div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="panel-card detail-card">
+    <%= detail_section "Every line" do %>
+      <% if @line_items.empty? %>
+        <div class="drawer-note">Nothing is on this list yet.</div>
+      <% else %>
+        <div class="table-scroll">
+          <table class="table table-sm align-middle mb-0">
+            <thead><tr><th>Gift</th><th class="text-end">Price</th><th>Status</th><th>Funded by</th></tr></thead>
+            <tbody>
+              <% @line_items.each do |line_item| %>
+                <tr>
+                  <td>
+                    <div class="cell-media"><%= gift_thumb(line_item.catalog_item) %>
+                      <div><span class="item-name"><%= link_to line_item.name, admin_line_item_path(line_item) %></span>
+                      <%= cell_sub line_item.spec.presence || "In the pool" %></div>
+                    </div>
+                  </td>
+                  <td class="text-end"><span class="num"><%= money(line_item.price_in_cents) %></span></td>
+                  <td><%= line_item_badge line_item %></td>
+                  <td><%= line_item.funded? ? line_item.funder_display_name : muted_dash %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

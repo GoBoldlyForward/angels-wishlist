@@ -1,0 +1,49 @@
+<%# locals: (product:) -%>
+<% left = product.left %>
+<% carted = product.carted %>
+<% specific = product.open.reject(&:pooled?) %>
+<% state = left.any? ? "#{left.size} still needed" : (carted.any? ? "In your cart" : "Fully funded") %>
+<%= link_to gift_path(product.key), class: class_names("tile", "is-claimed": product.done?),
+            data: { turbo_frame: "modal" }, aria: { label: "#{product.name}. #{state}. See details." } do %>
+  <div class="art-wrap">
+    <%= gift_art product.catalog_item, css_class: "tile-art" %>
+    <span class="cat-tag"><%= product.category ? product.category.name.split.first : "Request" %></span>
+    <% if product.done? && carted.any? %>
+      <span class="cart-tag"><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> In your cart</span>
+    <% elsif product.done? %>
+      <span class="claimed-tag"><i class="fa-solid fa-check" aria-hidden="true"></i> All funded</span>
+    <% elsif left.many? %>
+      <span class="need-tag"><%= left.size %> needed</span>
+    <% end %>
+  </div>
+  <div class="tile-body">
+    <div class="tile-name"><%= product.name %></div>
+    <div class="tile-for">
+      <% if left.one? %>
+        <span class="dot" style="background: <%= avatar_swatch(left.first.child.alias_name) %>"><%= left.first.child.alias_name.first %></span>
+        For <%= left.first.child %>
+      <% elsif left.any? %>
+        <i class="fa-solid fa-children tile-for-icon" aria-hidden="true"></i> <%= left.size %> children asked for this
+      <% elsif carted.any? %>
+        <i class="fa-solid fa-cart-shopping c-brand" aria-hidden="true"></i> <%= carted.size %> in your cart
+      <% else %>
+        <i class="fa-solid fa-circle-check c-green" aria-hidden="true"></i> Every one is funded
+      <% end %>
+    </div>
+    <% if specific.any? && left.many? %>
+      <div class="tiny c-brand">
+        <i class="fa-solid fa-tag t-2xs" aria-hidden="true"></i> <%= pluralize specific.size, "specific request" %>
+      </div>
+    <% end %>
+    <div class="tile-foot">
+      <span class="price"><%= "from " if product.varied_prices? %><%= money product.lowest_price_in_cents %></span>
+      <% if product.done? %>
+        <span class="tiny muted">Thank you</span>
+      <% else %>
+        <span class="add-btn <%= "in" if carted.any? %>" aria-hidden="true">
+          <i class="fa-solid <%= carted.any? ? "fa-check" : "fa-plus" %>"></i>
+        </span>
+      <% end %>
+    </div>
+  </div>
+<% end %>

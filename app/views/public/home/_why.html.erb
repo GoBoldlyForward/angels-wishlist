@@ -1,0 +1,32 @@
+<section class="why" id="why">
+  <div class="container">
+    <div class="why-intro">
+      <span class="tag tag-accent">The honest version</span>
+      <h2 class="section-title section-title-lg text-balance">You are choosing a gift. What moves is a donation.</h2>
+      <p class="t-md m-0">
+        Every family on this site is verified by <%= current_chapter&.name || "Atlanta Angels" %>, and every
+        line was added by a caregiver for a child in their home. When you check out, what you chose shows on
+        your receipt. At close, everything raised is pooled and spread evenly across every child's list, so
+        each household is funded to the same share and every caregiver is empowered to shop the specific
+        items and sizes the kids in their care actually need.
+      </p>
+    </div>
+
+    <div class="why-grid">
+      <% content.reasons.each do |reason| %>
+        <div class="why-card">
+          <i class="fa-solid <%= reason.icon %>" aria-hidden="true"></i>
+          <h4><%= reason.title %></h4>
+          <p><%= reason.body %></p>
+        </div>
+      <% end %>
+    </div>
+
+    <h3 class="t-lg why-next">What actually happens after you check out</h3>
+    <div class="flow">
+      <% content.steps.each do |step| %>
+        <div class="flow-step"><b><%= step.title %></b><span><%= step.body %></span></div>
+      <% end %>
+    </div>
+  </div>
+</section>

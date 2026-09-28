@@ -1,9 +1,7 @@
-<% content_for :title, "#{@category.name} | Wish List" %>
-<% available = @gifts.select(&:available?) %>
-<% children_count = available.map { |gift| gift.child.key }.uniq.size %>
-<% prices = available.map(&:price_in_cents) %>
-<% starting = [ 2, available.size ].min %>
-<% shown = Storefront::Product.group(@gifts.select { |gift| @filters.matches?(gift) }) %>
+<% category = @page.category %>
+<% content_for :title, "#{category.name} | Wish List" %>
+<% available = @page.available %>
+<% products = @page.products %>
 
 <main>
   <div class="cat-hero">
@@ -13,12 +11,12 @@
       <% end %>
       <div class="cat-head">
         <div>
-          <span class="cat-eyebrow"><i class="fa-solid <%= @category.icon %>" aria-hidden="true"></i> <%= @category.name %></span>
-          <h1><%= @category.headline.presence || @category.name %></h1>
+          <span class="cat-eyebrow"><i class="fa-solid <%= category.icon %>" aria-hidden="true"></i> <%= category.name %></span>
+          <h1><%= @page.headline %></h1>
           <p class="cat-lede">
             <%= pluralize available.size, "gift" %> in this category <%= available.one? ? "is" : "are" %> still
-            unfunded, asked for by <%= pluralize children_count, "child" %> across
-            <%= pluralize @catalog.household_count(available), "verified household" %>.
+            unfunded, asked for by <%= pluralize @page.children_count, "child" %> across
+            <%= pluralize @page.household_count, "verified household" %>.
           </p>
         </div>
 
@@ -26,8 +24,8 @@
           <h2 class="t-md">Fund this category</h2>
           <p class="tiny muted cat-cta-lede">We apply each gift to the child who has been waiting longest.</p>
           <% if available.any? %>
-            <%= form_with url: category_funding_path(@category),
-                          data: { controller: "shop-stepper", shop_stepper_prices_value: prices.to_json } do |form| %>
+            <%= form_with url: category_funding_path(category),
+                          data: { controller: "shop-stepper", shop_stepper_prices_value: @page.prices.to_json } do |form| %>
               <div class="stepper-row cat-stepper">
                 <div class="stepper">
                   <button class="step-btn" type="button" hidden aria-label="One fewer"
@@ -35,8 +33,8 @@
                     <i class="fa-solid fa-minus" aria-hidden="true"></i>
                   </button>
                   <%= form.label :quantity, "How many gifts to fund", class: "sr-only" %>
-                  <%= form.number_field :quantity, value: starting, min: 1, max: available.size, class: "step-n",
-                                                   required: true,
+                  <%= form.number_field :quantity, value: @page.starting_quantity, min: 1, max: available.size,
+                                                   class: "step-n", required: true,
                                                    data: { shop_stepper_target: "quantity",
                                                            action: "input->shop-stepper#refresh" } %>
                   <button class="step-btn" type="button" hidden aria-label="One more"
@@ -46,17 +44,17 @@
                 </div>
                 <div class="stepper-total">
                   <div class="tiny muted">gifts from this category</div>
-                  <div class="price" data-shop-stepper-target="total"><%= money prices.first(starting).sum %></div>
+                  <div class="price" data-shop-stepper-target="total"><%= money @page.starting_in_cents %></div>
                 </div>
               </div>
               <%= form.button class: "btn btn-primary btn-block" do %>
-                Add <span data-shop-stepper-target="count"><%= starting %></span> to cart
+                Add <span data-shop-stepper-target="count"><%= @page.starting_quantity %></span> to cart
               <% end %>
             <% end %>
-            <%= button_to "Cover the whole category · #{money prices.sum}", category_funding_path(@category),
+            <%= button_to "Cover the whole category · #{money @page.whole_in_cents}", category_funding_path(category),
                           params: { whole_category: 1 }, class: "btn btn-ghost btn-block cat-cover" %>
             <p class="tiny muted cat-cta-count">
-              <%= pluralize available.size, "gift" %> for <%= pluralize children_count, "child" %>
+              <%= pluralize available.size, "gift" %> for <%= pluralize @page.children_count, "child" %>
             </p>
           <% else %>
             <p class="muted m-0">Every gift in this category is funded or already in your cart.</p>
@@ -67,19 +65,18 @@
   </div>
 
   <div class="container">
-    <%= render "public/shared/filters", filters: @filters,
-               url: ->(query) { category_path(@category, query) } %>
+    <%= render "public/shared/filters", filters: @filters, url: ->(query) { category_path(category, query) } %>
 
     <div class="sec">
       <div class="sec-head">
         <div>
           <h2>Everything on this list</h2>
-          <p><%= pluralize shown.size, "product" %>, grouped so repeats show as one tile.</p>
+          <p><%= pluralize products.size, "product" %>, grouped so repeats show as one tile.</p>
         </div>
       </div>
       <div class="grid">
-        <% if shown.any? %>
-          <%= render partial: "public/shared/product_tile", collection: shown, as: :product %>
+        <% if products.any? %>
+          <%= render partial: "public/shared/product_tile", collection: products, as: :product %>
         <% else %>
           <p class="muted">Nothing matches these filters.</p>
         <% end %>
@@ -89,10 +86,10 @@
     <div class="sec">
       <div class="sec-head"><div><h2>Other categories</h2></div></div>
       <div class="chip-scroll other-categories">
-        <% @catalog.categories.reject { |category| category.id == @category.id }.each do |category| %>
-          <%= link_to category_path(category), class: "chip" do %>
-            <i class="fa-solid <%= category.icon %> chip-icon" aria-hidden="true"></i><%= category.name %>
-            <span class="chip-count"><%= @catalog.category_gifts(category).count { |gift| !gift.funded? } %></span>
+        <% @page.other_categories.each do |other, open_count| %>
+          <%= link_to category_path(other), class: "chip" do %>
+            <i class="fa-solid <%= other.icon %> chip-icon" aria-hidden="true"></i><%= other.name %>
+            <span class="chip-count"><%= open_count %></span>
           <% end %>
         <% end %>
       </div>

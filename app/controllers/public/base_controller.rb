@@ -36,7 +36,8 @@ module Public
       cart.lines
       return if cart.dropped_count.zero?
 
-      flash.now[:notice] = if cart.dropped_count == 1
+      # A dialog has nowhere to show a notice, so it waits for the next full page.
+      (turbo_frame_request? ? flash : flash.now)[:notice] = if cart.dropped_count == 1
         "A gift in your cart is no longer open, so we took it out."
       else
         "#{cart.dropped_count} gifts in your cart are no longer open, so we took them out."

@@ -3,10 +3,8 @@
 module Public
   class CategoriesController < BaseController
     def show
-      @category = Category.friendly.find(params[:id])
-      @catalog = catalog
       @filters = filters
-      @gifts = catalog.category_gifts(@category)
+      @page = Storefront::CategoryPage.new(Category.friendly.find(params[:id]), catalog: catalog, filters: filters)
     end
   end
 end

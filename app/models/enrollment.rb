@@ -3,7 +3,8 @@
 # What one household commits to for one event.
 class Enrollment < ApplicationRecord
   acts_as_paranoid
-  has_paper_trail only: %i[spending_agreed_at love_box submitted_at]
+  has_paper_trail only: %i[spending_agreed_at love_box submitted_at],
+                  meta: { organization_id: ->(enrollment) { enrollment.event.organization_id } }
 
   INTAKE_STEPS = %w[home children love_box lists payout review].freeze
 

@@ -8,8 +8,8 @@ module Admin
           "\x00\x00\x00\rIDATx\x9Cc\xF8\xFF\xFF?\x00\x05\xFE\x02\xFE\xA7\x9A\x8D\xB0\x00\x00\x00\x00IEND\xAEB`\x82".b
 
     setup do
-      @toys = Category.create!(name: "Toys & Games", position: 1)
-      @books = Category.create!(name: "Books", position: 2)
+      @toys = Category.create!(organization: @chapter, name: "Toys & Games", position: 1)
+      @books = Category.create!(organization: @chapter, name: "Books", position: 2)
       @blocks = CatalogItem.create!(category: @toys, name: "Building blocks", price_in_cents: 3_500, icon: "🧱",
                                     min_age: 3, max_age: 8)
       @novel = CatalogItem.create!(category: @books, name: "Chapter book set", price_in_cents: 2_200, active: false,

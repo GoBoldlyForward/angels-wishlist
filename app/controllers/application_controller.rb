@@ -35,12 +35,12 @@ class ApplicationController < ActionController::Base
   end
 
   def current_chapter
-    @current_chapter ||= Organization.chapter.order(:id).first
+    @current_chapter ||= Organization.chapter_for_host(request.host)
   end
 
   def current_storefront
-    @current_storefront ||= Organization.hosting.where(active: true).find_by(slug: params[:storefront]) ||
-                            current_chapter
+    @current_storefront ||= current_chapter&.children_organizations&.partner&.where(active: true)
+                                           &.find_by(slug: params[:storefront]) || current_chapter
   end
 
   def current_event

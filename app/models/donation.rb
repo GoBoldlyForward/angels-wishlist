@@ -2,7 +2,8 @@
 
 class Donation < ApplicationRecord
   acts_as_paranoid
-  has_paper_trail only: %i[status note_approved_at]
+  has_paper_trail only: %i[status note_approved_at],
+                  meta: { organization_id: ->(donation) { donation.event.organization_id } }
 
   FEE_RATE = 0.03
   MINIMUM_GENERAL_GIFT_IN_CENTS = 500

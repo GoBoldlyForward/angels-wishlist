@@ -3,7 +3,8 @@
 class Wishlist < ApplicationRecord
   extend FriendlyId
   acts_as_paranoid
-  has_paper_trail only: %i[status submitted_at approved_at caregiver_note interests review_note]
+  has_paper_trail only: %i[status submitted_at approved_at caregiver_note interests review_note],
+                  meta: { organization_id: ->(wishlist) { wishlist.event.organization_id } }
 
   belongs_to :child
   belongs_to :event
@@ -71,7 +72,7 @@ class Wishlist < ApplicationRecord
   # A typed gift joins a catalog product only when one name fits. A price
   # above the catalog's waits for staff before donors see it.
   def add_gift(name:, price_in_cents:, link_url: nil)
-    match = CatalogItem.unambiguous_match(name)
+    match = CatalogItem.where(organization_id: event.organization_id).unambiguous_match(name)
     above = match.present? && price_in_cents.to_i > match.price_in_cents
     line_items.create(name: name.to_s.strip, price_in_cents: price_in_cents, link_url: link_url.presence,
                       catalog_item: match, status: above ? "needs_review" : "open")

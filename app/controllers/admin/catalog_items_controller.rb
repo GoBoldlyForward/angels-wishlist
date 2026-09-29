@@ -5,7 +5,7 @@ module Admin
     before_action :set_catalog_item, only: %i[edit update destroy]
 
     def index
-      @table = CatalogTable.new(params)
+      @table = CatalogTable.new(current_chapter, params)
 
       respond_to do |format|
         format.html { @pagy, @rows = pagy(:offset, @table.rows) }
@@ -14,11 +14,11 @@ module Admin
     end
 
     def new
-      @form = CatalogItemForm.new(CatalogItem.new(category_id: params[:category_id]))
+      @form = CatalogItemForm.new(current_chapter.catalog_items.new(category_id: params[:category_id]))
     end
 
     def create
-      @form = CatalogItemForm.new(CatalogItem.new, catalog_item_params)
+      @form = CatalogItemForm.new(current_chapter.catalog_items.new, catalog_item_params)
       save_and_return(:new, "#{@form.name} is in the catalog.")
     end
 
@@ -39,7 +39,7 @@ module Admin
     private
 
     def set_catalog_item
-      @catalog_item = CatalogItem.friendly.find(params[:id])
+      @catalog_item = current_chapter.catalog_items.friendly.find(params[:id])
     end
 
     def save_and_return(template, notice)

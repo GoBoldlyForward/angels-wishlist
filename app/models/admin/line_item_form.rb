@@ -29,7 +29,8 @@ module Admin
     end
 
     def catalog_items
-      CatalogItem.available.or(CatalogItem.where(id: line_item.catalog_item_id)).includes(:category).order(:name)
+      chapter_items = CatalogItem.where(organization_id: line_item.wishlist.event.organization_id)
+      chapter_items.available.or(chapter_items.where(id: line_item.catalog_item_id)).includes(:category).order(:name)
     end
 
     private

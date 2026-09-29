@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_29_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_29_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -107,6 +107,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_120000) do
     t.integer "max_age"
     t.integer "min_age"
     t.string "name", null: false
+    t.bigint "organization_id", null: false
     t.string "photo_attribution"
     t.integer "price_in_cents", null: false
     t.string "slug"
@@ -115,6 +116,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_120000) do
     t.index ["active"], name: "index_catalog_items_on_active"
     t.index ["category_id"], name: "index_catalog_items_on_category_id"
     t.index ["deleted_at"], name: "index_catalog_items_on_deleted_at"
+    t.index ["organization_id"], name: "index_catalog_items_on_organization_id"
     t.index ["slug"], name: "index_catalog_items_on_slug", unique: true
   end
 
@@ -125,11 +127,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_120000) do
     t.string "headline"
     t.string "icon"
     t.string "name", null: false
+    t.bigint "organization_id", null: false
     t.integer "position"
     t.string "slug"
     t.string "tint"
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_categories_on_deleted_at"
+    t.index ["organization_id"], name: "index_categories_on_organization_id"
     t.index ["position"], name: "index_categories_on_position"
     t.index ["slug"], name: "index_categories_on_slug", unique: true
   end
@@ -288,18 +292,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_120000) do
     t.string "co_brand_line"
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
+    t.string "ein"
+    t.string "hostname"
     t.string "kind", default: "chapter", null: false
+    t.string "legal_name"
+    t.string "mail_from"
     t.bigint "mailing_address_id"
     t.string "name", null: false
     t.bigint "parent_id"
+    t.integer "platform_fee_basis_points", default: 0, null: false
     t.bigint "primary_contact_id"
     t.string "short_name"
     t.string "slug"
     t.string "stripe_account_id"
+    t.boolean "stripe_charges_enabled", default: false, null: false
     t.jsonb "theme", default: {}, null: false
     t.datetime "updated_at", null: false
     t.string "website_url"
     t.index ["deleted_at"], name: "index_organizations_on_deleted_at"
+    t.index ["hostname"], name: "index_organizations_on_hostname", unique: true, where: "(hostname IS NOT NULL)"
     t.index ["kind"], name: "index_organizations_on_kind"
     t.index ["mailing_address_id"], name: "index_organizations_on_mailing_address_id"
     t.index ["parent_id"], name: "index_organizations_on_parent_id"
@@ -548,8 +559,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_120000) do
     t.string "item_type", null: false
     t.text "object"
     t.jsonb "object_changes"
+    t.bigint "organization_id"
     t.string "whodunnit"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
+    t.index ["organization_id"], name: "index_versions_on_organization_id"
   end
 
   create_table "wishlists", force: :cascade do |t|
@@ -576,6 +589,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_120000) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "catalog_items", "categories"
+  add_foreign_key "catalog_items", "organizations"
+  add_foreign_key "categories", "organizations"
   add_foreign_key "children", "households"
   add_foreign_key "donations", "events"
   add_foreign_key "donations", "organizations", column: "storefront_organization_id"

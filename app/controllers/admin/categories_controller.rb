@@ -5,16 +5,16 @@ module Admin
     before_action :set_category, only: %i[edit update destroy]
 
     def index
-      @categories = Category.ordered
-      @item_counts = CatalogItem.group(:category_id).count
+      @categories = current_chapter.categories.ordered
+      @item_counts = current_chapter.catalog_items.group(:category_id).count
     end
 
     def new
-      @category = Category.new(tint: "t1")
+      @category = current_chapter.categories.new(tint: "t1")
     end
 
     def create
-      @category = Category.new(category_params)
+      @category = current_chapter.categories.new(category_params)
 
       if @category.save
         redirect_to admin_categories_path, notice: "#{@category.name} is added."
@@ -45,7 +45,7 @@ module Admin
     private
 
     def set_category
-      @category = Category.friendly.find(params[:id])
+      @category = current_chapter.categories.friendly.find(params[:id])
     end
 
     def category_params

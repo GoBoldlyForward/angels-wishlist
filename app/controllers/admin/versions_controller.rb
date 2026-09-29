@@ -3,7 +3,7 @@
 module Admin
   class VersionsController < BaseController
     def index
-      @table = VersionsTable.new(params)
+      @table = VersionsTable.new(current_chapter, params)
 
       respond_to do |format|
         format.html do

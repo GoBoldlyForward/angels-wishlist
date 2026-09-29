@@ -31,7 +31,7 @@ class CatalogItemTest < ActiveSupport::TestCase
   end
 
   test "a max age below the minimum is rejected" do
-    item = CatalogItem.new(category: Category.create!(name: "Toys"), name: "Backwards",
+    item = CatalogItem.new(category: build_category(name: "Toys"), name: "Backwards",
                            price_in_cents: 100, min_age: 14, max_age: 5)
 
     assert_not item.valid?

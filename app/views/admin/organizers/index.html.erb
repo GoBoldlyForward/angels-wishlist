@@ -1,0 +1,41 @@
+<% content_for :breadcrumbs do %><li class="breadcrumb-item active">Staff</li><% end %>
+
+<%= render "admin/shared/page_header", title: "Staff",
+           lede: "The organizers who run #{current_chapter.display_name}. Admins reach every chapter and are not listed." do %>
+  <%= link_to new_admin_organizer_path, class: "btn btn-primary btn-sm" do %>
+    <i class="bi bi-plus-lg"></i> Add an organizer
+  <% end %>
+<% end %>
+
+<div class="data-table-wrapper">
+  <div class="table-scroll">
+    <table class="table table-hover">
+      <thead><tr><th>Name</th><th>Email</th><th>Other chapters</th><th>Last signed in</th><th></th></tr></thead>
+      <tbody>
+        <% @memberships.each do |membership| %>
+          <% user = membership.user %>
+          <tr>
+            <td class="item-name"><%= user.full_name %></td>
+            <td><%= mail_to user.email %></td>
+            <td><%= user.organizations.chapter.where.not(id: current_chapter.id).map(&:display_name).to_sentence.presence || "—" %></td>
+            <td><%= user.last_sign_in_at ? "#{time_ago_in_words(user.last_sign_in_at)} ago" : "Not yet" %></td>
+            <td class="text-end">
+              <% unless user == current_user %>
+                <%= button_to "Remove", admin_organizer_path(membership), method: :delete, class: "btn btn-outline-danger btn-sm",
+                              form: { data: { turbo_confirm: "Remove #{user.full_name} from #{current_chapter.display_name}?" } } %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @memberships.empty? %>
+          <tr><td colspan="5">
+            <div class="empty-state"><i class="bi bi-person-badge"></i>
+              <h3>No organizers yet</h3>
+              <p>Add the first person who will run this chapter.</p>
+            </div>
+          </td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

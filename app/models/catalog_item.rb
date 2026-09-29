@@ -5,6 +5,7 @@ class CatalogItem < ApplicationRecord
   include PgSearch::Model
   acts_as_paranoid
 
+  belongs_to :organization
   belongs_to :category
 
   has_many :line_items, dependent: :nullify
@@ -25,6 +26,9 @@ class CatalogItem < ApplicationRecord
   validates :price_in_cents, numericality: { greater_than: 0 }
   validates :photo, content_type: %w[image/png image/jpeg image/webp], size: { less_than: 10.megabytes }
   validate :ages_in_order
+  validate :category_in_same_chapter
+
+  before_validation :take_chapter_from_category
 
   def price_in_dollars
     price_in_cents / 100.0
@@ -55,6 +59,16 @@ class CatalogItem < ApplicationRecord
   end
 
   private
+
+  def take_chapter_from_category
+    self.organization ||= category&.organization
+  end
+
+  def category_in_same_chapter
+    return if category.nil? || category.organization_id == organization_id
+
+    errors.add(:category, "belongs to another chapter")
+  end
 
   def ages_in_order
     return if min_age.blank? || max_age.blank?

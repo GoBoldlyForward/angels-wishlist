@@ -56,4 +56,5 @@ namespace :admin do
   resources :categories, except: :show
   resources :catalog_items, except: :show
   resources :organizations, except: :destroy
+  resources :organizers, only: %i[index new create destroy]
 end

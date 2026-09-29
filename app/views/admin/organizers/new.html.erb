@@ -1,0 +1,37 @@
+<% content_for :breadcrumbs do %>
+  <li class="breadcrumb-item"><%= link_to "Staff", admin_organizers_path %></li>
+  <li class="breadcrumb-item active">Add an organizer</li>
+<% end %>
+
+<%= render "admin/shared/page_header", title: "Add an organizer",
+           lede: "Someone new gets an account and an email to choose a password. An organizer of another chapter is added to this one too." %>
+
+<div class="row">
+  <div class="col-lg-7">
+    <div class="panel-card p-4">
+      <%= form_with model: @invite, scope: :organizer_invite, url: admin_organizers_path do |form| %>
+        <%= render "admin/shared/error_summary", record: @invite %>
+
+        <div class="row g-3">
+          <div class="col-12">
+            <%= form.label :email, class: "form-label" %>
+            <%= form.email_field :email, class: "form-control", required: true %>
+          </div>
+          <div class="col-md-6">
+            <%= form.label :first_name, class: "form-label" %>
+            <%= form.text_field :first_name, class: "form-control" %>
+          </div>
+          <div class="col-md-6">
+            <%= form.label :last_name, class: "form-label" %>
+            <%= form.text_field :last_name, class: "form-control" %>
+          </div>
+        </div>
+
+        <div class="drawer-actions mt-4">
+          <%= form.submit "Add the organizer", class: "btn btn-primary" %>
+          <%= link_to "Cancel", admin_organizers_path, class: "btn btn-outline-secondary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -18,12 +18,15 @@
           </div>
           <div class="col-md-4">
             <%= form.label :kind, class: "form-label" %>
-            <%= form.select :kind, Organization.kinds.keys.map { |kind| [ kind.humanize, kind ] }, {}, class: "form-select" %>
+            <% kinds = current_user.admin? || !current_chapter ? Organization.kinds.keys : %w[agency partner] %>
+            <%= form.select :kind, kinds.map { |kind| [ kind.humanize, kind ] }, {}, class: "form-select",
+                            disabled: form_object.persisted? %>
           </div>
           <div class="col-md-8">
-            <%= form.label :parent_id, "Part of", class: "form-label" %>
-            <%= form.collection_select :parent_id, Organization.where.not(id: form_object.id).order(:name), :id, :name,
-                                       { include_blank: "Nothing. It stands alone" }, class: "form-select" %>
+            <span class="form-label d-block">Part of</span>
+            <span class="form-control-plaintext">
+              <%= form_object.chapter? ? "Nothing. A chapter stands alone" : (form_object.parent || current_chapter)&.name %>
+            </span>
           </div>
           <div class="col-md-8">
             <%= form.label :website_url, "Website", class: "form-label" %>
@@ -41,6 +44,37 @@
             <div class="form-text">Shown under a partner's name in the header of its storefront.</div>
           </div>
         </div>
+
+        <%= detail_section "For a chapter" do %>
+          <div class="row g-3 mt-1">
+            <div class="col-md-8">
+              <%= form.label :legal_name, "Legal name", class: "form-label" %>
+              <%= form.text_field :legal_name, class: "form-control" %>
+              <div class="form-text">The 501(c)(3) named on every receipt. Leave it blank to use the name above.</div>
+            </div>
+            <div class="col-md-4">
+              <%= form.label :ein, "EIN", class: "form-label" %>
+              <%= form.text_field :ein, class: "form-control", placeholder: "12-3456789" %>
+            </div>
+            <div class="col-md-8">
+              <%= form.label :mail_from, "Send email as", class: "form-label" %>
+              <%= form.text_field :mail_from, class: "form-control", placeholder: "Atlanta Angels Wish List <wishlist@atlantaangels.org>" %>
+              <div class="form-text">The address must be verified with the mail provider.</div>
+            </div>
+            <% if current_user.admin? %>
+              <div class="col-md-8">
+                <%= form.label :hostname, "Host name", class: "form-label" %>
+                <%= form.text_field :hostname, class: "form-control", placeholder: "wishlist.atlantaangels.org" %>
+                <div class="form-text">Donors and caregivers who visit this host reach this chapter.</div>
+              </div>
+              <div class="col-md-4">
+                <%= form.label :platform_fee_basis_points, "Platform fee, in basis points", class: "form-label" %>
+                <%= form.number_field :platform_fee_basis_points, class: "form-control", min: 0, max: 2000 %>
+                <div class="form-text">100 is 1% of each gift.</div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
 
         <%= detail_section "Storefront, for a partner" do %>
           <div class="row g-3 mt-1">

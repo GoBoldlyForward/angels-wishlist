@@ -5,8 +5,9 @@ module Admin
   class VersionsTable < Table
     SEARCHED = %w[versions.item_type versions.event versions.object_changes::text].freeze
 
-    def initialize(params)
-      super(Version.all, params, tabs: build_tabs, filters: build_filters, sorts: build_sorts,
+    def initialize(chapter, params)
+      @versions = Version.where(organization_id: chapter)
+      super(@versions, params, tabs: build_tabs, filters: build_filters, sorts: build_sorts,
                                  search: method(:matching), default_order: "versions.created_at DESC, versions.id DESC")
     end
 
@@ -43,8 +44,8 @@ module Admin
     end
 
     def build_filters
-      types = Version.distinct.order(:item_type).pluck(:item_type)
-      actors = User.with_deleted.where(id: Version.where.not(whodunnit: nil).distinct.pluck(:whodunnit))
+      types = @versions.distinct.order(:item_type).pluck(:item_type)
+      actors = User.with_deleted.where(id: @versions.where.not(whodunnit: nil).distinct.pluck(:whodunnit))
                    .sort_by { |user| user.full_name.downcase }
       [
         Filter.new(key: "type", label: "Record", options: types.to_h { |type| [ type.underscore.humanize, type ] },

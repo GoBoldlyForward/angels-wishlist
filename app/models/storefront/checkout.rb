@@ -19,6 +19,7 @@ module Storefront
     validate :email_can_receive_a_receipt
     validate :cart_holds_something
     validate :every_gift_is_still_open
+    validate :chapter_takes_cards
 
     def initialize(attributes = {}, cart:, event:, storefront: nil, visit: nil)
       @cart = cart
@@ -88,6 +89,12 @@ module Storefront
 
     def cart_holds_something
       errors.add(:base, "Your cart is empty.") if @event.nil? || cart.empty?
+    end
+
+    def chapter_takes_cards
+      return if !PaymentGateway.live? || @event.nil? || @event.organization.stripe_charges_enabled?
+
+      errors.add(:base, "#{@event.organization.name} is not taking card donations yet. Nothing has been charged.")
     end
 
     def every_gift_is_still_open

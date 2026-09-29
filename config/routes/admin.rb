@@ -57,4 +57,5 @@ namespace :admin do
   resources :catalog_items, except: :show
   resources :organizations, except: :destroy
   resources :organizers, only: %i[index new create destroy]
+  resource :stripe_connection, only: %i[show create]
 end

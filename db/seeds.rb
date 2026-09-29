@@ -93,7 +93,7 @@ ActiveRecord::Base.transaction do
   puts "Organizations"
   angels = Organization.create!(name: "Atlanta Angels", short_name: "Angels", kind: "chapter",
                                 website_url: "https://atlantaangels.org",
-                                stripe_account_id: "acct_seed_angels",
+                                stripe_account_id: "acct_seed_angels", stripe_charges_enabled: true,
                                 theme: { stylesheet: "theme-angels" })
 
   passion = Organization.create!(name: "Passion City Church", short_name: "Passion", kind: "partner",
@@ -104,7 +104,7 @@ ActiveRecord::Base.transaction do
   nashville = Organization.create!(name: "Nashville Angels", short_name: "Nashville", kind: "chapter",
                                    website_url: "https://nashvilleangels.example.org",
                                    hostname: "nashville.localhost",
-                                   stripe_account_id: "acct_seed_nashville")
+                                   stripe_account_id: "acct_seed_nashville", stripe_charges_enabled: true)
 
   agencies = HOUSEHOLD_STAFF_FACTS.values.filter_map { |f| f[:agency] }.uniq.to_h do |name|
     [ name, Organization.create!(name: name, kind: "agency", parent: angels) ]

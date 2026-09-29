@@ -235,7 +235,19 @@ module Public
       assert_response :not_found
     end
 
+    test "a live checkout is refused while the chapter's Stripe account is not connected" do
+      add_to_cart @mayas_hoodie
+
+      with_live_gateway(->(*) { flunk "Stripe was asked to charge" }) do
+        assert_no_difference(-> { Donation.count }) { check_out }
+      end
+
+      assert_response :unprocessable_content
+      assert_includes response.body, "Atlanta Angels is not taking card donations yet"
+    end
+
     test "a live checkout sends the donor to Stripe and leaves the receipt to the gateway" do
+      @chapter.update!(stripe_charges_enabled: true)
       add_to_cart @mayas_hoodie
       asked = nil
       start = lambda do |donation, success_url:, cancel_url:|

@@ -42,6 +42,22 @@
             [ "Organizers", link_to(@organization.organizers.count, admin_organizers_path) ]
           ] %>
         <% end %>
+
+        <%= detail_section "Stripe" do %>
+          <% if @organization.stripe_charges_enabled? %>
+            <%= key_values [ [ "Account", @organization.stripe_account_id ], [ "Donations", status_badge("live", label: "Can be taken") ] ] %>
+          <% else %>
+            <div class="drawer-note mb-3">
+              Donations go straight into the chapter's own Stripe account. Until it is connected, the storefront cannot take a card.
+            </div>
+            <% if @organization == current_chapter %>
+              <%= button_to (@organization.stripe_account_id ? "Finish connecting Stripe" : "Connect Stripe"),
+                            admin_stripe_connection_path, class: "btn btn-primary btn-sm" %>
+            <% else %>
+              <span class="text-muted small">Switch to this chapter to connect its Stripe account.</span>
+            <% end %>
+          <% end %>
+        <% end %>
       <% end %>
     </div>
   </div>

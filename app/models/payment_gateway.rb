@@ -32,8 +32,15 @@ module PaymentGateway
     Checkout.new(url: session.url, reference: session.id)
   end
 
+  # The platform's own events and its connected accounts' events arrive signed with different secrets.
   def construct_event(payload, signature)
-    Stripe::Webhook.construct_event(payload, signature, ENV.fetch("STRIPE_WEBHOOK_SECRET"))
+    secrets = ENV.values_at("STRIPE_WEBHOOK_SECRET", "STRIPE_CONNECT_WEBHOOK_SECRET").compact_blank
+    secrets.each_with_index do |secret, index|
+      return Stripe::Webhook.construct_event(payload, signature, secret)
+    rescue Stripe::SignatureVerificationError
+      raise if index == secrets.size - 1
+    end
+    raise Stripe::SignatureVerificationError.new("No webhook secret is set", signature)
   end
 
   def handle(event)
@@ -48,6 +55,8 @@ module PaymentGateway
       Donation.succeeded.find_by(stripe_payment_intent_id: object.payment_intent)&.refund!
     when "charge.dispute.created"
       Donation.succeeded.find_by(stripe_payment_intent_id: object.payment_intent)&.mark_disputed!
+    when "account.updated"
+      Organization.chapter.find_by(stripe_account_id: object.id)&.update!(stripe_charges_enabled: object.charges_enabled)
     end
   end
 
@@ -69,6 +78,37 @@ module PaymentGateway
     donation.refund!
   end
 
+  # A chapter takes donations into its own Express account. Payouts stay manual so the
+  # balance is still there when caregivers are paid from it.
+  def chapter_onboarding_url(chapter, return_url:, refresh_url:)
+    unless live?
+      chapter.update!(stripe_account_id: "acct_test_#{SecureRandom.hex(6)}", stripe_charges_enabled: true)
+      return return_url
+    end
+
+    if chapter.stripe_account_id.blank?
+      account = Stripe::Account.create(
+        { type: "express", country: "US", business_type: "non_profit",
+          business_profile: { name: chapter.legal_name_or_name, url: chapter.website_url.presence }.compact,
+          capabilities: { card_payments: { requested: true }, transfers: { requested: true } },
+          settings: { payouts: { schedule: { interval: "manual" } } },
+          metadata: { organization: chapter.id } },
+        { api_key: ENV["STRIPE_SECRET_KEY"], idempotency_key: "chapter-account-#{chapter.id}" }
+      )
+      chapter.update!(stripe_account_id: account.id)
+    end
+
+    account_link(chapter.stripe_account_id, return_url:, refresh_url:)
+  end
+
+  def refresh_chapter(chapter)
+    return chapter if !live? || chapter.stripe_account_id.blank?
+
+    account = Stripe::Account.retrieve(chapter.stripe_account_id, { api_key: ENV["STRIPE_SECRET_KEY"] })
+    chapter.update!(stripe_charges_enabled: account.charges_enabled)
+    chapter
+  end
+
   # Stripe's own hosted onboarding, so identity and account details never
   # touch this application.
   def onboarding_url(household, return_url:, refresh_url:)
@@ -81,15 +121,18 @@ module PaymentGateway
       account = Stripe::Account.create(
         { type: "express", country: "US", email: household.caregiver.email,
           capabilities: { transfers: { requested: true } }, business_type: "individual",
-          metadata: { household: household.id } },
+          metadata: { household: household.id, organization: household.organization_id } },
         { api_key: ENV["STRIPE_SECRET_KEY"] }
       )
       household.update!(stripe_account_id: account.id)
     end
 
+    account_link(household.stripe_account_id, return_url:, refresh_url:)
+  end
+
+  def account_link(account_id, return_url:, refresh_url:)
     Stripe::AccountLink.create(
-      { account: household.stripe_account_id, type: "account_onboarding",
-        return_url: return_url, refresh_url: refresh_url },
+      { account: account_id, type: "account_onboarding", return_url: return_url, refresh_url: refresh_url },
       { api_key: ENV["STRIPE_SECRET_KEY"] }
     ).url
   end

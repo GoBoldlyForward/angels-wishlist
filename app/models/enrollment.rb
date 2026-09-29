@@ -52,6 +52,7 @@ class Enrollment < ApplicationRecord
       ("Finish your Love Box." unless love_box_selection.complete?),
       ("Add at least one gift to every list." if lists.empty? || lists.any? { |list| list.line_items.listed.none? }),
       ("Choose how you would like to be paid." if household.payout_via_none?),
+      ("Finish connecting with Stripe." if household.payout_via_stripe? && !household.stripe_connected?),
       ("Agree to how the funds will be spent." unless spending_agreed?)
     ].compact
   end

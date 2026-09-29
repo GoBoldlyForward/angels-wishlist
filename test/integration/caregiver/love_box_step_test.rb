@@ -51,6 +51,16 @@ module Caregiver
       assert_equal "love_box", @enrollment.intake_step
     end
 
+    test "an event with no Love Box choices lets the caregiver carry on" do
+      @event.update!(love_box_options: [])
+
+      get caregiver_intake_love_box_path
+      assert_select ".panel", /nothing to choose for the Love Box yet/
+
+      patch caregiver_intake_love_box_path
+      assert_redirected_to caregiver_intake_lists_path
+    end
+
     test "an option the event does not offer is dropped" do
       patch caregiver_intake_love_box_path,
             params: { love_box: full_love_box.merge("holiday" => { picks: [ "A pony" ] }) }

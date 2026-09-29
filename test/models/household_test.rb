@@ -35,4 +35,12 @@ class HouseholdTest < ActiveSupport::TestCase
       household.update!(county: "Fulton County")
     end
   end
+
+  test "a Stripe account is not paid until its onboarding is finished" do
+    household = build_household(stripe_account_id: "acct_started", stripe_onboarded_at: nil)
+    assert_equal "Stripe onboarding is not finished.", household.payout_blocker
+
+    household.update!(stripe_onboarded_at: Time.current)
+    assert household.payable?
+  end
 end

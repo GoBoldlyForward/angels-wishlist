@@ -107,7 +107,7 @@ class LoveBox
   end
 
   def complete?
-    groups.any? && missing_groups.empty?
+    missing_groups.empty?
   end
 
   # What volunteers need to pull for the whole event: item => how many.

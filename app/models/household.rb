@@ -5,7 +5,7 @@ class Household < ApplicationRecord
   include PgSearch::Model
   acts_as_paranoid
   has_paper_trail only: %i[verification_status verified_at hold_reason payout_method stripe_account_id
-                           mailing_address_id]
+                           stripe_onboarded_at mailing_address_id]
 
   COUNTIES = [ "Clayton", "Cobb", "DeKalb", "Douglas", "Fulton", "Gwinnett", "Henry", "Rockdale",
                "South Fulton" ].freeze
@@ -74,10 +74,14 @@ class Household < ApplicationRecord
     return hold_reason if verification_hold?
     return "Verification has not cleared." unless verification_verified?
     return "No payout method on file." if payout_via_none?
-    return "Stripe onboarding is not finished." if payout_via_stripe? && stripe_account_id.blank?
+    return "Stripe onboarding is not finished." if payout_via_stripe? && !stripe_connected?
     return "No mailing address for the gift card." if payout_via_gift_card? && mailing_address.blank?
 
     nil
+  end
+
+  def stripe_connected?
+    stripe_onboarded_at.present?
   end
 
   def payable?

@@ -7,7 +7,7 @@ module Admin
     WOULD_BE = <<~SQL.squish
       CASE WHEN households.verification_status = 'hold' THEN 'held'
            WHEN households.verification_status <> 'verified' OR households.payout_method = 'none'
-             OR (households.payout_method = 'stripe' AND COALESCE(households.stripe_account_id, '') = '')
+             OR (households.payout_method = 'stripe' AND households.stripe_onboarded_at IS NULL)
              OR (households.payout_method = 'gift_card' AND households.mailing_address_id IS NULL) THEN 'blocked'
            ELSE 'scheduled' END
     SQL

@@ -37,7 +37,7 @@
         </div>
       <% end %>
 
-      <%= render "caregiver/shared/love_box", box: @box %>
+      <% if @box.groups.any? %><%= render "caregiver/shared/love_box", box: @box %><% end %>
     </div>
 
     <div class="review-side">

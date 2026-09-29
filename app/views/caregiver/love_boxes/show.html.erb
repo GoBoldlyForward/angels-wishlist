@@ -14,6 +14,9 @@
     <% end %>
 
     <div class="panel form-card">
+      <% if @box.groups.empty? %>
+        <p class="t-base m-0">There is nothing to choose for the Love Box yet. Your coordinator will be in touch about it.</p>
+      <% end %>
       <% @box.groups.each do |group| %>
         <% allowed = @box.picks_allowed(group) %>
         <% picks = @box.picks_for(group) %>

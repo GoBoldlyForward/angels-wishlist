@@ -45,7 +45,7 @@ class DonationTest < ActiveSupport::TestCase
   end
   test "approving a note records who approved it" do
     donation = build_donation(event: build_event, note_to_family: "Could you send a photo?")
-    staff = users(:staff)
+    staff = users(:admin)
 
     PaperTrail.request(whodunnit: staff.id) { donation.approve_note! }
 

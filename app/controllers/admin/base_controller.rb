@@ -7,12 +7,21 @@ module Admin
     helper Admin::TableHelper
 
     before_action :authenticate_user!
-    before_action :require_admin
+    before_action :require_staff
 
     private
 
-    def require_admin
-      redirect_to root_path, alert: "That area is for staff." unless current_user.is_admin?
+    def require_staff
+      return if current_user.admin? || current_user.organizes?(current_chapter)
+
+      redirect_to root_path, alert: "That area is for staff."
+    end
+
+    # A partner's organizer works inside the chapter the partner belongs to.
+    def current_chapter
+      return @current_chapter if defined?(@current_chapter)
+
+      @current_chapter = current_organization&.partner? ? current_organization.parent : current_organization
     end
 
     def send_csv(table, columns, filename)

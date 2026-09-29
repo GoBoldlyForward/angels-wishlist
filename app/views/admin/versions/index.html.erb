@@ -29,7 +29,7 @@
             <td>
               <% if version.actor %>
                 <span><%= version.actor.full_name %></span>
-                <%= cell_sub version.actor.is_admin? ? "Staff" : version.actor.role.humanize %>
+                <%= cell_sub version.actor.role.humanize %>
               <% else %>
                 <%= muted_dash "The system" %>
               <% end %>

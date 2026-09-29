@@ -9,8 +9,8 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
-  belongs_to :organization, optional: true
-
+  has_many :organization_memberships, dependent: :destroy
+  has_many :organizations, through: :organization_memberships
   has_many :households, foreign_key: :caregiver_id, dependent: :restrict_with_error, inverse_of: :caregiver
   has_many :donations, foreign_key: :donor_id, dependent: :restrict_with_error, inverse_of: :donor
   has_many :children, through: :households
@@ -19,9 +19,10 @@ class User < ApplicationRecord
 
   friendly_id :full_name, use: :slugged
 
-  enum :role, { donor: "donor", caregiver: "caregiver", staff: "staff" }, validate: true
+  enum :role, { donor: "donor", caregiver: "caregiver", organizer: "organizer", admin: "admin" },
+       validate: true
 
-  scope :admins, -> { where(is_admin: true) }
+  scope :organizing, -> { where(role: %w[organizer admin]) }
 
   validates :first_name, :last_name, presence: true, if: :caregiver?
   validates :phone, phone: { allow_blank: true }
@@ -33,6 +34,22 @@ class User < ApplicationRecord
 
   def initials
     [ first_name, last_name ].compact_blank.map { |n| n[0] }.join.upcase.presence || "?"
+  end
+
+  # An admin works across the whole system, so every organization that hosts a
+  # drive is in reach without a membership row standing for it.
+  def available_organizations
+    admin? ? Organization.hosting.order(:name) : organizations.hosting.order(:name)
+  end
+
+  def organizes?(organization)
+    return false if organization.blank?
+
+    available_organizations.exists?(id: organization.id)
+  end
+
+  def organizes_anything?
+    available_organizations.exists?
   end
 
   # Devise requires a password on a new record. A donor row created at checkout

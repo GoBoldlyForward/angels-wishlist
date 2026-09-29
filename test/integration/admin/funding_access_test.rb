@@ -9,7 +9,7 @@ module Admin
                admin_organizations_path].freeze
 
     test "a donor is turned away from every page" do
-      sign_out users(:staff)
+      sign_out users(:admin)
       sign_in users(:donor)
 
       PAGES.each do |page|
@@ -19,7 +19,7 @@ module Admin
     end
 
     test "a caregiver cannot build payouts or record a gift" do
-      sign_out users(:staff)
+      sign_out users(:admin)
       sign_in users(:caregiver)
       build_list
       build_donation(event: @event)
@@ -36,7 +36,7 @@ module Admin
     end
 
     test "a signed-out visitor is sent to sign in" do
-      sign_out users(:staff)
+      sign_out users(:admin)
 
       get admin_donations_path
       assert_redirected_to new_user_session_path

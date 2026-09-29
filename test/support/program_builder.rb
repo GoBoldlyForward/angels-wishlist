@@ -22,6 +22,18 @@ module ProgramBuilder
                    first_name: "Denise", last_name: "Brooks", role: "caregiver" }.merge(attrs))
   end
 
+  def build_organizer(organization: nil, **attrs)
+    user = User.create!({ email: "org-#{SecureRandom.hex(4)}@example.com", password: "password123",
+                          first_name: "Nadia", last_name: "Iyer", role: "organizer" }.merge(attrs))
+    OrganizationMembership.create!(user: user, organization: organization || build_organization)
+    user
+  end
+
+  def build_admin(**attrs)
+    User.create!({ email: "admin-#{SecureRandom.hex(4)}@example.com", password: "password123",
+                   first_name: "Ada", last_name: "Byrne", role: "admin" }.merge(attrs))
+  end
+
   def build_donor(**attrs)
     User.create!({ email: "donor-#{SecureRandom.hex(4)}@example.com", role: "donor",
                    first_name: "Priya", last_name: "Sundaram" }.merge(attrs))

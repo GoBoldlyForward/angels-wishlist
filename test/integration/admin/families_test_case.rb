@@ -13,7 +13,7 @@ module Admin
     setup do
       @chapter = build_organization(name: "Atlanta Angels")
       @event = build_event(organization: @chapter, love_box_options: LoveBox::DEFAULT_GROUPS)
-      @staff = users(:staff)
+      @staff = users(:admin)
       sign_in @staff
     end
 

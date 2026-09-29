@@ -68,7 +68,7 @@ class LineItemTest < ActiveSupport::TestCase
 
   test "changing a line status records who changed it" do
     line = build_line_item(status: "needs_review")
-    staff = users(:staff)
+    staff = users(:admin)
 
     PaperTrail.request(whodunnit: staff.id) { line.update!(status: "open") }
 

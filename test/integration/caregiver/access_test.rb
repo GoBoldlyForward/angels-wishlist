@@ -19,8 +19,8 @@ module Caregiver
       end
     end
 
-    test "staff and donors are turned away" do
-      %i[staff donor].each do |role|
+    test "organizers, admins, and donors are turned away" do
+      %i[organizer admin donor].each do |role|
         sign_in users(role)
 
         get caregiver_root_path

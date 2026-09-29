@@ -8,6 +8,7 @@
     </nav>
   </div>
   <div class="topbar-right">
+    <%= render "shared/organization_switcher" %>
     <div class="dropdown">
       <button class="user-menu-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
         <div class="user-avatar"><%= current_user.initials %></div>

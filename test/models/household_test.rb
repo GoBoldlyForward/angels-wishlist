@@ -5,7 +5,7 @@ require "test_helper"
 class HouseholdTest < ActiveSupport::TestCase
   test "verifying a household records who verified it and what changed" do
     household = build_household(verification_status: "pending")
-    staff = users(:staff)
+    staff = users(:admin)
 
     PaperTrail.request(whodunnit: staff.id) do
       household.update!(verification_status: "verified", verified_at: Time.current)
@@ -21,7 +21,7 @@ class HouseholdTest < ActiveSupport::TestCase
   test "putting a household on hold records the reason" do
     household = build_household
 
-    PaperTrail.request(whodunnit: users(:staff).id) do
+    PaperTrail.request(whodunnit: users(:admin).id) do
       household.update!(verification_status: "hold", hold_reason: "Placement change reported.")
     end
 

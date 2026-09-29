@@ -29,11 +29,31 @@ bin/dev
 Without Stripe keys the app runs in test mode: a banner says so, checkout records the donation
 without charging, and payouts are marked sent without moving money.
 
-`bin/dev` runs the server and the Dart Sass watcher together. The seed builds one chapter, one
-partner skin, one event dated around today, and the twenty children across ten households that the
-prototype holds, with each list fitted to the $200 cap. Sign in as `staff@atlantaangels.example.org` with `password123`; every seeded
-caregiver uses the same password. Set `SEED_PASSWORD` to choose another. Every seeded write runs as the user who would have made it, so
-the audit trail reads as caregivers building lists, Sam verifying and approving, and donors giving.
+`bin/dev` runs the server and the Dart Sass watcher together, on port 3000 unless `PORT` is set
+in the shell or in `.env`.
+
+The seed builds the Atlanta chapter, its Passion City partner skin, one event dated around today,
+and the twenty children across ten households that the prototype holds, with each list fitted to
+the $200 cap. A small Nashville chapter with one open event gives the organization switcher
+somewhere to go. Every seeded write runs as the user who would have made it, so the audit trail
+reads as caregivers building lists, Sam verifying and approving, and donors giving.
+
+Every seeded account signs in with `password123`. Set `SEED_PASSWORD` to choose another.
+
+| Account | Role | What it reaches |
+| --- | --- | --- |
+| `admin@wishlist.example.org` | admin | `/admin` for any chapter |
+| `regional@angels.example.org` | organizer | `/admin` for Atlanta and Nashville, the switcher case |
+| `staff@atlantaangels.example.org` | organizer | `/admin` for Atlanta only |
+| `serve@passioncity.example.org` | organizer | nothing yet: a partner's organizer has no staff pages |
+| `denise.brooks@example.com` | caregiver | `/caregiver`, as does any other seeded caregiver |
+
+### A second checkout
+
+Two checkouts can run at once if each has its own port and database. `PORT` goes in `.env`, which
+is the only file `bin/dev` reads. `DATABASE_URL` goes in `.env.development`, never `.env`: a
+`DATABASE_URL` in `.env` reaches the test environment too, and `bin/rails test` would then load
+fixtures over the development database. `.env.test` carries the matching test database.
 
 ## The three scopes
 
@@ -41,7 +61,12 @@ the audit trail reads as caregivers building lists, Sam verifying and approving,
 | --- | --- | --- | --- |
 | `Public` | none, or `/with/<partner>` | donors, unauthenticated | the storefront, categories, cart, checkout |
 | `Caregiver` | `/caregiver` | the authenticated caregiver | their household, children, lists, payout |
-| `Admin` | `/admin` | staff | verification, list review, the ledger, payouts |
+| `Admin` | `/admin` | organizers and admins | verification, list review, the ledger, payouts, for the current organization |
+
+An organizer can belong to several chapters. `organization_memberships` records which, the switcher
+in the staff topbar picks one, and `current_organization` (held in the session) chooses the chapter
+`/admin` works in. An admin reaches every chapter and partner without membership rows; agencies
+place children and cannot have members.
 
 The caregiver scope is named for the person, not the record, because `Household` is a model class
 and a controller namespace of the same name collides with it.
@@ -54,9 +79,9 @@ and a controller namespace of the same name collides with it.
   Stripe account is looked up through the tree.
 - **Events belong to an organization.** A chapter can run several drives a year or skip a year.
   Households persist across events; a wishlist is one child in one event.
-- **Every person is a user.** Staff, caregivers, and donors share the table with a `role`. A donor
-  row created at checkout has no password, which is what lets guest giving and a returning donor
-  share one row.
+- **Every person is a user.** Admins, organizers, caregivers, and donors share the table with one
+  `role` each. A donor row created at checkout has no password, which is what lets guest giving
+  and a returning donor share one row.
 - **A line item is funded whole by one donation.** `donation_id` on `line_items` is what "funded"
   means. There is no funded flag and no funded-at column.
 - **Review is a status on the record that owns the text.** Households carry a verification status,

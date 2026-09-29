@@ -4,6 +4,8 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   post "stripe/webhooks" => "stripe_webhooks#create"
 
+  resource :current_organization, only: :update
+
   draw :admin
   draw :caregiver
   draw :public

@@ -1,0 +1,15 @@
+<% organizations = current_user.available_organizations %>
+<% if organizations.many? %>
+  <%= form_with url: current_organization_path, method: :patch,
+                class: "d-flex align-items-center gap-2",
+                data: { controller: "auto-submit", action: "change->auto-submit#submit" } do |form| %>
+    <%= form.label :organization_id, "Organization", class: "visually-hidden" %>
+    <%= form.select :organization_id,
+                    options_from_collection_for_select(organizations, :id, :display_name, current_organization&.id),
+                    {}, class: "form-select form-select-sm" %>
+    <%= form.submit "Switch", class: "btn btn-sm btn-outline-secondary",
+                    data: { auto_submit_target: "fallback" } %>
+  <% end %>
+<% elsif current_organization %>
+  <span class="navbar-text"><%= current_organization.display_name %></span>
+<% end %>

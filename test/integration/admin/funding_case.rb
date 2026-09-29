@@ -11,7 +11,7 @@ module Admin
     setup do
       @chapter = build_organization(name: "Atlanta Angels")
       @event = build_event(organization: @chapter, name: "Christmas 2026")
-      sign_in users(:staff)
+      sign_in users(:admin)
     end
 
     private

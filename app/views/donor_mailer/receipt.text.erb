@@ -10,7 +10,7 @@ Receipt <%= @donation.uuid.first(8).upcase %>
 Where it is needed most: <%= number_to_currency(@donation.general_gift_in_cents / 100.0) %>
 <% end -%>
 <% if @donation.fee_covered? -%>
-Card processing: <%= number_to_currency(@donation.fee_in_cents / 100.0) %>
+Card processing and fees: <%= number_to_currency(@donation.fee_in_cents / 100.0) %>
 <% end -%>
 
 Total: <%= number_to_currency(@donation.charged_in_dollars) %>

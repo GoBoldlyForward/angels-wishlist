@@ -56,14 +56,15 @@ These come from the prototype as Atlanta Angels left it. Each is a requirement.
 - A line is funded whole, once, by one donation. Funding drives the storefront's counters and the
   donor's receipt. It does not decide what any household is paid.
 - A general gift is $5 or more.
-- Covering card processing adds 3% and is checked by default. The fee is stored apart from the
-  gift.
+- Covering the fees is checked by default. It adds what card processing and the platform fee
+  take, so the whole gift reaches the families. The fee is stored apart from the gift.
 - A refunded or disputed donation leaves the pool, and its lines return to open.
 
 ### Money going out
 
 - **Everything raised is pooled and spread evenly.** The pool is every succeeded donation's gift
-  and general gift for the event. Fees are not part of it.
+  and general gift for the event, less whatever of card processing and the platform fee its donor
+  did not cover.
 - **Every list is funded to the same percentage.** That percentage is the pool divided by the
   total asked across every live list of a verified household, and never more than 100%.
 - A household's share is the sum of its children's list shares.

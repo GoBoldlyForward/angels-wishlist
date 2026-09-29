@@ -13,7 +13,8 @@ module PaymentGateway
   end
 
   # Where to send the donor to pay. In test mode that is straight to the
-  # confirmation page, with the donation already settled.
+  # confirmation page, with the donation already settled. A live donation is a
+  # destination charge: it lands in the chapter's account, less the application fee.
   def start_checkout(donation, success_url:, cancel_url:)
     unless live?
       donation.update!(payment_method_label: "Test mode")
@@ -21,11 +22,14 @@ module PaymentGateway
       return Checkout.new(url: success_url, reference: nil)
     end
 
+    chapter_account = donation.event.organization.stripe_account_id
     session = Stripe::Checkout::Session.create(
       { mode: "payment", customer_email: donation.donor.email, client_reference_id: donation.uuid,
         success_url: success_url, cancel_url: cancel_url, line_items: checkout_lines(donation),
         payment_intent_data: { metadata: { donation: donation.uuid },
-                               description: "Donation to the holiday wish list program" },
+                               description: "Donation to the holiday wish list program",
+                               on_behalf_of: chapter_account, transfer_data: { destination: chapter_account },
+                               application_fee_amount: donation.application_fee_in_cents },
         submit_type: "donate" },
       { api_key: ENV["STRIPE_SECRET_KEY"], idempotency_key: "checkout-#{donation.uuid}" }
     )
@@ -70,9 +74,11 @@ module PaymentGateway
     donation.reload
   end
 
+  # A destination charge gives back the chapter's share and the application fee along with the donor's money.
   def refund(donation)
     if live? && donation.stripe_payment_intent_id.present?
-      Stripe::Refund.create({ payment_intent: donation.stripe_payment_intent_id },
+      returned = donation.application_fee_in_cents.positive? ? { reverse_transfer: true, refund_application_fee: true } : {}
+      Stripe::Refund.create({ payment_intent: donation.stripe_payment_intent_id, **returned },
                             { api_key: ENV["STRIPE_SECRET_KEY"], idempotency_key: "refund-#{donation.uuid}" })
     end
     donation.refund!
@@ -171,7 +177,7 @@ module PaymentGateway
   def checkout_lines(donation)
     lines = donation.chosen_line_items.map { |line| [ line.name, line.price_in_cents ] }
     lines << [ "Where it is needed most", donation.general_gift_in_cents ] if donation.general_gift_in_cents.positive?
-    lines << [ "Card processing", donation.fee_in_cents ] if donation.fee_in_cents.positive?
+    lines << [ "Card processing and fees", donation.fee_in_cents ] if donation.fee_in_cents.positive?
 
     lines.map do |name, cents|
       { quantity: 1, price_data: { currency: "usd", unit_amount: cents, product_data: { name: name } } }

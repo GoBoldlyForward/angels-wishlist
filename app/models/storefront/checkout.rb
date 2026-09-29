@@ -76,6 +76,8 @@ module Storefront
         ahoy_visit_id: @visit&.id,
         gift_in_cents: cart.gift_in_cents, general_gift_in_cents: cart.general_gift_in_cents,
         fee_in_cents: fee_in_cents,
+        platform_fee_in_cents: Donation.platform_fee_for(cart.total_in_cents, @event.organization.platform_fee_basis_points),
+        processing_fee_in_cents: Donation.processing_fee_for(charged_in_cents),
         display_name: display_name.to_s.strip.presence, anonymous: anonymous?,
         note_to_family: (note_to_family.to_s.strip.presence if note_offered?),
         cart: { "line_item_ids" => cart.lines.map(&:id) } }

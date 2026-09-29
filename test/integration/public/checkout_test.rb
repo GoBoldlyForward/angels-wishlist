@@ -35,8 +35,8 @@ module Public
       assert_select "label[for=checkout_display_name]", "Your name, as it should appear"
       assert_select "textarea[name=?][maxlength=?]", "checkout[note_to_family]", "1000"
       assert_select "input[type=checkbox][name=?][checked]", "checkout[cover_fee]"
-      assert_select ".fee-choice", /Add \$3\.15 to cover card processing, so the full \$105\s+goes to the program/
-      assert_select ".total-row b", "$108.15"
+      assert_select ".fee-choice", /Add \$3\.44 to cover card processing and fees, so the full \$105\s+goes to the families/
+      assert_select ".total-row b", "$108.44"
       assert_select "form[action=?][data-turbo=false]", checkout_path
     end
 
@@ -90,8 +90,8 @@ module Public
       assert donation.succeeded?
       assert_equal 8_000, donation.gift_in_cents
       assert_equal 2_500, donation.general_gift_in_cents
-      assert_equal 315, donation.fee_in_cents
-      assert_equal 10_815, donation.charged_in_cents
+      assert_equal 344, donation.fee_in_cents
+      assert_equal 10_844, donation.charged_in_cents
       assert_equal "kate.hollis@example.com", donation.donor.email
       assert donation.donor.donor?
       assert_equal "The Hollis family", donation.display_name
@@ -105,7 +105,7 @@ module Public
       assert_nil session[:cart]
     end
 
-    test "the fee changes what is charged and never the gift" do
+    test "the fee changes what is charged, never the gift, and decides whether the gift joins the pool whole" do
       add_to_cart @mayas_hoodie
       check_out cover_fee: "0"
       without_fee = Donation.last
@@ -115,8 +115,10 @@ module Public
       with_fee = Donation.last
 
       assert_equal [ 4_000, 0, 4_000 ], [ without_fee.gift_in_cents, without_fee.fee_in_cents, without_fee.charged_in_cents ]
-      assert_equal [ 4_000, 120, 4_120 ], [ with_fee.gift_in_cents, with_fee.fee_in_cents, with_fee.charged_in_cents ]
-      assert_equal 8_000, @event.reload.raised_in_cents
+      assert_equal [ 4_000, 150, 4_150 ], [ with_fee.gift_in_cents, with_fee.fee_in_cents, with_fee.charged_in_cents ]
+      assert_equal [ 146, 150 ], [ without_fee.processing_fee_in_cents, with_fee.processing_fee_in_cents ]
+      assert_equal [ 3_854, 4_000 ], [ without_fee.pool_in_cents, with_fee.pool_in_cents ]
+      assert_equal 7_854, @event.reload.raised_in_cents
     end
 
     test "a blank name makes the gift anonymous" do
@@ -179,7 +181,7 @@ module Public
       assert_response :unprocessable_content
       assert_select ".flash-alert", /chosen by someone else first/
       assert_select ".checkout-group h2", text: "Maya, 9", count: 0
-      assert_select ".total-row b", "$41.20"
+      assert_select ".total-row b", "$41.50"
     end
 
     test "the confirmation names the amount, the gifts, the note, and what happens next" do
@@ -190,7 +192,7 @@ module Public
 
       assert_response :success
       assert_select "h1", /You gave \$65/
-      assert_select ".confirmation-head", /charged \$66\.95/
+      assert_select ".confirmation-head", /charged \$67\.25/
       assert_select ".mini", text: /Hoodie\s+For Maya, 9/
       assert_select ".mini", text: /General gift/
       assert_select ".confirmation-note", /Thinking of you all this Christmas/

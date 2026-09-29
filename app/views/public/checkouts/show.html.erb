@@ -110,8 +110,8 @@
         <label class="t-sm fee-choice">
           <%= form.check_box :cover_fee, data: { checkout_fee_target: "choice", action: "checkout-fee#refresh" } %>
           <span>
-            Add <%= money_exact cart.fee_in_cents %> to cover card processing, so the full <%= money total %>
-            goes to the program.
+            Add <%= money_exact cart.fee_in_cents %> to cover card processing and fees, so the full <%= money total %>
+            goes to the families.
           </span>
         </label>
 

@@ -40,7 +40,7 @@
           </div>
           <div class="col-12">
             <%= form.label :co_brand_line, "Co-brand line", class: "form-label" %>
-            <%= form.text_field :co_brand_line, class: "form-control", placeholder: "Wish List · with Atlanta Angels" %>
+            <%= form.text_field :co_brand_line, class: "form-control", placeholder: "Wish List · with #{chapter_name}" %>
             <div class="form-text">Shown under a partner's name in the header of its storefront.</div>
           </div>
         </div>
@@ -58,7 +58,7 @@
             </div>
             <div class="col-md-8">
               <%= form.label :mail_from, "Send email as", class: "form-label" %>
-              <%= form.text_field :mail_from, class: "form-control", placeholder: "Atlanta Angels Wish List <wishlist@atlantaangels.org>" %>
+              <%= form.text_field :mail_from, class: "form-control", placeholder: "Wish List <wishlist@yourchapter.org>" %>
               <div class="form-text">The address must be verified with the mail provider.</div>
             </div>
             <% if current_user.admin? %>

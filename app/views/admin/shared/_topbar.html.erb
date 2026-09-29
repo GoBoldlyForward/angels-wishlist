@@ -2,7 +2,7 @@
   <div style="display:flex;align-items:center;gap:10px">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><%= link_to current_chapter&.name || "Atlanta Angels", admin_root_path %></li>
+        <li class="breadcrumb-item"><%= link_to chapter_name, admin_root_path %></li>
         <%= yield :breadcrumbs %>
       </ol>
     </nav>

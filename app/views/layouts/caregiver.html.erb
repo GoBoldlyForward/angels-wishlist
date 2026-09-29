@@ -14,8 +14,8 @@
     <header class="hdr">
       <div class="container hdr-in">
         <%= link_to caregiver_root_path, class: "brand" do %>
-          <%= image_tag "logo-mark.svg", alt: "" %>
-          <span class="brand-name"><%= current_chapter&.name || "Atlanta Angels" %><span>Wish List</span></span>
+          <%= chapter_mark %>
+          <span class="brand-name"><%= chapter_name %><span>Wish List</span></span>
         <% end %>
         <nav class="hdr-nav">
           <%= link_to "See the donor view", root_path, class: "hdr-link hide-sm" %>
@@ -34,14 +34,14 @@
     <footer class="ftr">
       <div class="container ftr-in">
         <div style="display:flex; align-items:center; gap:10px">
-          <%= image_tag "logo-mark.svg", alt: "", style: "height:28px" %>
+          <%= chapter_mark style: "height:28px" %>
           <div>
-            <div class="t-base w-700 ink"><%= current_chapter&.name || "Atlanta Angels" %></div>
+            <div class="t-base w-700 ink"><%= chapter_name %></div>
             <div class="tiny">Consistent relationships are the solution.</div>
           </div>
         </div>
         <div class="tiny" style="max-width:520px">
-          Anything you enter about a child stays with <%= current_chapter&.name || "Atlanta Angels" %> staff.
+          Anything you enter about a child stays with <%= chapter_name %> staff.
           Donors see a stand-in name, an age, and the interests you write.
         </div>
       </div>

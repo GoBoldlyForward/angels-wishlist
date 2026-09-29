@@ -2,6 +2,16 @@ module ApplicationHelper
   THEME_STYLESHEETS = %w[theme-angels theme-passion].freeze
   AVATAR_SWATCHES = 6
 
+  def chapter_name
+    current_chapter&.name || "Wish List"
+  end
+
+  # The chapter's own logo when it has uploaded one.
+  def chapter_mark(**options)
+    logo = current_chapter&.logo
+    image_tag(logo&.attached? ? logo : "logo-mark.svg", alt: "", **options)
+  end
+
   # Whole dollars, the way every figure on the site reads.
   def money(cents)
     number_to_currency(cents.to_i / 100.0, precision: 0)

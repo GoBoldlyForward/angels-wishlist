@@ -5,7 +5,7 @@ class DonorMailer < ApplicationMailer
     @donation = donation
     @chapter = donation.event.organization
     donation.update_column(:receipt_sent_at, Time.current)
-    mail to: donation.donor.email, subject: "Your receipt from #{@chapter.name}"
+    mail to: donation.donor.email, from: from_chapter(@chapter), subject: "Your receipt from #{@chapter.name}"
   end
 
   def impact_statement(donor, event, message)
@@ -13,6 +13,6 @@ class DonorMailer < ApplicationMailer
     @event = event
     @message = message
     @chapter = event.organization
-    mail to: donor.email, subject: "What your gift did this holiday"
+    mail to: donor.email, from: from_chapter(@chapter), subject: "What your gift did this holiday"
   end
 end

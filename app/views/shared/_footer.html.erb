@@ -1,5 +1,5 @@
 <footer class="py-3 mt-auto">
   <div class="container text-center text-muted">
-    <small>&copy; <%= Date.current.year %> Atlanta Angels. Gifts are donations to Atlanta Angels, a 501(c)(3).</small>
+    <small>&copy; <%= Date.current.year %> <%= chapter_name %>. Gifts are donations to <%= current_chapter&.legal_name_or_name || chapter_name %>, a 501(c)(3).</small>
   </div>
 </footer>

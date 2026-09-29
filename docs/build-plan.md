@@ -126,14 +126,14 @@ assumption in the last column until Atlanta Angels says otherwise.
 | 12 | How much is the fee a donor may cover? | Whatever lets the whole gift reach the families after card processing and the platform fee. It is worked out from the gift, not a flat 3% |
 | 13 | Where does a partner's storefront live? | At its own path on the same site, skinned throughout, checkout included |
 | 14 | Do the Love Box choices change each year? | Yes. They are set per event and staff can edit them |
-| 15 | Is there more than one kind of staff? | Two, from step 8. Platform administrators (us) reach every chapter. Chapter staff reach only their own chapter and can do everything inside it |
+| 15 | Is there more than one kind of staff? | Two. Admins (us) reach every chapter. Organizers reach the chapters they are members of and can do everything inside them |
 | 16 | Whose product photographs? | The prototype's are placeholders. Atlanta Angels supplies or licenses replacements before launch |
 | 17 | How does a visitor reach a chapter? | By hostname. Each chapter has its own domain or subdomain. A partner storefront stays at `/with/<partner>` under its chapter's host |
 | 18 | Where does our platform fee come from? | Out of each donation, together with card processing, as Stripe's application fee. A donor who covers the fees pays both. When a donor does not, both come out of that gift before it joins the pool |
 | 19 | What is the platform fee? | A percentage of each gift, stored on the chapter so it can differ per chapter. Each donation records the fee it was charged |
 | 20 | Which Stripe account type does a chapter get? | Express, with card payments and transfers, onboarded as a nonprofit. Account debits need the platform to carry the account's losses, which Express does |
 | 21 | Is the catalog shared across chapters? | No. Each chapter has its own categories and catalog, copied from a starter set when the chapter is created |
-| 22 | Can one person staff two chapters? | No. A staff user belongs to one chapter. Donors and caregivers are not tied to a chapter |
+| 22 | Can one person staff two chapters? | Yes. An organizer's memberships list their chapters, and a switcher picks the one they are working in. Donors and caregivers are not tied to a chapter |
 
 ## Schema
 
@@ -385,8 +385,8 @@ What this commits us to:
 #### Tenancy
 
 - **Resolve the chapter on every request.** Public and caregiver pages find it by hostname, and a
-  host no chapter claims falls back to the oldest chapter. Admin pages use the signed-in staff
-  member's chapter, or the chapter a platform administrator has switched to.
+  host no chapter claims falls back to the oldest chapter. Admin pages use the chapter the
+  signed-in organizer or admin has switched to.
 - **Every admin lookup starts from the chapter.** Payouts, donations, organizations, categories,
   catalog items, and the audit trail all narrow to it.
 - **Partners and agencies stay under their chapter** through `parent_id`. A partner's storefront
@@ -404,17 +404,18 @@ What this commits us to:
 | --- | --- | --- |
 | Donor | a donor, or not at all | their chapter's storefront |
 | Caregiver | a caregiver | their household at the chapter they are on |
-| Chapter staff | `role: staff` with a chapter | everything inside that chapter, and adding its staff |
-| Platform administrator | `role: staff` with `is_admin` | every chapter, a chapter switcher, and creating chapters |
+| Organizer | `role: organizer` with memberships | everything inside the chapters they belong to, and adding organizers to them |
+| Admin | `role: admin` | every chapter, and creating chapters |
 
-A caregiver or donor with `is_admin` set is invalid, and so is chapter staff with no chapter.
+Organizers and admins switch chapters from the staff topbar. The chapter they are working in is
+held in the session.
 
 #### Chapter onboarding
 
 1. A platform administrator creates the chapter, its hostname, and its fee rate. Its categories
    and catalog are copied from the oldest chapter.
-2. Staff are added from the chapter's Staff page and choose a password from an emailed link.
-3. Chapter staff complete Stripe's hosted onboarding for an Express account, as the nonprofit.
+2. Organizers are added from the chapter's Staff page and choose a password from an emailed link.
+3. An organizer completes Stripe's hosted onboarding for an Express account, as the nonprofit.
 4. Returning from Stripe, and every `account.updated` webhook, records whether the account can
    take charges.
 5. The storefront refuses checkout until it can.
@@ -433,7 +434,7 @@ A caregiver or donor with `is_admin` set is invalid, and so is chapter staff wit
 
 | Part | Done when |
 | --- | --- |
-| a. Tenancy and roles | Two chapters on two hosts each run a season, and a test walks the admin as each chapter's staff and never reaches the other chapter's records |
+| a. Tenancy | Two chapters on two hosts each run a season, and a test walks the admin as each chapter's organizer and never reaches the other chapter's records |
 | b. Chapter branding | Nothing in `app/` names Atlanta Angels, and each chapter's storefront, emails, and receipt carry its own name and EIN |
 | c. Chapter Stripe onboarding | A chapter reaches charges enabled through hosted onboarding, and checkout is refused before then |
 | d. Destination charges | A donation goes to the chapter's account with the application fee, and the pool is net of what the donor did not cover |

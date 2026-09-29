@@ -152,17 +152,40 @@ module PaymentGateway
     household.update!(stripe_onboarded_at: Time.current) if account.details_submitted
   end
 
+  # The share comes out of the chapter's balance by account debit, then goes to the caregiver
+  # from the platform's, since only the platform can transfer to a caregiver's account.
   def transfer(payout)
     return payout.mark_sent!(stripe_transfer_id: "tr_test_#{SecureRandom.hex(6)}") unless live?
 
+    debit_chapter(payout)
     transfer = Stripe::Transfer.create(
       { amount: payout.amount_in_cents, currency: "usd", destination: payout.household.stripe_account_id,
-        description: "#{payout.event.name} wish list", metadata: { payout: payout.id } },
+        transfer_group: "event-#{payout.event_id}", description: "#{payout.event.name} wish list",
+        metadata: { payout: payout.id, organization: payout.event.organization_id } },
       { api_key: ENV["STRIPE_SECRET_KEY"], idempotency_key: "payout-#{payout.id}-#{payout.amount_in_cents}" }
     )
     payout.mark_sent!(stripe_transfer_id: transfer.id)
   rescue Stripe::StripeError => e
     payout.mark_failed!(e.message)
+  end
+
+  # A retried payout reuses its debit. One whose amount changed since gives the old debit back first.
+  def debit_chapter(payout)
+    return if payout.debited_in_cents == payout.amount_in_cents
+
+    if payout.stripe_debit_id.present?
+      Stripe::Refund.create({ charge: payout.stripe_debit_id },
+                            { api_key: ENV["STRIPE_SECRET_KEY"], idempotency_key: "undebit-#{payout.stripe_debit_id}" })
+      payout.update!(stripe_debit_id: nil, debited_in_cents: nil)
+    end
+
+    debit = Stripe::Charge.create(
+      { amount: payout.amount_in_cents, currency: "usd", source: payout.event.organization.stripe_account_id,
+        description: "#{payout.event.name} payout to #{payout.household.display_name}",
+        metadata: { payout: payout.id } },
+      { api_key: ENV["STRIPE_SECRET_KEY"], idempotency_key: "debit-#{payout.id}-#{payout.amount_in_cents}" }
+    )
+    payout.update!(stripe_debit_id: debit.id, debited_in_cents: payout.amount_in_cents)
   end
 
   def settle(session)

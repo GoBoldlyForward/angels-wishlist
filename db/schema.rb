@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_29_130001) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_29_130002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -324,6 +324,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_130001) do
     t.text "adjustment_note"
     t.integer "amount_in_cents", default: 0, null: false
     t.datetime "created_at", null: false
+    t.integer "debited_in_cents"
     t.datetime "deleted_at"
     t.bigint "event_id", null: false
     t.string "gift_card_tracking_number"
@@ -334,6 +335,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_130001) do
     t.datetime "scheduled_for"
     t.datetime "sent_at"
     t.string "status", default: "blocked", null: false
+    t.string "stripe_debit_id"
     t.string "stripe_transfer_id"
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_payouts_on_deleted_at"

@@ -50,6 +50,9 @@ namespace :admin do
     end
   end
   resource :impact_statement, only: %i[new create]
+  resource :chapter_funds, only: :show do
+    post :release
+  end
 
   # Setup
   resources :events, except: :destroy

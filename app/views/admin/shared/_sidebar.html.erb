@@ -18,6 +18,7 @@
     <%= nav_item "Donors", admin_donors_path, icon: "people" %>
     <%= nav_item "Donations", admin_donations_path, icon: "receipt" %>
     <%= nav_item "Payouts", admin_payouts_path, icon: "bank" %>
+    <%= nav_item "Chapter funds", admin_chapter_funds_path, icon: "wallet2" %>
 
     <div class="nav-section-label">Inbox</div>
     <%= nav_item "Needs review", admin_inbox_path, icon: "inbox", count: Admin::Inbox.new(current_event).count, tone: "danger" %>

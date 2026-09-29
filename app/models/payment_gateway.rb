@@ -143,6 +143,21 @@ module PaymentGateway
     ).url
   end
 
+  # What the chapter could send to its bank today. Test mode has no balance to read.
+  def chapter_balance_in_cents(chapter)
+    return nil if !live? || chapter.stripe_account_id.blank?
+
+    balance = Stripe::Balance.retrieve({ api_key: ENV["STRIPE_SECRET_KEY"], stripe_account: chapter.stripe_account_id })
+    balance.available.select { |funds| funds.currency == "usd" }.sum(&:amount)
+  end
+
+  def release_to_bank(chapter, cents)
+    return unless live?
+
+    Stripe::Payout.create({ amount: cents, currency: "usd", description: "Wish List funds" },
+                          { api_key: ENV["STRIPE_SECRET_KEY"], stripe_account: chapter.stripe_account_id })
+  end
+
   # The account exists as soon as onboarding starts. It counts once the
   # caregiver has finished Stripe's form.
   def sync_onboarding(household)

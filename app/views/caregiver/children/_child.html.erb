@@ -27,11 +27,18 @@
         <%= field_error(entry, :birthdate) %>
         <p class="hint"><i class="fa-solid fa-lock t-2xs"></i> Staff only. Donors see the age.</p>
       </div>
-      <div class="field">
-        <%= f.label :gender, "Girl or boy", class: "f" %>
-        <%= f.select :gender, [ [ "Girl", "girl" ], [ "Boy", "boy" ] ], { include_blank: "Choose" }, class: input_class(entry, :gender) %>
+      <fieldset class="field">
+        <legend class="f">Girl or boy</legend>
+        <div class="<%= class_names("opts opts-row", "is-invalid": entry.errors[:gender].any?) %>">
+          <% Intake::ChildEntry::GENDERS.each do |gender| %>
+            <label class="opt" for="<%= f.field_id(:gender, gender) %>">
+              <%= f.radio_button :gender, gender %>
+              <span><%= gender.capitalize %></span>
+            </label>
+          <% end %>
+        </div>
         <%= field_error(entry, :gender) %>
-      </div>
+      </fieldset>
     </div>
 
     <div class="field" data-controller="intake-tags" data-intake-tags-name-value="<%= prefix %>[interests][]">

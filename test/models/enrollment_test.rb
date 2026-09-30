@@ -50,7 +50,7 @@ class EnrollmentTest < ActiveSupport::TestCase
     box.assign(box.groups.to_h { |group| [ group.id, { picks: [ group.options.first ], count: 2 } ] })
 
     assert box.complete?
-    assert_equal "One holiday mug per caregiver (2)", box.summary_for(box.groups.find { |g| g.id == "cups" })
+    assert_equal "Holiday plastic cups for each member of the family (2)", box.summary_for(box.groups.find { |g| g.id == "cups" })
   end
 
   test "cups need a count unless declined" do

@@ -12,7 +12,7 @@ module Caregiver
     def update
       @box.assign(love_box_params)
       current_enrollment.save!
-      return continue_to(:lists) if @box.complete?
+      return continue_to(:payout) if @box.complete?
 
       @missing = @box.missing_groups
       render :show, status: :unprocessable_entity

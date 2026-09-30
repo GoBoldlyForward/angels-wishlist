@@ -145,7 +145,7 @@ module Caregiver
     end
 
     test "the steps behind the caregiver are links" do
-      start_household(step: "lists")
+      start_household(step: "love_box")
       sign_in users(:caregiver)
 
       get caregiver_intake_love_box_path

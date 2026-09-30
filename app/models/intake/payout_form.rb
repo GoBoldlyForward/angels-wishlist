@@ -52,7 +52,11 @@ module Intake
     end
 
     def connected?
-      household.stripe_account_id.present?
+      household.stripe_connected?
+    end
+
+    def connection_started?
+      household.stripe_account_id.present? && !connected?
     end
 
     def self.human_attribute_name(attribute, options = {})
@@ -72,7 +76,10 @@ module Intake
     end
 
     def stripe_is_connected
-      errors.add(:base, "Connect with Stripe first, or choose the gift card in the mail.") unless connected?
+      return if connected?
+
+      first = connection_started? ? "Finish connecting with Stripe" : "Connect with Stripe first"
+      errors.add(:base, "#{first}, or choose the gift card in the mail.")
     end
 
     def agreement_is_given

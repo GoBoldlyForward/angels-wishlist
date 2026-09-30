@@ -54,7 +54,9 @@ module Admin
     end
 
     def payout_destination(household)
-      return household.stripe_account_id.presence || "Stripe onboarding not finished" if household.payout_via_stripe?
+      if household.payout_via_stripe?
+        return household.stripe_connected? ? household.stripe_account_id : "Stripe onboarding not finished"
+      end
       return household.mailing_address&.to_s.presence || "No mailing address" if household.payout_via_gift_card?
 
       "No destination"

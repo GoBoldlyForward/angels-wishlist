@@ -5,6 +5,7 @@ module Caregiver
     self.step = "payout"
 
     def show
+      sync_stripe
       @form = Intake::PayoutForm.new(enrollment: current_enrollment)
     end
 
@@ -16,6 +17,13 @@ module Caregiver
     end
 
     private
+
+    # Stripe sends the caregiver back here whether or not they finished its form.
+    def sync_stripe
+      PaymentGateway.sync_onboarding(current_household)
+    rescue Stripe::StripeError
+      flash.now[:alert] = "Stripe could not be reached to check your account. Try again in a moment."
+    end
 
     def payout_params
       params.expect(payout: %i[payout_method agreed street_line_1 city zipcode])

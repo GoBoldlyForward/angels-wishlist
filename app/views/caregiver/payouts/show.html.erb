@@ -56,6 +56,16 @@
             You can change it any time before lists close. <%= chapter %> never sees your full account number.</div></div>
           <button class="btn btn-ghost btn-sm mt-3" type="submit" form="connect-stripe">Change the account</button>
         </div>
+      <% elsif @form.connection_started? %>
+        <div class="panel panel-warm" style="max-width:640px">
+          <h3 class="t-md" style="margin-bottom:8px">Finish connecting with Stripe</h3>
+          <p class="t-base" style="margin:0 0 18px">
+            You started with Stripe but did not finish. Pick up where you left off so your household's share
+            has somewhere to go.
+          </p>
+          <button class="btn btn-ink" type="submit" form="connect-stripe"><i class="fa-brands fa-stripe-s"></i> &nbsp;Finish with Stripe</button>
+          <p class="hint" style="margin-top:12px">You come back to this page when you are done.</p>
+        </div>
       <% else %>
         <div class="panel" style="max-width:640px">
           <h3 class="t-md" style="margin-bottom:8px">Connect with Stripe</h3>

@@ -154,6 +154,7 @@ ActiveRecord::Base.transaction do
         display_name: row["name"], county: row["area"],
         payout_method: facts[:payout],
         stripe_account_id: facts[:payout] == "stripe" ? "acct_seed_#{row['id']}" : nil,
+        stripe_onboarded_at: facts[:payout] == "stripe" ? event.opened_at + facts[:joined].days : nil,
         created_at: event.opened_at + facts[:joined].days
       )
     end

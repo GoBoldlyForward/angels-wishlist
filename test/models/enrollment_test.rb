@@ -15,6 +15,14 @@ class EnrollmentTest < ActiveSupport::TestCase
                  @enrollment.blockers
   end
 
+  test "Stripe counts as a way to be paid once its form is finished" do
+    @household.update!(payout_method: "stripe", stripe_account_id: "acct_started", stripe_onboarded_at: nil)
+    assert_includes @enrollment.blockers, "Finish connecting with Stripe."
+
+    @household.update!(stripe_onboarded_at: Time.current)
+    assert_not_includes @enrollment.reload.blockers, "Finish connecting with Stripe."
+  end
+
   test "submitting sends every draft list for review" do
     wishlist = build_wishlist(child: build_child(household: @household), event: @event, status: "draft")
     build_line_item(wishlist: wishlist)

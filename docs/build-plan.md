@@ -33,6 +33,7 @@ and both describe rules the program no longer follows. Neither should be built f
 | `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` | A banner says test mode. Checkout records the donation without charging. Caregiver onboarding and transfers succeed at once without moving money |
 | `SMTP_ADDRESS`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `MAIL_FROM` | Every message is skipped and logged. Password reset emails do not arrive |
 | An S3 bucket and its credentials | Catalog items show the photos bundled with the app. Uploading a photo or a logo fails |
+| `CAREGIVER_HELP_PHONE` | The caregiver help dialog says to call a coordinator but gives no number |
 
 ### Where the build departs from this plan
 
@@ -340,7 +341,8 @@ Production has no mail provider configured. Choosing one is part of this step.
 
 ## Before launch
 
-- [ ] Stripe keys, webhook secret, and a Connect platform account
+- [ ] Stripe keys, webhook secret, and a Connect platform account. A caregiver counts as connected once Stripe
+      reports its onboarding form finished, checked when they return to the payout step
 - [ ] S3 bucket and credentials
 - [ ] A mail provider and a sending domain
 - [ ] Font Awesome kit

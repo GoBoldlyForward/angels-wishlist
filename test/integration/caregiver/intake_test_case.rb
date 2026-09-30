@@ -36,7 +36,7 @@ module Caregiver
       enrollment.love_box_selection.assign(full_love_box)
       enrollment.save!
       enrollment.agree_to_spending!
-      household.update!(payout_method: "stripe", stripe_account_id: "acct_test_ready")
+      household.update!(payout_method: "stripe", stripe_account_id: "acct_test_ready", stripe_onboarded_at: Time.current)
     end
 
     # Loads the form first, as a person would, so the spam check has its token.

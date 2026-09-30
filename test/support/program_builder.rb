@@ -29,10 +29,11 @@ module ProgramBuilder
 
   def build_household(organization: nil, **attrs)
     organization ||= build_organization
+    attrs = { stripe_account_id: "acct_test" }.merge(attrs)
+    attrs = { stripe_onboarded_at: (Time.current if attrs[:stripe_account_id]) }.merge(attrs)
     Household.create!({ organization: organization, caregiver: build_caregiver,
                         display_name: "The Brooks home #{SecureRandom.hex(3)}",
-                        verification_status: "verified", payout_method: "stripe",
-                        stripe_account_id: "acct_test" }.merge(attrs))
+                        verification_status: "verified", payout_method: "stripe" }.merge(attrs))
   end
 
   def build_child(household: nil, age: 9, **attrs)

@@ -73,7 +73,7 @@ module PaymentGateway
   # touch this application.
   def onboarding_url(household, return_url:, refresh_url:)
     unless live?
-      household.update!(stripe_account_id: "acct_test_#{SecureRandom.hex(6)}")
+      household.update!(stripe_account_id: "acct_test_#{SecureRandom.hex(6)}", stripe_onboarded_at: Time.current)
       return return_url
     end
 
@@ -94,11 +94,13 @@ module PaymentGateway
     ).url
   end
 
-  def ready_for_payouts?(household)
-    return false if household.stripe_account_id.blank?
-    return true unless live?
+  # The account exists as soon as onboarding starts. It counts once the
+  # caregiver has finished Stripe's form.
+  def sync_onboarding(household)
+    return if !live? || household.stripe_account_id.blank? || household.stripe_connected?
 
-    Stripe::Account.retrieve(household.stripe_account_id, { api_key: ENV["STRIPE_SECRET_KEY"] }).payouts_enabled
+    account = Stripe::Account.retrieve(household.stripe_account_id, { api_key: ENV["STRIPE_SECRET_KEY"] })
+    household.update!(stripe_onboarded_at: Time.current) if account.details_submitted
   end
 
   def transfer(payout)

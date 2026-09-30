@@ -26,7 +26,7 @@ module Caregiver
 
       assert_redirected_to caregiver_intake_payout_url
       assert @household.reload.payout_via_stripe?
-      assert @household.stripe_account_id.present?
+      assert @household.stripe_connected?
 
       follow_redirect!
       assert_select ".panel-green", /Connected/
@@ -41,8 +41,38 @@ module Caregiver
       assert @household.reload.payout_via_none?
     end
 
+    test "an account whose Stripe form is unfinished is not connected" do
+      @household.update!(payout_method: "stripe", stripe_account_id: "acct_started")
+
+      get caregiver_intake_payout_path
+      assert_select ".pay-detail-stripe h3", "Finish connecting with Stripe"
+      assert_select ".panel-green", false
+
+      patch caregiver_intake_payout_path, params: { payout: { payout_method: "stripe", agreed: "1" } }
+      assert_response :unprocessable_entity
+      assert_select ".form-errors", /Finish connecting with Stripe/
+    end
+
+    test "coming back from Stripe with the form finished marks the account connected" do
+      @household.update!(payout_method: "stripe", stripe_account_id: "acct_started")
+
+      with_live_stripe_account(details_submitted: true) { get caregiver_intake_payout_path }
+
+      assert @household.reload.stripe_connected?
+      assert_select ".panel-green", /Connected/
+    end
+
+    test "coming back from Stripe without finishing leaves the account unconnected" do
+      @household.update!(payout_method: "stripe", stripe_account_id: "acct_started")
+
+      with_live_stripe_account(details_submitted: false) { get caregiver_intake_payout_path }
+
+      assert_not @household.reload.stripe_connected?
+      assert_select ".pay-detail-stripe h3", "Finish connecting with Stripe"
+    end
+
     test "choosing Stripe once connected records the method and the agreement" do
-      @household.update!(stripe_account_id: "acct_test_1")
+      @household.update!(stripe_account_id: "acct_test_1", stripe_onboarded_at: Time.current)
 
       patch caregiver_intake_payout_path, params: { payout: { payout_method: "stripe", agreed: "1" } }
 
@@ -71,7 +101,7 @@ module Caregiver
     end
 
     test "the agreement has to be checked" do
-      @household.update!(stripe_account_id: "acct_test_1")
+      @household.update!(stripe_account_id: "acct_test_1", stripe_onboarded_at: Time.current)
 
       patch caregiver_intake_payout_path, params: { payout: { payout_method: "stripe", agreed: "0" } }
 
@@ -85,6 +115,19 @@ module Caregiver
 
       assert_response :unprocessable_entity
       assert_select ".form-errors", /Payout method has to be chosen/
+    end
+
+    private
+
+    def with_live_stripe_account(details_submitted:)
+      original_live = PaymentGateway.method(:live?)
+      original_retrieve = Stripe::Account.method(:retrieve)
+      PaymentGateway.define_singleton_method(:live?) { true }
+      Stripe::Account.define_singleton_method(:retrieve) { |*| Struct.new(:details_submitted).new(details_submitted) }
+      yield
+    ensure
+      PaymentGateway.define_singleton_method(:live?, original_live)
+      Stripe::Account.define_singleton_method(:retrieve, original_retrieve)
     end
   end
 end

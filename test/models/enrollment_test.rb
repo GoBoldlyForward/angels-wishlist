@@ -10,7 +10,7 @@ class EnrollmentTest < ActiveSupport::TestCase
   end
 
   test "a new enrollment says everything that is missing" do
-    assert_equal [ "Add at least one child.", "Finish your Love Box.", "Add at least one gift to every list.",
+    assert_equal [ "Add at least one child.", "Add at least one gift to every list.", "Finish your Love Box.",
                    "Choose how you would like to be paid.", "Agree to how the funds will be spent." ],
                  @enrollment.blockers
   end
@@ -34,20 +34,20 @@ class EnrollmentTest < ActiveSupport::TestCase
   end
 
   test "intake only moves forward" do
-    @enrollment.advance_to!(:lists)
+    @enrollment.advance_to!(:love_box)
     @enrollment.advance_to!(:children)
 
-    assert_equal "lists", @enrollment.intake_step
+    assert_equal "love_box", @enrollment.intake_step
   end
 
   test "a chapter that has switched off Getting paid asks for nothing about payout" do
     @household.organization.update!(collects_payout_details: false)
 
-    assert_equal %w[home children love_box lists review], @enrollment.intake_steps
+    assert_equal %w[home children lists love_box review], @enrollment.intake_steps
     assert_equal "review", @enrollment.step_from(:payout)
     assert_equal "lists", @enrollment.step_from(:lists)
     assert_empty @enrollment.payout_blockers
-    assert_equal [ "Add at least one child.", "Finish your Love Box.", "Add at least one gift to every list." ],
+    assert_equal [ "Add at least one child.", "Add at least one gift to every list.", "Finish your Love Box." ],
                  @enrollment.blockers
   end
 
@@ -60,7 +60,7 @@ class EnrollmentTest < ActiveSupport::TestCase
     box.assign(box.groups.to_h { |group| [ group.id, { picks: [ group.options.first ], count: 2 } ] })
 
     assert box.complete?
-    assert_equal "One holiday mug per caregiver (2)", box.summary_for(box.groups.find { |g| g.id == "cups" })
+    assert_equal "Holiday plastic cups for each member of the family (2)", box.summary_for(box.groups.find { |g| g.id == "cups" })
   end
 
   test "cups need a count unless declined" do

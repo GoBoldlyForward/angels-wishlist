@@ -8,15 +8,18 @@ module Caregiver
 
     setup do
       @chapter.update!(collects_payout_details: false)
-      @household, @enrollment = start_household(step: "lists")
+      @household, @enrollment = start_household(step: "love_box")
       add_child_with_list(@household)
       @enrollment.love_box_selection.assign(full_love_box)
       @enrollment.save!
       sign_in users(:caregiver)
     end
 
-    test "lists lead straight to review, and the step is not shown" do
-      patch finish_caregiver_intake_lists_path
+    test "the Love Box leads straight to review, and the step is not shown" do
+      get caregiver_intake_love_box_path
+      assert_select "button[type=submit]", /Review and submit/
+
+      patch caregiver_intake_love_box_path, params: { love_box: full_love_box }
 
       assert_redirected_to caregiver_intake_review_path
       assert_equal "review", @enrollment.reload.intake_step
@@ -63,8 +66,8 @@ module Caregiver
     test "the step cannot be used to jump ahead" do
       get caregiver_intake_payout_path
 
-      assert_redirected_to caregiver_intake_lists_path
-      assert_equal "lists", @enrollment.reload.intake_step
+      assert_redirected_to caregiver_intake_love_box_path
+      assert_equal "love_box", @enrollment.reload.intake_step
     end
 
     test "switching the step back on asks a submitted caregiver for it" do

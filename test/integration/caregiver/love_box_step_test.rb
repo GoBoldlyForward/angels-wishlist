@@ -10,14 +10,26 @@ module Caregiver
       sign_in users(:caregiver)
     end
 
-    test "every group is one select, with the disclosure beneath" do
+    test "every group is a list of options to click, with the disclosure beneath" do
       get caregiver_intake_love_box_path
 
       assert_response :success
-      assert_select "select[name^='love_box[']", @event.love_box_groups.size + 1
-      assert_select "select[name=?]", "love_box[snack][picks][]", 2
-      assert_select "select[name=?]", "love_box[treat][picks][]", 1
+      assert_select "select", 0
+      assert_select "input[type=radio][name=?]", "love_box[holiday][picks][]", 4
+      assert_select "input[type=checkbox][name=?]", "love_box[snack][picks][]", 3
+      assert_select "input[type=radio][name=?]", "love_box[treat][picks][]", 3
+      assert_select "fieldset legend", "Family drink"
       assert_select ".disclosure", /separate from the gift funds/
+    end
+
+    test "options read alphabetically with no thank you last, however the event lists them" do
+      @event.update!(love_box_options: [ { id: "grocery", label: "$25 grocery gift card",
+                                           options: [ "Walmart", "No thank you", "ALDI", "Trader Joe's" ] } ])
+
+      get caregiver_intake_love_box_path
+
+      assert_equal [ "ALDI", "Trader Joe's", "Walmart", "No thank you" ],
+                   css_select("input[name='love_box[grocery][picks][]']").map { |input| input["value"] }
     end
 
     test "a household with more than five children picks two treats" do
@@ -25,18 +37,18 @@ module Caregiver
 
       get caregiver_intake_love_box_path
 
-      assert_select "select[name=?]", "love_box[treat][picks][]", 2
+      assert_select "input[type=checkbox][name=?]", "love_box[treat][picks][]", 3
       assert_select ".hint", "Households with more than five kids pick two."
     end
 
-    test "a full box is saved and leads to the lists" do
+    test "a full box is saved and leads to getting paid" do
       patch caregiver_intake_love_box_path, params: { love_box: full_love_box }
 
-      assert_redirected_to caregiver_intake_lists_path
+      assert_redirected_to caregiver_intake_payout_path
       box = @enrollment.reload.love_box_selection
       assert box.complete?
-      assert_equal "One holiday mug per caregiver (2)", box.summary_for(box.groups.second)
-      assert_equal "lists", @enrollment.intake_step
+      assert_equal "Holiday plastic cups for each member of the family (2)", box.summary_for(box.groups.second)
+      assert_equal "payout", @enrollment.intake_step
     end
 
     test "a half-finished box is saved and says what is missing" do
@@ -58,7 +70,7 @@ module Caregiver
       assert_select ".panel", /nothing to choose for the Love Box yet/
 
       patch caregiver_intake_love_box_path
-      assert_redirected_to caregiver_intake_lists_path
+      assert_redirected_to caregiver_intake_payout_path
     end
 
     test "an option the event does not offer is dropped" do

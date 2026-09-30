@@ -16,6 +16,8 @@ module Caregiver
       assert_select ".child-form", 1
       assert_select ".child-form .hint b", Child::ALIASES.first
       assert_select "input[name$='[display_name]'][value=?]", Child::ALIASES.first
+      assert_select "input[type=radio][name$='[gender]']", 2
+      assert_select "select", 0
     end
 
     test "saving creates each child, an alias, and a draft list with the interests and the note" do
@@ -27,7 +29,7 @@ module Caregiver
         } }
       end
 
-      assert_redirected_to caregiver_intake_love_box_path
+      assert_redirected_to caregiver_intake_lists_path
       amelia, marcus = @household.children.order(:id).to_a
       assert_equal Child::ALIASES.first(2), [ amelia.display_name, marcus.display_name ]
       assert_equal 12, marcus.age
@@ -36,7 +38,7 @@ module Caregiver
       assert list.draft?
       assert_equal %w[drawing soccer], list.interests
       assert_equal "Draws on every napkin in the house.", list.caregiver_note
-      assert_equal "love_box", @enrollment.reload.intake_step
+      assert_equal "lists", @enrollment.reload.intake_step
     end
 
     test "a name the system did not offer is never used as the alias" do
@@ -117,7 +119,7 @@ module Caregiver
         "c#{drop.child_id}" => child_fields(id: drop.child_id, legal_first_name: "Marcus", remove: "1")
       } }
 
-      assert_redirected_to caregiver_intake_love_box_path
+      assert_redirected_to caregiver_intake_lists_path
       assert_equal [ keep.child_id ], @household.children.reload.pluck(:id)
       assert_not Wishlist.exists?(drop.id)
     end

@@ -6,7 +6,7 @@ class Enrollment < ApplicationRecord
   has_paper_trail only: %i[spending_agreed_at love_box submitted_at],
                   meta: { organization_id: ->(enrollment) { enrollment.event.organization_id } }
 
-  INTAKE_STEPS = %w[home children love_box lists payout review].freeze
+  INTAKE_STEPS = %w[home children lists love_box payout review].freeze
 
   belongs_to :household
   belongs_to :event
@@ -40,8 +40,8 @@ class Enrollment < ApplicationRecord
     lists = wishlists.includes(:line_items).to_a
     [
       ("Add at least one child." if household.children.active.none?),
-      ("Finish your Love Box." unless love_box_selection.complete?),
       ("Add at least one gift to every list." if lists.empty? || lists.any? { |list| list.line_items.listed.none? }),
+      ("Finish your Love Box." unless love_box_selection.complete?),
       *payout_blockers
     ].compact
   end

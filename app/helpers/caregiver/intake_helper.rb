@@ -2,8 +2,8 @@
 
 module Caregiver
   module IntakeHelper
-    STEP_LABELS = { "home" => "Your home", "children" => "The children", "love_box" => "Love Box",
-                    "lists" => "Their lists", "payout" => "Getting paid", "review" => "Review" }.freeze
+    STEP_LABELS = { "home" => "Your home", "children" => "The children", "lists" => "Their lists",
+                    "love_box" => "Love Box", "payout" => "Getting paid", "review" => "Review" }.freeze
 
     def event_day(time)
       time&.in_time_zone&.strftime("%B %-d")

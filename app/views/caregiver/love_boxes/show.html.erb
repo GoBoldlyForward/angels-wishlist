@@ -20,17 +20,22 @@
       <% @box.groups.each do |group| %>
         <% allowed = @box.picks_allowed(group) %>
         <% picks = @box.picks_for(group) %>
-        <div class="field" <% if group.asks_count %>data-controller="intake-love-box" data-intake-love-box-declined-value="<%= LoveBox::DECLINED %>"<% end %>>
-          <label class="f" for="love_box_<%= group.id %>_0"><%= group.label %></label>
-          <div class="<%= "row2" if allowed == 2 %>">
-            <% allowed.times do |slot| %>
-              <%= select_tag "love_box[#{group.id}][picks][]",
-                             options_for_select(group.options, picks[slot]),
-                             id: "love_box_#{group.id}_#{slot}",
-                             class: class_names("i", "is-invalid": slot.zero? && missing.include?(group.id) && picks.empty?),
-                             include_blank: slot.zero? ? "Choose one" : "Second pick, if you want one",
-                             aria: { label: (slot.zero? ? nil : "#{group.label}, second pick") },
-                             data: (group.asks_count && slot.zero? ? { intake_love_box_target: "pick", action: "intake-love-box#toggle" } : {}) %>
+        <% name = "love_box[#{group.id}][picks][]" %>
+        <fieldset class="field" data-controller="intake-love-box"
+                  data-intake-love-box-declined-value="<%= LoveBox::DECLINED %>" data-intake-love-box-max-value="<%= allowed %>">
+          <legend class="f"><%= group.label %></legend>
+          <div class="<%= class_names("opts", "is-invalid": missing.include?(group.id) && picks.empty?) %>">
+            <% group.ordered_options.each_with_index do |option, index| %>
+              <% id = "love_box_#{group.id}_#{index}" %>
+              <% input = { id: id, data: { intake_love_box_target: "option", action: "change->intake-love-box#toggle" } } %>
+              <label class="opt" for="<%= id %>">
+                <% if allowed == 1 %>
+                  <%= radio_button_tag name, option, picks.include?(option), input %>
+                <% else %>
+                  <%= check_box_tag name, option, picks.include?(option), input %>
+                <% end %>
+                <span><%= option %></span>
+              </label>
             <% end %>
           </div>
           <% if group.asks_count %>
@@ -53,7 +58,7 @@
           <% elsif group.large_household_only && allowed == 2 %>
             <p class="hint">Households with more than five kids pick two.</p>
           <% end %>
-        </div>
+        </fieldset>
       <% end %>
     </div>
 
@@ -67,7 +72,7 @@
     <div class="container sticky-in flow-screen">
       <span class="tiny muted">One box per household.</span>
       <button class="btn btn-primary" type="submit">
-        <%= current_enrollment.submitted? ? "Save" : "Build their lists" %> <i class="fa-solid fa-arrow-right"></i>
+        <%= current_enrollment.submitted? ? "Save" : (current_enrollment.step_from(:payout) == "payout" ? "Set up how you get paid" : "Review and submit") %> <i class="fa-solid fa-arrow-right"></i>
       </button>
     </div>
   </div>

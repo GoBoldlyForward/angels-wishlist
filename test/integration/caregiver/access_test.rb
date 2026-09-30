@@ -13,7 +13,7 @@ module Caregiver
     end
 
     test "every step asks a visitor to sign in" do
-      %i[children love_box lists payout review submission].each do |step|
+      %i[children lists love_box payout review submission].each do |step|
         get public_send("caregiver_intake_#{step}_path")
         assert_redirected_to new_user_session_path, "#{step} was open to a visitor"
       end

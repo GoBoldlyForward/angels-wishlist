@@ -23,7 +23,7 @@ and both describe rules the program no longer follows. Neither should be built f
 | 5. Donor storefront and checkout | Built. Runs in test mode until Stripe keys are set |
 | 6. Close and payouts | Built. Transfers run in test mode until Stripe keys are set |
 | 7. Communications | Written. Nothing is sent until a mail provider is set |
-| 8. Multiple chapters on Stripe Connect | Scoped below. Not started |
+| 8. Multiple chapters on Stripe Connect | Built. Chapter accounts, destination charges, and account debits run in test mode until Stripe keys are set |
 
 **Deployed:** Heroku app `angels-wishlist`, deploying from `main` after CI passes.
 
@@ -236,8 +236,8 @@ The six steps in the prototype, saved as the caregiver goes so they can return.
 | --- | --- |
 | Your home | the caregiver's user, the household, its address and county |
 | The children | each child, an assigned alias, and a draft wishlist holding interests and the note |
-| Love Box | the enrollment's choices |
 | Their lists | line items, matched to the catalog where one name fits |
+| Love Box | the enrollment's choices |
 | Getting paid | the payout method, a Stripe Connect account or a mailing address, and the agreement |
 | Review | submits every list for review |
 

@@ -271,6 +271,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_120000) do
     t.index ["wishlist_id"], name: "index_line_items_on_wishlist_id"
   end
 
+  create_table "organization_memberships", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.bigint "organization_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["deleted_at"], name: "index_organization_memberships_on_deleted_at"
+    t.index ["organization_id"], name: "index_organization_memberships_on_organization_id"
+    t.index ["user_id", "organization_id"], name: "index_organization_memberships_on_user_id_and_organization_id", unique: true, where: "(deleted_at IS NULL)"
+    t.index ["user_id"], name: "index_organization_memberships_on_user_id"
+  end
+
   create_table "organizations", force: :cascade do |t|
     t.boolean "active", default: true, null: false
     t.string "co_brand_line"
@@ -507,11 +519,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_120000) do
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "first_name"
-    t.boolean "is_admin", default: false, null: false
     t.string "last_name"
     t.datetime "last_sign_in_at"
     t.string "last_sign_in_ip"
-    t.bigint "organization_id"
     t.string "phone"
     t.string "preferred_language"
     t.datetime "remember_created_at"
@@ -525,7 +535,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_120000) do
     t.index ["ahoy_visit_id"], name: "index_users_on_ahoy_visit_id"
     t.index ["deleted_at"], name: "index_users_on_deleted_at"
     t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["organization_id"], name: "index_users_on_organization_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role"], name: "index_users_on_role"
     t.index ["slug"], name: "index_users_on_slug", unique: true
@@ -581,6 +590,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_120000) do
   add_foreign_key "line_items", "catalog_items"
   add_foreign_key "line_items", "donations"
   add_foreign_key "line_items", "wishlists"
+  add_foreign_key "organization_memberships", "organizations"
+  add_foreign_key "organization_memberships", "users"
   add_foreign_key "organizations", "addresses", column: "mailing_address_id"
   add_foreign_key "organizations", "organizations", column: "parent_id"
   add_foreign_key "organizations", "users", column: "primary_contact_id"
@@ -595,7 +606,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_120000) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
-  add_foreign_key "users", "organizations"
   add_foreign_key "wishlists", "children"
   add_foreign_key "wishlists", "events"
 end

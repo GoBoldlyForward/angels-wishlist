@@ -149,11 +149,11 @@ module Public
       add_to_cart @mayas_hoodie
 
       assert_no_difference -> { User.count } do
-        check_out email: users(:staff).email
+        check_out email: users(:admin).email
       end
 
-      assert_equal users(:staff), Donation.last.donor
-      assert users(:staff).reload.staff?
+      assert_equal users(:admin), Donation.last.donor
+      assert users(:admin).reload.admin?
     end
 
     test "a note longer than a thousand characters is turned away" do

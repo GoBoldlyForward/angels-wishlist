@@ -21,7 +21,7 @@ module Admin
       assert_includes first.css(".audit-changes").text.squish, "Caregiver note: She fills a sketchbook a month. → She draws every day."
 
       verified = css_select("tbody tr").find { |tr| tr.css(".audit-changes").text.include?("pending → verified") }
-      assert_includes verified.text, "Sam Reed"
+      assert_includes verified.text, "Ada Byrne"
       assert_select "td .item-name a[href=?]", admin_household_path(@household), text: "The Brooks home"
       assert_select "td .item-name a[href=?]", admin_line_item_path(@line_item), text: "Art supply set"
     end
@@ -65,7 +65,7 @@ module Admin
 
       rows = csv_rows
       assert_equal 1, rows.size
-      assert_equal "Sam Reed", rows.first["Who"]
+      assert_equal "Ada Byrne", rows.first["Who"]
       assert_includes rows.first["What changed"], 'verification_status: "pending" -> "verified"'
     end
   end

@@ -12,7 +12,7 @@ class ApplicationController < ActionController::Base
   before_action :set_paper_trail_whodunnit
   before_action :set_current_user
 
-  helper_method :current_storefront, :current_event, :current_chapter
+  helper_method :current_storefront, :current_event, :current_chapter, :current_organization
 
   private
 
@@ -23,6 +23,15 @@ class ApplicationController < ActionController::Base
 
   def set_current_user
     Current.user = current_user
+  end
+
+  # The organization every staff-side query is scoped to. It lives in the
+  # session so a switch outlasts the request that made it.
+  def current_organization
+    return @current_organization if defined?(@current_organization)
+
+    reachable = current_user&.available_organizations
+    @current_organization = reachable&.find_by(id: session[:organization_id]) || reachable&.first
   end
 
   def current_chapter
@@ -47,7 +56,7 @@ class ApplicationController < ActionController::Base
   end
 
   def home_path_for(user)
-    return admin_root_path if user.is_admin?
+    return admin_root_path if user.admin? || user.organizer?
     return caregiver_root_path if user.caregiver?
 
     root_path

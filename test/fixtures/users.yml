@@ -1,10 +1,16 @@
-staff:
+admin:
+  email: admin@wishlist.example.org
+  encrypted_password: <%= Devise::Encryptor.digest(User, "password123") %>
+  first_name: Ada
+  last_name: Byrne
+  role: admin
+
+organizer:
   email: staff@atlantaangels.example.org
   encrypted_password: <%= Devise::Encryptor.digest(User, "password123") %>
   first_name: Sam
   last_name: Reed
-  role: staff
-  is_admin: true
+  role: organizer
 
 caregiver:
   email: denise.brooks@example.com

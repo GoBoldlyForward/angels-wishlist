@@ -85,8 +85,9 @@ ActiveRecord::Base.transaction do
   puts "Clearing existing records"
   # Users and organizations reference each other, so ordered deletes cannot
   # satisfy both constraints. Truncate resolves the cycle in one statement.
-  tables = %w[versions payouts enrollments line_items donations wishlists children households catalog_items
-              categories events organizations users addresses friendly_id_slugs]
+  tables = %w[versions payouts enrollments line_items donations wishlists children households
+              organization_memberships catalog_items categories events organizations users addresses
+              friendly_id_slugs]
   ActiveRecord::Base.connection.execute("TRUNCATE #{tables.join(', ')} RESTART IDENTITY CASCADE")
 
   puts "Organizations"
@@ -95,18 +96,38 @@ ActiveRecord::Base.transaction do
                                 stripe_account_id: "acct_seed_angels",
                                 theme: { stylesheet: "theme-angels" })
 
-  Organization.create!(name: "Passion City Church", short_name: "Passion", kind: "partner",
-                       parent: angels, co_brand_line: "Wish List · with Atlanta Angels",
-                       theme: { stylesheet: "theme-passion" })
+  passion = Organization.create!(name: "Passion City Church", short_name: "Passion", kind: "partner",
+                                 parent: angels, co_brand_line: "Wish List · with Atlanta Angels",
+                                 theme: { stylesheet: "theme-passion" })
+
+  # A second chapter gives the organization switcher somewhere to go.
+  nashville = Organization.create!(name: "Nashville Angels", short_name: "Nashville", kind: "chapter",
+                                   website_url: "https://nashvilleangels.example.org",
+                                   stripe_account_id: "acct_seed_nashville")
 
   agencies = HOUSEHOLD_STAFF_FACTS.values.filter_map { |f| f[:agency] }.uniq.to_h do |name|
     [ name, Organization.create!(name: name, kind: "agency", parent: angels) ]
   end
 
   puts "Staff"
+  User.create!(email: "admin@wishlist.example.org", password: SEED_PASSWORD,
+               first_name: "Ada", last_name: "Byrne", role: "admin")
   staff = User.create!(email: "staff@atlantaangels.example.org", password: SEED_PASSWORD,
-                       first_name: "Sam", last_name: "Reed", role: "staff", is_admin: true,
-                       organization: angels)
+                       first_name: "Sam", last_name: "Reed", role: "organizer")
+  june = User.create!(email: "staff@nashvilleangels.example.org", password: SEED_PASSWORD,
+                      first_name: "June", last_name: "Whitlock", role: "organizer")
+  drew = User.create!(email: "serve@passioncity.example.org", password: SEED_PASSWORD,
+                      first_name: "Drew", last_name: "Halloran", role: "organizer")
+  # One organizer in two chapters is what the organization switcher is for.
+  nadia = User.create!(email: "regional@angels.example.org", password: SEED_PASSWORD,
+                       first_name: "Nadia", last_name: "Iyer", role: "organizer")
+
+  { staff => [ angels ], june => [ nashville ], drew => [ passion ], nadia => [ angels, nashville ] }
+    .each { |user, orgs| orgs.each { |org| OrganizationMembership.create!(user: user, organization: org) } }
+
+  angels.update!(primary_contact: staff)
+  nashville.update!(primary_contact: june)
+  passion.update!(primary_contact: drew)
 
   puts "Event"
   # Dated relative to now so the seed always opens on a program mid-flight
@@ -117,6 +138,10 @@ ActiveRecord::Base.transaction do
                         payout_at: (3.weeks.from_now + 1.day).change(hour: 9),
                         per_child_cap_in_cents: CAP_IN_DOLLARS * 100,
                         love_box_options: LoveBox::DEFAULT_GROUPS)
+
+  Event.create!(organization: nashville, name: "Christmas #{Date.current.year}",
+                opened_at: event.opened_at, closes_at: event.closes_at, payout_at: event.payout_at,
+                per_child_cap_in_cents: CAP_IN_DOLLARS * 100, love_box_options: LoveBox::DEFAULT_GROUPS)
 
   puts "Categories and catalog"
   categories = DATA["categories"].each_with_index.to_h do |row, index|

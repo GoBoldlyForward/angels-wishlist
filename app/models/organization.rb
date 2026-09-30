@@ -10,7 +10,8 @@ class Organization < ApplicationRecord
 
   has_many :children_organizations, class_name: "Organization", foreign_key: :parent_id,
            dependent: :nullify, inverse_of: :parent
-  has_many :staff, class_name: "User", dependent: :nullify, inverse_of: :organization
+  has_many :organization_memberships, dependent: :destroy
+  has_many :organizers, through: :organization_memberships, source: :user
   has_many :events, dependent: :destroy
   has_many :households, dependent: :destroy
   has_many :placed_households, class_name: "Household", foreign_key: :placing_organization_id,

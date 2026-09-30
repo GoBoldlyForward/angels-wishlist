@@ -74,7 +74,7 @@ class WishlistTest < ActiveSupport::TestCase
     wishlist = build_wishlist(status: "live", approved_at: Time.current)
     line = build_line_item(wishlist: wishlist)
 
-    Current.set(user: users(:staff)) { line.update!(spec: "Size 11") }
+    Current.set(user: users(:admin)) { line.update!(spec: "Size 11") }
 
     assert_equal "live", wishlist.reload.status
   end
@@ -156,7 +156,7 @@ class WishlistTest < ActiveSupport::TestCase
 
   test "approving a list records who approved it" do
     wishlist = build_wishlist(status: "in_review")
-    staff = users(:staff)
+    staff = users(:admin)
 
     PaperTrail.request(whodunnit: staff.id) { wishlist.approve! }
 

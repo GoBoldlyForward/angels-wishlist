@@ -1,4 +1,4 @@
-<% content_for :title, "Set up your wish lists | #{current_chapter&.name || "Atlanta Angels"}" %>
+<% content_for :title, "Set up your wish lists | #{chapter_name}" %>
 <% taking_lists = current_event.present? && !current_event.closed? %>
 
 <section class="hero">
@@ -20,7 +20,7 @@
           <p class="tiny" style="margin-top:6px">Already started? <%= link_to "Sign in", new_user_session_path, class: "link" %> to pick up where you left off.</p>
         <% end %>
       <% else %>
-        <p class="tiny muted" style="margin-top:12px">Lists are not open right now. Your Angels coordinator will let you know when they are.</p>
+        <p class="tiny muted" style="margin-top:12px">Lists are not open right now. Your coordinator at <%= chapter_name %> will let you know when they are.</p>
       <% end %>
     </div>
   </div>

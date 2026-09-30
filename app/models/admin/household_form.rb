@@ -48,7 +48,7 @@ module Admin
     end
 
     def agencies
-      Organization.agency.order(:name)
+      Organization.agency.where(parent: household.organization).order(:name)
     end
 
     private

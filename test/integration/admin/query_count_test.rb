@@ -22,12 +22,12 @@ module Admin
     end
 
     test "the catalog runs the same number of queries however many items it shows" do
-      category = Category.create!(name: "Toys & Games")
+      category = build_category(organization: @chapter, name: "Toys & Games")
       CatalogItem.create!(category: category, name: "Blocks", price_in_cents: 2_000)
       get admin_catalog_items_path
       before = queries_during { get admin_catalog_items_path }
 
-      4.times { |n| CatalogItem.create!(category: Category.create!(name: "Shelf #{n}"), name: "Gift #{n}", price_in_cents: 2_000) }
+      4.times { |n| CatalogItem.create!(category: build_category(organization: @chapter, name: "Shelf #{n}"), name: "Gift #{n}", price_in_cents: 2_000) }
 
       assert_equal before, queries_during { get admin_catalog_items_path }
     end

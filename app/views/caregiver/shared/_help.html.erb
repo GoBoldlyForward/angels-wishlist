@@ -9,10 +9,10 @@
     <div class="modal-bd">
       <p>
         <% if ENV["CAREGIVER_HELP_PHONE"].present? %>
-          Call your Angels coordinator at <%= ENV["CAREGIVER_HELP_PHONE"] %> and they will build the lists with you
+          Call your coordinator at <%= chapter_name %> on <%= ENV["CAREGIVER_HELP_PHONE"] %> and they will build the lists with you
           over the phone.
         <% else %>
-          Call your Angels coordinator and they will build the lists with you over the phone.
+          Call your coordinator at <%= chapter_name %> and they will build the lists with you over the phone.
         <% end %>
         Plenty of families do it that way.
       </p>

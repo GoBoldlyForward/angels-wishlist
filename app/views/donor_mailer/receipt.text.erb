@@ -10,11 +10,11 @@ Receipt <%= @donation.uuid.first(8).upcase %>
 Where it is needed most: <%= number_to_currency(@donation.general_gift_in_cents / 100.0) %>
 <% end -%>
 <% if @donation.fee_covered? -%>
-Card processing: <%= number_to_currency(@donation.fee_in_cents / 100.0) %>
+Card processing and fees: <%= number_to_currency(@donation.fee_in_cents / 100.0) %>
 <% end -%>
 
 Total: <%= number_to_currency(@donation.charged_in_dollars) %>
 
-<%= @chapter.name %> is a 501(c)(3). Your gift is a tax-deductible donation designated to the holiday wish list program, not a purchase of goods, and no goods or services were provided to you in return.
+<%= @chapter.legal_name_or_name %> is a 501(c)(3)<%= ", EIN #{@chapter.ein}" if @chapter.ein.present? %>. Your gift is a tax-deductible donation designated to the holiday wish list program, not a purchase of goods, and no goods or services were provided to you in return.
 
 Everything raised is pooled and spread evenly across every child's list, so each one is funded to the same share.

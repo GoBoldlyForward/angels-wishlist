@@ -15,7 +15,8 @@ module Admin
       "Photo attribution" => ->(item) { item.photo_attribution }
     }.freeze
 
-    def initialize(params)
+    def initialize(chapter, params)
+      @chapter = chapter
       super(items, params, tabs: catalog_tabs, filters: catalog_filters, sorts: catalog_sorts,
             search: method(:matching), default_order: Arel.sql("categories.position, catalog_items.name"))
     end
@@ -33,17 +34,17 @@ module Admin
     end
 
     def category_count
-      Category.count
+      @chapter.categories.count
     end
 
     def price_range
-      CatalogItem.available.pick(Arel.sql("MIN(price_in_cents)"), Arel.sql("MAX(price_in_cents)"))
+      @chapter.catalog_items.available.pick(Arel.sql("MIN(price_in_cents)"), Arel.sql("MAX(price_in_cents)"))
     end
 
     private
 
     def items
-      CatalogItem.joins(:category).preload(:category).with_attached_photo
+      @chapter.catalog_items.joins(:category).preload(:category).with_attached_photo
     end
 
     def catalog_tabs
@@ -58,7 +59,7 @@ module Admin
     def catalog_filters
       [
         Filter.new(key: "category", label: "Category",
-                   options: Category.ordered.pluck(:name, :id).to_h.transform_values(&:to_s),
+                   options: @chapter.categories.ordered.pluck(:name, :id).to_h.transform_values(&:to_s),
                    scope: ->(rows, value) { rows.where(category_id: value) }),
         Filter.new(key: "price", label: "Price",
                    options: { "Under $25" => "0-2499", "$25 to $50" => "2500-4999", "$50 to $100" => "5000-9999",

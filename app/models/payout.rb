@@ -2,7 +2,8 @@
 
 class Payout < ApplicationRecord
   acts_as_paranoid
-  has_paper_trail only: %i[status amount_in_cents hold_reason stripe_transfer_id gift_card_tracking_number]
+  has_paper_trail only: %i[status amount_in_cents hold_reason stripe_debit_id stripe_transfer_id gift_card_tracking_number],
+                  meta: { organization_id: ->(payout) { payout.event.organization_id } }
 
   belongs_to :household
   belongs_to :event

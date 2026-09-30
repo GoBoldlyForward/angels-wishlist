@@ -2,7 +2,8 @@
 
 class LineItem < ApplicationRecord
   acts_as_paranoid
-  has_paper_trail only: %i[status name price_in_cents spec link_url]
+  has_paper_trail only: %i[status name price_in_cents spec link_url],
+                  meta: { organization_id: ->(line) { line.wishlist.event.organization_id } }
 
   MINIMUM_PRICE_IN_CENTS = 500
   LOCKED_ONCE_FUNDED = %w[name price_in_cents spec link_url catalog_item_id].freeze

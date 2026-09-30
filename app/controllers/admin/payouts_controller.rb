@@ -43,7 +43,8 @@ module Admin
     private
 
     def set_payout
-      @payout = Payout.includes(household: %i[caregiver mailing_address]).find(params[:id])
+      @payout = Payout.where(event: current_chapter.events).includes(household: %i[caregiver mailing_address])
+                      .find(params[:id])
     end
   end
 end

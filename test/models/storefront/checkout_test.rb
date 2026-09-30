@@ -25,7 +25,7 @@ module Storefront
 
       donation = checkout.donation
       assert donation.pending?
-      assert_equal [ 4_800, 2_000, 204 ], [ donation.gift_in_cents, donation.general_gift_in_cents, donation.fee_in_cents ]
+      assert_equal [ 4_800, 2_000, 234 ], [ donation.gift_in_cents, donation.general_gift_in_cents, donation.fee_in_cents ]
       assert_equal({ "line_item_ids" => [ @line.id ] }, donation.cart)
       assert_equal "Thinking of you.", donation.note_to_family
       assert_equal @event.organization, donation.storefront_organization
@@ -34,7 +34,7 @@ module Storefront
     end
 
     test "the fee is on unless the donor turns it off" do
-      assert_equal 144, build(email: "kate.hollis@example.com").fee_in_cents
+      assert_equal 174, build(email: "kate.hollis@example.com").fee_in_cents
       assert_equal 0, build(email: "kate.hollis@example.com", cover_fee: "0").fee_in_cents
       assert_equal 4_800, build(email: "kate.hollis@example.com", cover_fee: "0").charged_in_cents
     end

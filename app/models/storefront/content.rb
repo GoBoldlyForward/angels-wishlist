@@ -11,7 +11,7 @@ module Storefront
     GENERAL_GIFT_PRESETS_IN_DOLLARS = [ 25, 50, 100, 250 ].freeze
 
     def initialize(chapter:, event:)
-      @name = chapter&.name || "Atlanta Angels"
+      @name = chapter&.name || "Wish List"
       @event = event
     end
 

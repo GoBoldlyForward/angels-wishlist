@@ -1,5 +1,5 @@
 <% content_for :title, "Review | Wish List" %>
-<% chapter = current_chapter&.name || "Atlanta Angels" %>
+<% chapter = chapter_name %>
 <% closes = event_day(current_event.closes_at) %>
 
 <%= render "caregiver/shared/steps" %>

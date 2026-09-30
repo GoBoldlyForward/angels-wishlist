@@ -30,6 +30,35 @@
           [ "Co-brand line", @organization.co_brand_line ]
         ] %>
       <% end %>
+
+      <% if @organization.chapter? %>
+        <%= detail_section "The chapter" do %>
+          <%= key_values [
+            [ "Legal name", @organization.legal_name_or_name ],
+            [ "EIN", @organization.ein ],
+            [ "Host name", @organization.hostname || "None. It is reached only as the oldest chapter" ],
+            [ "Sends email as", @organization.mail_from ],
+            [ "Platform fee", number_to_percentage(@organization.platform_fee_basis_points / 100.0, precision: 2, strip_insignificant_zeros: true) ],
+            [ "Organizers", link_to(@organization.organizers.count, admin_organizers_path) ]
+          ] %>
+        <% end %>
+
+        <%= detail_section "Stripe" do %>
+          <% if @organization.stripe_charges_enabled? %>
+            <%= key_values [ [ "Account", @organization.stripe_account_id ], [ "Donations", status_badge("live", label: "Can be taken") ] ] %>
+          <% else %>
+            <div class="drawer-note mb-3">
+              Donations go straight into the chapter's own Stripe account. Until it is connected, the storefront cannot take a card.
+            </div>
+            <% if @organization == current_chapter %>
+              <%= button_to (@organization.stripe_account_id ? "Finish connecting Stripe" : "Connect Stripe"),
+                            admin_stripe_connection_path, class: "btn btn-primary btn-sm" %>
+            <% else %>
+              <span class="text-muted small">Switch to this chapter to connect its Stripe account.</span>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
     </div>
   </div>
 

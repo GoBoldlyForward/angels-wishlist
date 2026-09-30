@@ -5,8 +5,8 @@ require_relative "funding_case"
 module Admin
   class CategoriesTest < FundingCase
     setup do
-      @toys = Category.create!(name: "Toys & Games", icon: "fa-puzzle-piece", tint: "t2", position: 1)
-      @clothes = Category.create!(name: "Clothes & Shoes", icon: "fa-shirt", tint: "t1", position: 1)
+      @toys = Category.create!(organization: @chapter, name: "Toys & Games", icon: "fa-puzzle-piece", tint: "t2", position: 1)
+      @clothes = Category.create!(organization: @chapter, name: "Clothes & Shoes", icon: "fa-shirt", tint: "t1", position: 1)
     end
 
     test "the list is in position order" do

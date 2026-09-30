@@ -50,10 +50,15 @@ namespace :admin do
     end
   end
   resource :impact_statement, only: %i[new create]
+  resource :chapter_funds, only: :show do
+    post :release
+  end
 
   # Setup
   resources :events, except: :destroy
   resources :categories, except: :show
   resources :catalog_items, except: :show
   resources :organizations, except: :destroy
+  resources :organizers, only: %i[index new create destroy]
+  resource :stripe_connection, only: %i[show create]
 end

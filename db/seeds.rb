@@ -93,7 +93,7 @@ ActiveRecord::Base.transaction do
   puts "Organizations"
   angels = Organization.create!(name: "Atlanta Angels", short_name: "Angels", kind: "chapter",
                                 website_url: "https://atlantaangels.org",
-                                stripe_account_id: "acct_seed_angels",
+                                stripe_account_id: "acct_seed_angels", stripe_charges_enabled: true,
                                 theme: { stylesheet: "theme-angels" })
 
   passion = Organization.create!(name: "Passion City Church", short_name: "Passion", kind: "partner",
@@ -103,7 +103,8 @@ ActiveRecord::Base.transaction do
   # A second chapter gives the organization switcher somewhere to go.
   nashville = Organization.create!(name: "Nashville Angels", short_name: "Nashville", kind: "chapter",
                                    website_url: "https://nashvilleangels.example.org",
-                                   stripe_account_id: "acct_seed_nashville")
+                                   hostname: "nashville.localhost",
+                                   stripe_account_id: "acct_seed_nashville", stripe_charges_enabled: true)
 
   agencies = HOUSEHOLD_STAFF_FACTS.values.filter_map { |f| f[:agency] }.uniq.to_h do |name|
     [ name, Organization.create!(name: name, kind: "agency", parent: angels) ]
@@ -145,7 +146,7 @@ ActiveRecord::Base.transaction do
 
   puts "Categories and catalog"
   categories = DATA["categories"].each_with_index.to_h do |row, index|
-    [ row["id"], Category.create!(name: row["label"], icon: row["icon"], tint: row["tint"],
+    [ row["id"], Category.create!(organization: angels, name: row["label"], icon: row["icon"], tint: row["tint"],
                                   position: index + 1, headline: DATA["cat_copy"][row["id"]]) ]
   end
 
@@ -158,6 +159,8 @@ ActiveRecord::Base.transaction do
                                      stock_photo: with_photo.include?(row["id"]) ? "catalog/#{row['id']}.jpg" : nil,
                                      photo_attribution: with_photo.include?(row["id"]) ? "Openverse, CC licensed" : nil) ]
   end
+
+  nashville.copy_catalog_from(angels)
 
   puts "Households, children, and lists"
   households = DATA["households"].to_h do |row|

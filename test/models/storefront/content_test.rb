@@ -41,7 +41,7 @@ module Storefront
       content = Content.new(chapter: nil, event: nil)
 
       assert_match(/\AWhen the lists close we total everything raised/, content.steps.second.body)
-      assert_match(/Atlanta Angels/, content.steps.first.body)
+      assert_match(/charged by Wish List/, content.steps.first.body)
     end
   end
 end

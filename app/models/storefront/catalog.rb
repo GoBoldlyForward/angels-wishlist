@@ -30,7 +30,7 @@ module Storefront
     end
 
     def categories
-      @categories ||= Category.ordered.to_a
+      @categories ||= Category.where(organization_id: @event&.organization_id).ordered.to_a
     end
 
     def category_gifts(category)

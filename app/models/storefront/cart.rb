@@ -60,7 +60,7 @@ module Storefront
     end
 
     def fee_in_cents
-      Donation.fee_for(total_in_cents)
+      Donation.fee_for(total_in_cents, platform_fee_basis_points: @event&.organization&.platform_fee_basis_points.to_i)
     end
 
     def count

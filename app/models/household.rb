@@ -5,7 +5,8 @@ class Household < ApplicationRecord
   include PgSearch::Model
   acts_as_paranoid
   has_paper_trail only: %i[verification_status verified_at hold_reason payout_method stripe_account_id
-                           stripe_onboarded_at mailing_address_id]
+                           stripe_onboarded_at mailing_address_id],
+                  meta: { organization_id: :organization_id }
 
   COUNTIES = [ "Clayton", "Cobb", "DeKalb", "Douglas", "Fulton", "Gwinnett", "Henry", "Rockdale",
                "South Fulton" ].freeze

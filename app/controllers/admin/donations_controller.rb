@@ -50,7 +50,8 @@ module Admin
     private
 
     def set_donation
-      @donation = Donation.includes(:donor, :event, line_items: { wishlist: :child }).find_by!(uuid: params[:id])
+      @donation = Donation.where(event: current_chapter.events).includes(:donor, :event, line_items: { wishlist: :child })
+                          .find_by!(uuid: params[:id])
     end
 
     def offline_gift_params

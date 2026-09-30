@@ -59,8 +59,14 @@ module ProgramBuilder
     Wishlist.create!({ child: child, event: event, status: "live" }.merge(attrs))
   end
 
-  def build_catalog_item(**attrs)
-    category = Category.create!(name: "Art & Music #{SecureRandom.hex(3)}")
+  # Catalogs belong to a chapter; left unsaid, that is the oldest one, which is the test's own.
+  def build_category(organization: nil, **attrs)
+    organization ||= Organization.chapter.order(:id).first || build_organization
+    Category.create!({ organization: organization, name: "Art & Music #{SecureRandom.hex(3)}" }.merge(attrs))
+  end
+
+  def build_catalog_item(organization: nil, **attrs)
+    category = attrs.delete(:category) || build_category(organization: organization)
     CatalogItem.create!({ category: category, name: "Art supply set #{SecureRandom.hex(3)}",
                           price_in_cents: 4_800 }.merge(attrs))
   end

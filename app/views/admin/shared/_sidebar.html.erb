@@ -1,7 +1,7 @@
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <div class="logo-icon">AA</div>
-    <span class="logo-text">Wish List<span class="logo-sub"><%= current_chapter&.name || "Atlanta Angels" %></span></span>
+    <div class="logo-icon"><%= current_chapter&.display_name.to_s.split.map(&:first).join.first(2).upcase.presence || "WL" %></div>
+    <span class="logo-text">Wish List<span class="logo-sub"><%= chapter_name %></span></span>
   </div>
 
   <nav class="sidebar-nav">
@@ -18,6 +18,7 @@
     <%= nav_item "Donors", admin_donors_path, icon: "people" %>
     <%= nav_item "Donations", admin_donations_path, icon: "receipt" %>
     <%= nav_item "Payouts", admin_payouts_path, icon: "bank" %>
+    <%= nav_item "Chapter funds", admin_chapter_funds_path, icon: "wallet2" %>
 
     <div class="nav-section-label">Inbox</div>
     <%= nav_item "Needs review", admin_inbox_path, icon: "inbox", count: Admin::Inbox.new(current_event).count, tone: "danger" %>
@@ -28,6 +29,7 @@
     <%= nav_item "Categories", admin_categories_path, icon: "tags" %>
     <%= nav_item "Catalog", admin_catalog_items_path, icon: "bag" %>
     <%= nav_item "Organizations", admin_organizations_path, icon: "building" %>
+    <%= nav_item "Staff", admin_organizers_path, icon: "person-badge" %>
 
     <div class="nav-section-label">The donor site</div>
     <%= link_to root_path, class: "nav-link", target: "_blank", rel: "noopener" do %>

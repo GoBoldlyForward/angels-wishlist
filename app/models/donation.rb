@@ -2,9 +2,12 @@
 
 class Donation < ApplicationRecord
   acts_as_paranoid
-  has_paper_trail only: %i[status note_approved_at]
+  has_paper_trail only: %i[status note_approved_at],
+                  meta: { organization_id: ->(donation) { donation.event.organization_id } }
 
-  FEE_RATE = 0.03
+  # What Stripe charges the platform for a card, the rate the application fee is estimated at.
+  PROCESSING_BASIS_POINTS = 290
+  PROCESSING_FIXED_IN_CENTS = 30
   MINIMUM_GENERAL_GIFT_IN_CENTS = 500
 
   belongs_to :donor, class_name: "User"
@@ -20,7 +23,7 @@ class Donation < ApplicationRecord
   scope :with_unapproved_note, -> { where.not(note_to_family: [ nil, "" ]).where(note_approved_at: nil) }
   scope :offline, -> { where(stripe_payment_intent_id: nil) }
 
-  validates :gift_in_cents, :general_gift_in_cents, :fee_in_cents,
+  validates :gift_in_cents, :general_gift_in_cents, :fee_in_cents, :platform_fee_in_cents, :processing_fee_in_cents,
             numericality: { greater_than_or_equal_to: 0 }
   validates :note_to_family, length: { maximum: 1000 }
   validate :carries_some_money
@@ -37,6 +40,16 @@ class Donation < ApplicationRecord
 
   def given_in_cents
     gift_in_cents + general_gift_in_cents
+  end
+
+  # Card processing and the platform fee, which Stripe keeps from the charge.
+  def application_fee_in_cents
+    platform_fee_in_cents + processing_fee_in_cents
+  end
+
+  # What reaches the families: the gift, less whatever of the application fee the donor did not cover.
+  def pool_in_cents
+    [ given_in_cents - [ application_fee_in_cents - fee_in_cents, 0 ].max, 0 ].max
   end
 
   def chosen_line_items
@@ -112,8 +125,22 @@ class Donation < ApplicationRecord
     end
   end
 
-  def self.fee_for(cents)
-    (cents * FEE_RATE).round
+  # The amount that lets a whole gift reach the families after processing and the platform fee.
+  def self.fee_for(cents, platform_fee_basis_points: 0)
+    return 0 unless cents.positive?
+
+    kept = cents + platform_fee_for(cents, platform_fee_basis_points)
+    charged = ((kept + PROCESSING_FIXED_IN_CENTS) / (1 - (PROCESSING_BASIS_POINTS / 10_000r))).floor
+    charged += 1 while charged - processing_fee_for(charged) < kept
+    charged - cents
+  end
+
+  def self.platform_fee_for(cents, basis_points)
+    (cents * basis_points / 10_000r).round
+  end
+
+  def self.processing_fee_for(charged_in_cents)
+    (charged_in_cents * PROCESSING_BASIS_POINTS / 10_000r).round + PROCESSING_FIXED_IN_CENTS
   end
 
   private

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title><%= content_for(:title) || "Wish List | #{current_storefront&.name || "Atlanta Angels"}" %></title>
-    <meta name="description" content="Browse gift lists written by caregivers for children navigating foster care in metro Atlanta. Every gift is a donation to Atlanta Angels.">
+    <title><%= content_for(:title) || "Wish List | #{current_storefront&.name || chapter_name}" %></title>
+    <meta name="description" content="Browse gift lists written by caregivers for children navigating foster care. Every gift is a donation to <%= chapter_name %>.">
     <%= render "layouts/head" %>
     <%= render "layouts/storefront_styles", organization: current_storefront %>
     <%= stylesheet_link_tag "storefront", "data-turbo-track": "reload" %>

@@ -24,7 +24,7 @@ Devise.setup do |config|
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class
   # with default "from" parameter.
-  config.mailer_sender = ENV.fetch("MAIL_FROM", "Atlanta Angels Wish List <wishlist@example.org>")
+  config.mailer_sender = ENV.fetch("MAIL_FROM", "Wish List <wishlist@example.org>")
 
   # Configure the class responsible to send e-mails.
   # config.mailer = 'Devise::Mailer'

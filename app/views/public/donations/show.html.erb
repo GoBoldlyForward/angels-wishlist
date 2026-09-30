@@ -1,6 +1,6 @@
 <% content_for :title, "Thank you | Wish List" %>
 <% content_for(:head) { tag.meta(name: "robots", content: "noindex") } %>
-<% chapter = current_chapter&.name || "Atlanta Angels" %>
+<% chapter = chapter_name %>
 <% finished = @receipt.succeeded? %>
 
 <main class="container confirmation-page">

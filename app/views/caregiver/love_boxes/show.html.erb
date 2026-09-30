@@ -1,5 +1,5 @@
 <% content_for :title, "Love Box | Wish List" %>
-<% chapter = current_chapter&.name || "Atlanta Angels" %>
+<% chapter = chapter_name %>
 <% missing = Array(@missing).map(&:id) %>
 
 <%= render "caregiver/shared/steps" %>

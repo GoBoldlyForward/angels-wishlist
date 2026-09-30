@@ -1,0 +1,62 @@
+<% content_for :breadcrumbs do %><li class="breadcrumb-item active">Chapter funds</li><% end %>
+
+<%= render "admin/shared/page_header", title: "Chapter funds",
+           lede: "Donations land in #{current_chapter.display_name}'s own Stripe account. What caregivers are still owed by direct deposit stays there until they are paid." %>
+
+<% if @funds %>
+  <div class="stat-cards">
+    <%= stat_card "In Stripe", @funds.balance_in_cents ? money_exact(@funds.balance_in_cents) : "—", icon: "wallet2", color: "blue",
+                  note: @funds.balance_in_cents ? "available now" : "no balance in test mode" %>
+    <%= stat_card "Held for caregivers", money_exact(@funds.held_in_cents), icon: "lock", color: "gold",
+                  note: "direct deposit shares not yet sent" %>
+    <%= stat_card "Free to send", money_exact(@funds.releasable_in_cents), icon: "bank", color: "green",
+                  note: "gift cards, surplus, and anything left over" %>
+  </div>
+
+  <div class="row g-3 mt-1">
+    <div class="col-lg-7">
+      <div class="data-table-wrapper">
+        <div class="panel-card-head"><h2>Held by event</h2></div>
+        <div class="table-scroll">
+          <table class="table">
+            <thead><tr><th>Event</th><th class="text-end">Owed by direct deposit</th><th class="text-end">Already paid</th><th class="text-end">Held</th></tr></thead>
+            <tbody>
+              <% @funds.events.each do |row| %>
+                <tr>
+                  <td><%= link_to row.event.name, admin_event_path(row.event) %></td>
+                  <td class="text-end num"><%= money_exact row.owed_in_cents %></td>
+                  <td class="text-end num"><%= money_exact row.paid_in_cents %></td>
+                  <td class="text-end num"><%= money_exact row.held_in_cents %></td>
+                </tr>
+              <% end %>
+              <% if @funds.events.empty? %>
+                <tr><td colspan="4" class="text-muted small p-3">Nothing is held. Every direct deposit has been sent.</td></tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="panel-card p-4">
+        <%= detail_section "Send to the chapter's bank" do %>
+          <% if @funds.releasable_in_cents.positive? %>
+            <%= form_with url: release_admin_chapter_funds_path, method: :post,
+                          data: { turbo_confirm: "Send this to the chapter's bank?" } do |form| %>
+              <%= form.label :amount_in_dollars, "Amount", class: "form-label" %>
+              <div class="input-group mb-3">
+                <span class="input-group-text">$</span>
+                <%= form.text_field :amount_in_dollars, class: "form-control", value: Admin::Dollars.from_cents(@funds.releasable_in_cents) %>
+              </div>
+              <%= form.submit "Send to the bank", class: "btn btn-primary" %>
+            <% end %>
+          <% else %>
+            <div class="drawer-note">Nothing is free to send yet.</div>
+          <% end %>
+          <div class="form-text mt-3">The account pays out only when sent from here, so caregivers' shares are there on payout day.</div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

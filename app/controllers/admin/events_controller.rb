@@ -2,7 +2,6 @@
 
 module Admin
   class EventsController < BaseController
-    before_action :require_chapter
     before_action :set_event, only: %i[show edit update]
 
     def index
@@ -41,10 +40,6 @@ module Admin
     end
 
     private
-
-    def require_chapter
-      redirect_to new_admin_organization_path, alert: "Add the chapter first. Events belong to it." unless current_chapter
-    end
 
     def set_event
       @event = Event.where(organization: current_chapter).friendly.find(params[:id])

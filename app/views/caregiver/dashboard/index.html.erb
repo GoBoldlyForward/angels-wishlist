@@ -1,5 +1,5 @@
 <% content_for :title, "My lists | Wish List" %>
-<% chapter = current_chapter&.name || "Atlanta Angels" %>
+<% chapter = chapter_name %>
 <% open_for_edits = !current_event.closed? %>
 <% closes = event_day(current_event.closes_at) %>
 
@@ -83,7 +83,7 @@
           <% if current_household.verification_verified? %>
             <%= chapter %> has confirmed your household.
           <% elsif current_household.verification_hold? %>
-            Your household is on hold. Your Angels coordinator will be in touch.
+            Your household is on hold. Your coordinator at <%= chapter %> will be in touch.
           <% else %>
             <%= chapter %> is confirming your household. It usually takes a day.
           <% end %>

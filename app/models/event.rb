@@ -57,7 +57,10 @@ class Event < ApplicationRecord
   end
 
   def raised_in_cents
-    donations.succeeded.sum("gift_in_cents + general_gift_in_cents")
+    donations.succeeded.sum(Arel.sql(<<~SQL.squish))
+      GREATEST(gift_in_cents + general_gift_in_cents
+               - GREATEST(platform_fee_in_cents + processing_fee_in_cents - fee_in_cents, 0), 0)
+    SQL
   end
 
   def percent_funded

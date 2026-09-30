@@ -73,7 +73,7 @@ module Storefront
       assert_equal 4_000, @cart.gift_in_cents
       assert_equal 2_500, @cart.general_gift_in_cents
       assert_equal 6_500, @cart.total_in_cents
-      assert_equal 195, @cart.fee_in_cents
+      assert_equal 225, @cart.fee_in_cents
       assert_equal 2, @cart.count
     end
 

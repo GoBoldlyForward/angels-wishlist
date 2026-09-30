@@ -79,6 +79,51 @@ module Admin
       assert_equal({ "stylesheet" => "theme-angels", "tokens" => { "brand" => "#00b5e2" } }, @partner.theme)
     end
 
+    test "an admin adds a chapter, which starts from the oldest chapter's catalog" do
+      shelf = build_category(organization: @chapter, name: "Toys & Games", position: 1)
+      build_catalog_item(category: shelf, name: "Building blocks", price_in_cents: 3_500)
+
+      post admin_organizations_path, params: { organization: {
+        name: "Nashville Angels", kind: "chapter", hostname: "https://Wishlist.NashvilleAngels.example/",
+        legal_name: "Nashville Angels, Inc.", ein: "12-3456789", platform_fee_basis_points: 150
+      } }
+
+      chapter = Organization.find_by!(name: "Nashville Angels")
+      assert_redirected_to admin_organization_path(chapter)
+      assert_nil chapter.parent
+      assert_equal [ "wishlist.nashvilleangels.example", "12-3456789", 150 ],
+                   [ chapter.hostname, chapter.ein, chapter.platform_fee_basis_points ]
+      assert_equal [ "Toys & Games" ], chapter.categories.pluck(:name)
+      assert_equal [ [ "Building blocks", 3_500 ] ], chapter.catalog_items.pluck(:name, :price_in_cents)
+    end
+
+    test "an organizer adds agencies and partners to their own chapter, never a chapter" do
+      sign_in build_organizer(organization: @chapter)
+
+      post admin_organizations_path, params: { organization: {
+        name: "Nashville Angels", kind: "chapter", hostname: "wishlist.nashvilleangels.example",
+        platform_fee_basis_points: 0
+      } }
+
+      added = Organization.find_by!(name: "Nashville Angels")
+      assert added.agency?
+      assert_equal @chapter, added.parent
+      assert_nil added.hostname
+    end
+
+    test "an organizer cannot change the chapter's host name or fee" do
+      sign_in build_organizer(organization: @chapter)
+
+      patch admin_organization_path(@chapter), params: { organization: {
+        legal_name: "Atlanta Angels, Inc.", hostname: "evil.example", platform_fee_basis_points: 0
+      } }
+
+      assert_redirected_to admin_organization_path(@chapter)
+      @chapter.reload
+      assert_equal "Atlanta Angels, Inc.", @chapter.legal_name
+      assert_nil @chapter.hostname
+    end
+
     test "an organization without a name is refused" do
       patch admin_organization_path(@agency), params: { organization: { name: "" } }
 

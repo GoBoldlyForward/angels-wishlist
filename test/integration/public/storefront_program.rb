@@ -17,9 +17,9 @@ module StorefrontProgram
     @partner = build_organization(name: "Passion City Church", kind: "partner", parent: @chapter,
                                   theme: { stylesheet: "theme-passion" })
     @event = build_event(organization: @chapter, name: "Christmas")
-    @art = Category.create!(name: "Art & Music", icon: "fa-palette", tint: "t5", position: 2,
+    @art = Category.create!(organization: @chapter, name: "Art & Music", icon: "fa-palette", tint: "t5", position: 2,
                             headline: "For the kids who draw, build, and make noise")
-    @clothes = Category.create!(name: "Clothes & Shoes", icon: "fa-shirt", tint: "t1", position: 1,
+    @clothes = Category.create!(organization: @chapter, name: "Clothes & Shoes", icon: "fa-shirt", tint: "t1", position: 1,
                                 headline: "The clothes they actually need this winter")
     @hoodie = CatalogItem.create!(category: @clothes, name: "Hoodie", price_in_cents: 4_000, icon: "🧥")
     @art_set = CatalogItem.create!(category: @art, name: "Art supply set", price_in_cents: 2_000, icon: "🎨")

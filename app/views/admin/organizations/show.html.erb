@@ -39,6 +39,7 @@
             [ "Host name", @organization.hostname || "None. It is reached only as the oldest chapter" ],
             [ "Sends email as", @organization.mail_from ],
             [ "Platform fee", number_to_percentage(@organization.platform_fee_basis_points / 100.0, precision: 2, strip_insignificant_zeros: true) ],
+            [ "Getting paid step", @organization.collects_payout_details? ? "Asked during intake" : "Switched off. Lists come in without payout details" ],
             [ "Organizers", link_to(@organization.organizers.count, admin_organizers_path) ]
           ] %>
         <% end %>

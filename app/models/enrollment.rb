@@ -24,8 +24,37 @@ class Enrollment < ApplicationRecord
     event.wishlists.joins(:child).where(children: { household_id: household_id })
   end
 
-  def step_number
-    INTAKE_STEPS.index(intake_step) + 1
+  # The steps this chapter asks a caregiver for, in order.
+  def intake_steps
+    self.class.intake_steps_for(event.organization)
+  end
+
+  # The step itself, or the next one the chapter asks for when it has switched this one off.
+  def step_from(step)
+    INTAKE_STEPS.drop(INTAKE_STEPS.index(step.to_s)).find { |name| intake_steps.include?(name) }
+  end
+
+  # Plain sentences saying what still stands between this household and
+  # submitting, in the order the caregiver meets them.
+  def blockers
+    lists = wishlists.includes(:line_items).to_a
+    [
+      ("Add at least one child." if household.children.active.none?),
+      ("Finish your Love Box." unless love_box_selection.complete?),
+      ("Add at least one gift to every list." if lists.empty? || lists.any? { |list| list.line_items.listed.none? }),
+      *payout_blockers
+    ].compact
+  end
+
+  # What the Getting paid step still needs, or nothing while the chapter has that step switched off.
+  def payout_blockers
+    return [] unless event.organization.collects_payout_details?
+
+    [
+      ("Choose how you would like to be paid." if household.payout_via_none?),
+      ("Finish connecting with Stripe." if household.payout_via_stripe? && !household.stripe_connected?),
+      ("Agree to how the funds will be spent." unless spending_agreed?)
+    ].compact
   end
 
   def spending_agreed?
@@ -44,20 +73,6 @@ class Enrollment < ApplicationRecord
     blockers.empty?
   end
 
-  # Plain sentences saying what still stands between this household and
-  # submitting, in the order the caregiver meets them.
-  def blockers
-    lists = wishlists.includes(:line_items).to_a
-    [
-      ("Add at least one child." if household.children.active.none?),
-      ("Finish your Love Box." unless love_box_selection.complete?),
-      ("Add at least one gift to every list." if lists.empty? || lists.any? { |list| list.line_items.listed.none? }),
-      ("Choose how you would like to be paid." if household.payout_via_none?),
-      ("Finish connecting with Stripe." if household.payout_via_stripe? && !household.stripe_connected?),
-      ("Agree to how the funds will be spent." unless spending_agreed?)
-    ].compact
-  end
-
   def advance_to!(step)
     update!(intake_step: step.to_s) unless reached?(step)
   end
@@ -71,5 +86,9 @@ class Enrollment < ApplicationRecord
       wishlists.where(status: "draft").find_each(&:submit!)
       update!(submitted_at: Time.current, intake_step: INTAKE_STEPS.last)
     end
+  end
+
+  def self.intake_steps_for(chapter)
+    chapter.collects_payout_details? ? INTAKE_STEPS : INTAKE_STEPS - %w[payout]
   end
 end

@@ -46,12 +46,14 @@
         <div class="fund-line" style="margin-bottom:9px"><span>Children</span><b><%= @lists.size %></b></div>
         <div class="fund-line" style="margin-bottom:9px"><span>Gifts listed</span><b><%= @lists.sum { |list| listed_gifts(list).size } %></b></div>
         <div class="fund-line" style="margin-bottom:14px"><span>If fully funded</span><b><%= money(@lists.sum { |list| gifts_total_in_cents(list) }) %></b></div>
-        <hr style="border:none; border-top:1px solid var(--line-soft); margin:0 0 14px">
-        <div class="t-sm">
-          <b class="ink">Paid by</b><br>
-          <%= payout_summary(current_household) %>
-          <div><%= link_to "Change", caregiver_intake_payout_path, class: "link" %></div>
-        </div>
+        <% if current_chapter.collects_payout_details? %>
+          <hr style="border:none; border-top:1px solid var(--line-soft); margin:0 0 14px">
+          <div class="t-sm">
+            <b class="ink">Paid by</b><br>
+            <%= payout_summary(current_household) %>
+            <div><%= link_to "Change", caregiver_intake_payout_path, class: "link" %></div>
+          </div>
+        <% end %>
 
         <% if @blockers.any? %>
           <div class="panel panel-warm" style="margin-top:18px; padding:16px">

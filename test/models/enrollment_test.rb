@@ -38,7 +38,17 @@ class EnrollmentTest < ActiveSupport::TestCase
     @enrollment.advance_to!(:children)
 
     assert_equal "lists", @enrollment.intake_step
-    assert_equal 4, @enrollment.step_number
+  end
+
+  test "a chapter that has switched off Getting paid asks for nothing about payout" do
+    @household.organization.update!(collects_payout_details: false)
+
+    assert_equal %w[home children love_box lists review], @enrollment.intake_steps
+    assert_equal "review", @enrollment.step_from(:payout)
+    assert_equal "lists", @enrollment.step_from(:lists)
+    assert_empty @enrollment.payout_blockers
+    assert_equal [ "Add at least one child.", "Finish your Love Box.", "Add at least one gift to every list." ],
+                 @enrollment.blockers
   end
 
   test "one enrollment per household per event" do

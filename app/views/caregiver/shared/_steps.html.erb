@@ -7,14 +7,15 @@
     </div>
   <% else %>
     <nav class="steps" aria-label="Steps">
-      <% furthest = current_enrollment ? current_enrollment.step_number - 1 : 0 %>
-      <% Enrollment::INTAKE_STEPS.each_with_index do |name, index| %>
+      <% steps = current_enrollment ? current_enrollment.intake_steps : Enrollment.intake_steps_for(current_chapter) %>
+      <% steps.each_with_index do |name, index| %>
         <% on = name == step %>
-        <% done = !on && index < furthest %>
+        <% reached = current_enrollment&.reached?(name) %>
+        <% done = !on && reached && name != current_enrollment.intake_step %>
         <% content = capture do %>
           <span class="n"><% if done %><i class="fa-solid fa-check"></i><% else %><%= index + 1 %><% end %></span><span class="step-name"><%= Caregiver::IntakeHelper::STEP_LABELS.fetch(name) %></span>
         <% end %>
-        <% if current_enrollment && index <= furthest %>
+        <% if reached %>
           <%= link_to content, intake_step_path(name), class: class_names("step", on: on, done: done), aria: { current: (on ? "step" : nil) } %>
         <% else %>
           <div class="<%= class_names("step", on: on) %>"><%= content %></div>

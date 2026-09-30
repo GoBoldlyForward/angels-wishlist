@@ -55,6 +55,40 @@ is the only file `bin/dev` reads. `DATABASE_URL` goes in `.env.development`, nev
 `DATABASE_URL` in `.env` reaches the test environment too, and `bin/rails test` would then load
 fixtures over the development database. `.env.test` carries the matching test database.
 
+## Configuration
+
+Every key the app reads comes from the environment. Locally they go in `.env`, copied from
+`.env.example`; on Heroku they are config vars. Nothing is read from Rails credentials except
+`secret_key_base`.
+
+| Variable | Needed | What it is for | When it is missing |
+| --- | --- | --- | --- |
+| `RAILS_MASTER_KEY` or `SECRET_KEY_BASE` | production | Signs sessions and Devise tokens. The master key decrypts `config/credentials.yml.enc` | Production does not boot |
+| `DATABASE_URL` | production | Postgres. Heroku sets it | Development and test use the databases named in `config/database.yml` |
+| `APP_HOST` | production | The host in links inside emails, such as password resets | Links point at `localhost:3000` |
+| `STRIPE_SECRET_KEY` | live money | Every call to Stripe: checkout, refunds, chapter and caregiver onboarding, account debits, transfers, chapter balances and bank payouts | Test mode: a banner says so, checkout records the donation without charging, and onboarding and payouts succeed at once without moving money |
+| `STRIPE_WEBHOOK_SECRET` | live money | Verifies the platform's own events at `/stripe/webhooks`: checkouts, refunds, disputes | Webhooks are refused, so a donor who closes the tab after paying is not recorded until they return |
+| `STRIPE_CONNECT_WEBHOOK_SECRET` | live money | Verifies connected accounts' events at the same URL. `account.updated` is what turns a chapter's donations on | A chapter's account is only rechecked when an organizer returns from Stripe onboarding |
+| `SMTP_ADDRESS`, `SMTP_USERNAME`, `SMTP_PASSWORD` | sending mail | The mail provider. `SMTP_PORT` defaults to 587 | Production skips and logs every message, password resets included |
+| `MAIL_FROM` | sending mail | The default sender, such as `Wish List <wishlist@example.org>`. A chapter with its own verified address sends as that instead | Mail comes from `wishlist@example.org` |
+| `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | uploads | Active Storage on S3, for catalog photos and logos. `AWS_REGION` defaults to `us-east-1` and `AWS_BUCKET` to `angels-wishlist`, with the environment name appended | Catalog items show their bundled photos, and uploading a photo or logo fails |
+| `CAREGIVER_HELP_PHONE` | optional | The number caregivers are told to call for help with their lists | The help panel says to call their coordinator, with no number |
+| `PINPOINT_EMBED_URL` | optional | The Pinpoint feedback widget | No widget |
+| `CORS_ORIGINS` | optional | Comma-separated origins allowed to call `/api` | None |
+| `SEED_PASSWORD` | optional | The password every seeded account gets | `password123` |
+| `SEED_DEMO_DATA` | production seeding | Must be `yes` for `db:seed` to run in production, since it replaces every record | The seed refuses to run |
+| `PORT`, `RAILS_MAX_THREADS`, `WEB_CONCURRENCY`, `JOB_CONCURRENCY`, `SOLID_QUEUE_IN_PUMA`, `RAILS_LOG_LEVEL` | optional | Server tuning. Defaults: port 3000, 3 threads, one job process, `info` logs | The defaults |
+
+`STRIPE_PUBLISHABLE_KEY` is not read. Checkout and onboarding both use Stripe's hosted pages, so
+no key reaches the browser.
+
+Stripe needs more than keys before live money moves: a Connect platform account with account
+debits enabled, and each chapter's signed consent to account debits. Point both webhook endpoints,
+the platform's and Connect's, at `https://<host>/stripe/webhooks`. The Connect endpoint needs
+`account.updated`. The platform endpoint needs `checkout.session.completed`,
+`checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`,
+`checkout.session.expired`, `charge.refunded`, and `charge.dispute.created`.
+
 ## The three scopes
 
 | Scope | Prefix | Who | What lives there |
@@ -159,9 +193,11 @@ heroku run bin/rails console -a angels-wishlist
       `--on-brand` contrast: Angels gold on white is 2.9:1 and fails.
 - [ ] **S3.** Create the bucket and set `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`,
       and `AWS_BUCKET`. Production Active Storage already points at the `amazon` service.
-- [ ] **Stripe.** Set `STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY`, and `STRIPE_WEBHOOK_SECRET`.
-      Payment Intents for donations, Connect for caregiver payouts.
-- [ ] **Mail.** Choose a provider and a sending domain. Production has no outgoing mail settings.
+- [ ] **Stripe.** Set `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and
+      `STRIPE_CONNECT_WEBHOOK_SECRET`, enable account debits, and register both webhook endpoints.
+      See [Configuration](#configuration).
+- [ ] **Mail.** Choose a provider and a sending domain, then set `SMTP_ADDRESS`, `SMTP_USERNAME`,
+      `SMTP_PASSWORD`, `MAIL_FROM`, and `APP_HOST`.
 - [ ] **Decisions.** Sixteen questions in the build plan are waiting on Atlanta Angels. The build
       follows a stated assumption for each.
 - [ ] **Demo data.** The seeds replace every record and refuse to run in production unless

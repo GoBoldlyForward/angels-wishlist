@@ -16,6 +16,8 @@ module Caregiver
       assert_select ".child-form", 1
       assert_select ".child-form .hint b", Child::ALIASES.first
       assert_select "input[name$='[display_name]'][value=?]", Child::ALIASES.first
+      assert_select "input[type=radio][name$='[gender]']", 2
+      assert_select "select", 0
     end
 
     test "saving creates each child, an alias, and a draft list with the interests and the note" do

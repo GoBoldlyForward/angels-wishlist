@@ -14,6 +14,11 @@ class LoveBox
     def to_h
       super.stringify_keys
     end
+
+    # Alphabetical, so a caregiver can scan the list, with "No thank you" last.
+    def ordered_options
+      options.sort_by { |option| [ option == DECLINED ? 1 : 0, option.downcase ] }
+    end
   end
 
   DECLINED = "No thank you"
@@ -23,28 +28,28 @@ class LoveBox
     { id: "holiday", label: "Holiday celebrated", picks: 1,
       options: [ "Christmas", "Hanukkah", "Kwanzaa", "Winter themed" ] },
     { id: "cups", label: "Festive cups", picks: 1, asks_count: true,
-      options: [ "One holiday mug per caregiver", "Holiday plastic cups for each member of the family", DECLINED ] },
+      options: [ "Holiday plastic cups for each member of the family", "One holiday mug per caregiver", DECLINED ] },
     { id: "drink", label: "Family drink", picks: 1,
-      options: [ "Hot chocolate", "Apple cider", DECLINED ] },
+      options: [ "Apple cider", "Hot chocolate", DECLINED ] },
     { id: "snack", label: "Family snack", picks: 2, hint: "Pick up to two.",
-      options: [ "Microwave popcorn (box)", "Boxed candy", DECLINED ] },
+      options: [ "Boxed candy", "Microwave popcorn (box)", DECLINED ] },
     { id: "treat", label: "Family treat", picks: 2, large_household_only: true,
-      options: [ "Gingerbread house", "Decorate-a-cookie kit", DECLINED ] },
+      options: [ "Decorate-a-cookie kit", "Gingerbread house", DECLINED ] },
     { id: "game", label: "Family game", picks: 2, large_household_only: true,
-      options: [ "Uno", "Taco Cat Goat Cheese", "Herd Mentality", "Tapple", "Taboo", "Throw Throw Burrito",
-                 "Sushi Go!", DECLINED ] },
+      options: [ "Herd Mentality", "Sushi Go!", "Taboo", "Taco Cat Goat Cheese", "Tapple", "Throw Throw Burrito",
+                 "Uno", DECLINED ] },
     { id: "activity", label: "Family activity", picks: 1,
-      options: [ "Coloring book for teens and adults, with gel pens", "Coloring book for kids, with crayons",
-                 "Family word search book", "Family puzzle", "Family craft kit #1", "Family craft kit #2",
+      options: [ "Coloring book for kids, with crayons", "Coloring book for teens and adults, with gel pens",
+                 "Family craft kit #1", "Family craft kit #2", "Family puzzle", "Family word search book",
                  DECLINED ] },
     { id: "book", label: "Holiday or winter themed book", picks: 1,
-      options: [ "The Snowy Day", "Santa Mouse", "The Polar Express", "The Night Before Christmas", DECLINED ] },
+      options: [ "Santa Mouse", "The Night Before Christmas", "The Polar Express", "The Snowy Day", DECLINED ] },
     { id: "grocery", label: "$25 grocery gift card", picks: 1,
-      options: [ "Walmart", "Target", "Publix", "ALDI", "Trader Joe's" ] },
+      options: [ "ALDI", "Publix", "Target", "Trader Joe's", "Walmart" ] },
     { id: "cozy", label: "Cozy item", picks: 1,
       options: [ "Holiday blanket", "Holiday candle", DECLINED ] },
     { id: "container", label: "Love Box container", picks: 1,
-      options: [ "Cloth", "Cardboard, ready to decorate" ] }
+      options: [ "Cardboard, ready to decorate", "Cloth" ] }
   ].map { |row| Group.from(row).to_h }.freeze
 
   attr_reader :enrollment

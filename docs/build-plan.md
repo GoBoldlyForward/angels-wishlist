@@ -23,7 +23,7 @@ and both describe rules the program no longer follows. Neither should be built f
 | 5. Donor storefront and checkout | Built. Runs in test mode until Stripe keys are set |
 | 6. Close and payouts | Built. Transfers run in test mode until Stripe keys are set |
 | 7. Communications | Written. Nothing is sent until a mail provider is set |
-| 8. Multiple chapters on Stripe Connect | Scoped below. Not started |
+| 8. Multiple chapters on Stripe Connect | Built. Chapter accounts, destination charges, and account debits run in test mode until Stripe keys are set |
 
 **Deployed:** Heroku app `angels-wishlist`, deploying from `main` after CI passes.
 

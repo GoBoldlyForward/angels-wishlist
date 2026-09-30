@@ -10,7 +10,7 @@ class EnrollmentTest < ActiveSupport::TestCase
   end
 
   test "a new enrollment says everything that is missing" do
-    assert_equal [ "Add at least one child.", "Finish your Love Box.", "Add at least one gift to every list.",
+    assert_equal [ "Add at least one child.", "Add at least one gift to every list.", "Finish your Love Box.",
                    "Choose how you would like to be paid.", "Agree to how the funds will be spent." ],
                  @enrollment.blockers
   end
@@ -34,10 +34,10 @@ class EnrollmentTest < ActiveSupport::TestCase
   end
 
   test "intake only moves forward" do
-    @enrollment.advance_to!(:lists)
+    @enrollment.advance_to!(:love_box)
     @enrollment.advance_to!(:children)
 
-    assert_equal "lists", @enrollment.intake_step
+    assert_equal "love_box", @enrollment.intake_step
     assert_equal 4, @enrollment.step_number
   end
 

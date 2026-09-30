@@ -13,7 +13,7 @@ module Caregiver
       return add_child if params[:add_child].present?
       return render :show, status: :unprocessable_entity unless @form.save
 
-      continue_to(:love_box)
+      continue_to(:lists)
     end
 
     private

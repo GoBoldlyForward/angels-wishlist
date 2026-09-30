@@ -9,6 +9,7 @@ module Caregiver
     before_action :require_enrollment
     before_action :require_open_lists
     before_action :require_reached_step
+    before_action :require_offered_step
 
     helper_method :step
 
@@ -32,9 +33,19 @@ module Caregiver
       redirect_to intake_step_path(current_enrollment.intake_step), alert: "Finish this step first."
     end
 
+    # A step the chapter has switched off passes the caregiver on to the next one it asks for.
+    def require_offered_step
+      return if step.nil? || current_enrollment.nil? || current_enrollment.intake_steps.include?(step)
+
+      following = current_enrollment.step_from(step)
+      current_enrollment.advance_to!(following)
+      redirect_to current_enrollment.submitted? ? caregiver_root_path : intake_step_path(following)
+    end
+
     # Before submitting, a saved step leads to the next one. Afterwards the
     # caregiver is editing from the dashboard and goes back to it.
     def continue_to(next_step)
+      next_step = current_enrollment.step_from(next_step)
       current_enrollment.advance_to!(next_step)
       return redirect_to caregiver_root_path, notice: "Saved.", status: :see_other if current_enrollment.submitted?
 

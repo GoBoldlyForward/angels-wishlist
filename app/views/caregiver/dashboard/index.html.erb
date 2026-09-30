@@ -92,11 +92,19 @@
         <hr style="border:none; border-top:1px solid var(--line-soft); margin:0 0 14px">
         <div class="t-sm" style="margin-bottom:14px">
           <b class="ink">Paid by</b><br>
-          <%= payout_summary(current_household) %>
-          <% if current_household.payout_via_stripe? && !current_household.stripe_connected? %>
-            <div class="field-error">Stripe is not connected yet.</div>
+          <% if current_chapter.collects_payout_details? %>
+            <%= payout_summary(current_household) %>
+            <% if current_household.payout_via_stripe? && !current_household.stripe_connected? %>
+              <div class="field-error">Stripe is not connected yet.</div>
+            <% elsif current_enrollment.payout_blockers.any? %>
+              <div class="field-error">We need this before your share can be sent.</div>
+            <% end %>
+            <% if open_for_edits %><div><%= link_to (current_enrollment.payout_blockers.any? ? "Set it up" : "Change"), caregiver_intake_payout_path, class: "link" %></div><% end %>
+          <% elsif current_household.payout_via_none? %>
+            We will ask how you would like to be paid before your share is sent.
+          <% else %>
+            <%= payout_summary(current_household) %>
           <% end %>
-          <% if open_for_edits %><div><%= link_to "Change", caregiver_intake_payout_path, class: "link" %></div><% end %>
         </div>
 
         <hr style="border:none; border-top:1px solid var(--line-soft); margin:0 0 14px">

@@ -247,6 +247,9 @@ The six steps in the prototype, saved as the caregiver goes so they can return.
 - Stripe's hosted onboarding collects identity and account details. None of it touches this
   application.
 - The review step shows each child exactly as a donor will see them.
+- A chapter can switch the Getting paid step off from its organization page, to take lists before
+  Stripe is ready. Lists are then submitted without a payout method or the agreement, and the
+  household's payout stays blocked. Once the step is back on, the dashboard asks for it.
 - After submitting, the caregiver's dashboard shows each list's status and lets them edit until
   the event closes.
 

@@ -61,6 +61,16 @@
               <%= form.text_field :mail_from, class: "form-control", placeholder: "Wish List <wishlist@yourchapter.org>" %>
               <div class="form-text">The address must be verified with the mail provider.</div>
             </div>
+            <div class="col-12">
+              <div class="form-check">
+                <%= form.check_box :collects_payout_details, class: "form-check-input" %>
+                <%= form.label :collects_payout_details, "Ask caregivers how they want to be paid", class: "form-check-label" %>
+              </div>
+              <div class="form-text">
+                The Getting paid step of intake, with the spending agreement. Switch it off to take lists before Stripe is ready.
+                Caregivers who sent lists in without it are asked for it on their dashboard once it is back on.
+              </div>
+            </div>
             <% if current_user.admin? %>
               <div class="col-md-8">
                 <%= form.label :hostname, "Host name", class: "form-label" %>

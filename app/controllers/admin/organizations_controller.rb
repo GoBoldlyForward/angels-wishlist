@@ -2,7 +2,8 @@
 
 module Admin
   class OrganizationsController < BaseController
-    FIELDS = %i[name short_name kind website_url active co_brand_line theme_stylesheet legal_name ein mail_from].freeze
+    FIELDS = %i[name short_name kind website_url active co_brand_line theme_stylesheet legal_name ein mail_from
+                collects_payout_details].freeze
     ADMIN_FIELDS = %i[hostname platform_fee_basis_points].freeze
 
     skip_before_action :require_chapter, only: %i[index new create]

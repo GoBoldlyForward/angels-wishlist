@@ -72,7 +72,7 @@
     <div class="container sticky-in flow-screen">
       <span class="tiny muted">One box per household.</span>
       <button class="btn btn-primary" type="submit">
-        <%= current_enrollment.submitted? ? "Save" : "Set up how you get paid" %> <i class="fa-solid fa-arrow-right"></i>
+        <%= current_enrollment.submitted? ? "Save" : (current_enrollment.step_from(:payout) == "payout" ? "Set up how you get paid" : "Review and submit") %> <i class="fa-solid fa-arrow-right"></i>
       </button>
     </div>
   </div>

@@ -124,6 +124,22 @@ module Admin
       assert_nil @chapter.hostname
     end
 
+    test "an organizer switches the Getting paid step off and back on" do
+      sign_in build_organizer(organization: @chapter)
+
+      get edit_admin_organization_path(@chapter)
+      assert_select "input[type=checkbox][name=?][checked]", "organization[collects_payout_details]"
+
+      patch admin_organization_path(@chapter), params: { organization: { collects_payout_details: "0" } }
+      assert_not @chapter.reload.collects_payout_details?
+
+      get admin_organization_path(@chapter)
+      assert_select "dd", text: "Switched off. Lists come in without payout details"
+
+      patch admin_organization_path(@chapter), params: { organization: { collects_payout_details: "1" } }
+      assert @chapter.reload.collects_payout_details?
+    end
+
     test "an organization without a name is refused" do
       patch admin_organization_path(@agency), params: { organization: { name: "" } }
 

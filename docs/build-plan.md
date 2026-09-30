@@ -236,8 +236,8 @@ The six steps in the prototype, saved as the caregiver goes so they can return.
 | --- | --- |
 | Your home | the caregiver's user, the household, its address and county |
 | The children | each child, an assigned alias, and a draft wishlist holding interests and the note |
-| Love Box | the enrollment's choices |
 | Their lists | line items, matched to the catalog where one name fits |
+| Love Box | the enrollment's choices |
 | Getting paid | the payout method, a Stripe Connect account or a mailing address, and the agreement |
 | Review | submits every list for review |
 

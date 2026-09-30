@@ -18,7 +18,7 @@ module Caregiver
 
     def finish
       empty = @lists.find { |list| list.line_items.none? { |line| !line.withdrawn_status? } }
-      return continue_to(:payout) if empty.nil?
+      return continue_to(:love_box) if empty.nil?
 
       redirect_to caregiver_intake_list_path(empty), status: :see_other,
                   alert: "Add at least one gift for #{empty.child.legal_first_name}."

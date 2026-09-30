@@ -29,14 +29,14 @@ module Caregiver
       assert_select ".hint", "Households with more than five kids pick two."
     end
 
-    test "a full box is saved and leads to the lists" do
+    test "a full box is saved and leads to getting paid" do
       patch caregiver_intake_love_box_path, params: { love_box: full_love_box }
 
-      assert_redirected_to caregiver_intake_lists_path
+      assert_redirected_to caregiver_intake_payout_path
       box = @enrollment.reload.love_box_selection
       assert box.complete?
       assert_equal "One holiday mug per caregiver (2)", box.summary_for(box.groups.second)
-      assert_equal "lists", @enrollment.intake_step
+      assert_equal "payout", @enrollment.intake_step
     end
 
     test "a half-finished box is saved and says what is missing" do
@@ -58,7 +58,7 @@ module Caregiver
       assert_select ".panel", /nothing to choose for the Love Box yet/
 
       patch caregiver_intake_love_box_path
-      assert_redirected_to caregiver_intake_lists_path
+      assert_redirected_to caregiver_intake_payout_path
     end
 
     test "an option the event does not offer is dropped" do

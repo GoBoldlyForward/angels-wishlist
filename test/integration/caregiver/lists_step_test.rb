@@ -124,13 +124,13 @@ module Caregiver
       assert_equal "lists", @enrollment.reload.intake_step
     end
 
-    test "moving on leads to getting paid" do
+    test "moving on leads to the Love Box" do
       build_line_item(wishlist: @list)
 
       patch finish_caregiver_intake_lists_path
 
-      assert_redirected_to caregiver_intake_payout_path
-      assert_equal "payout", @enrollment.reload.intake_step
+      assert_redirected_to caregiver_intake_love_box_path
+      assert_equal "love_box", @enrollment.reload.intake_step
     end
 
     test "changing a live list sends it back to review" do

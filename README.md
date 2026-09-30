@@ -38,15 +38,61 @@ the $200 cap. A small Nashville chapter with one open event gives the organizati
 somewhere to go. Every seeded write runs as the user who would have made it, so the audit trail
 reads as caregivers building lists, Sam verifying and approving, and donors giving.
 
-Every seeded account signs in with `password123`. Set `SEED_PASSWORD` to choose another.
+### Signing in as each role
 
-| Account | Role | What it reaches |
-| --- | --- | --- |
-| `admin@wishlist.example.org` | admin | `/admin` for any chapter |
-| `regional@angels.example.org` | organizer | `/admin` for Atlanta and Nashville, the switcher case |
-| `staff@atlantaangels.example.org` | organizer | `/admin` for Atlanta only |
-| `serve@passioncity.example.org` | organizer | nothing yet: a partner's organizer has no staff pages |
-| `denise.brooks@example.com` | caregiver | `/caregiver`, as does any other seeded caregiver |
+Everyone signs in at http://localhost:3000/users/sign_in and lands on their own home page. The
+username is the email. Every seeded account's password is `password123`, unless `SEED_PASSWORD`
+was set when the seed ran.
+
+| Role | URL | Username | Password | What it reaches |
+| --- | --- | --- | --- | --- |
+| Donor | http://localhost:3000/ | none | none | The Atlanta storefront. Donors give as guests and never sign in |
+| Donor, partner storefront | http://localhost:3000/with/passion-city-church | none | none | The same drive in the Passion City skin |
+| Donor, second chapter | http://nashville.localhost:3000/ | none | none | The Nashville storefront, chosen by hostname |
+| Caregiver | http://localhost:3000/caregiver | `denise.brooks@example.com` | `password123` | Their household, children, lists, and payout. Any other seeded caregiver works the same way |
+| Organizer, one chapter | http://localhost:3000/admin | `staff@atlantaangels.example.org` | `password123` | Staff pages for Atlanta only |
+| Organizer, two chapters | http://localhost:3000/admin | `regional@angels.example.org` | `password123` | Staff pages for Atlanta and Nashville, the switcher case |
+| Organizer, Nashville | http://localhost:3000/admin | `staff@nashvilleangels.example.org` | `password123` | Staff pages for Nashville only |
+| Organizer, partner | http://localhost:3000/admin | `serve@passioncity.example.org` | `password123` | Nothing yet: a partner's organizer has no staff pages and is sent back to the storefront |
+| Admin | http://localhost:3000/admin | `admin@wishlist.example.org` | `password123` | Staff pages for any chapter, plus chapter setup |
+
+To get the same sign-ins in an environment that was not seeded, paste this into `bin/rails console`
+there (`heroku run bin/rails console -a angels-wishlist` for production). It deletes nothing and
+can be run again: it creates the admin, an organizer on the oldest chapter, and a caregiver with no
+household yet, who lands in intake. Running it again resets those three passwords. Change
+`password` before pasting it anywhere real.
+
+```ruby
+password = "password123"
+
+accounts = [
+  { email: "admin@wishlist.example.org", role: "admin", first_name: "Ada", last_name: "Byrne" },
+  { email: "staff@atlantaangels.example.org", role: "organizer", first_name: "Sam", last_name: "Reed" },
+  { email: "denise.brooks@example.com", role: "caregiver", first_name: "Denise", last_name: "Brooks" }
+]
+
+users = accounts.map do |attributes|
+  user = User.find_or_initialize_by(email: attributes[:email])
+  user.update!(attributes.merge(password: password))
+  user
+end
+
+chapter = Organization.chapter.order(:id).first
+organizer = users.find(&:organizer?)
+OrganizationMembership.find_or_create_by!(user: organizer, organization: chapter) if chapter
+
+host = ENV.fetch("APP_HOST", "localhost:3000")
+users.each do |user|
+  path = user.caregiver? ? "/caregiver" : "/admin"
+  puts "#{user.role.ljust(10)} #{user.email.ljust(34)} #{password}  #{host}#{path}"
+end
+puts "No chapter exists yet, so the organizer has no staff pages. Sign in as the admin and add one." unless chapter
+```
+
+The other caregivers are `grace.okafor`, `marcus.vance`, `rosa.delgado`, `tamika.whitfield`,
+`carmen.alvarez`, `kofi.boateng`, `renee.sinclair`, `mai.tran`, and `pam.whitaker`, each
+`@example.com`. Renee's household is still awaiting verification and Pam's is on hold, which makes
+them the accounts to use for those two states.
 
 ### A second checkout
 

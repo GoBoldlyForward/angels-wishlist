@@ -113,7 +113,8 @@
         <%= f.check_box :agreed, disabled: current_enrollment.spending_agreed? %>
         <span class="t-base"><b class="ink">By accepting these funds, I agree to use them for holiday gifts for the
         child each list is for.</b> If something on a list no longer fits or is no longer wanted, I will spend that
-        money on what that child actually needs.</span>
+        money on what that child actually needs. After the holidays, I will upload photos of what I bought and/or
+        the receipts.</span>
       </label>
       <% if current_enrollment.spending_agreed? %>
         <p class="hint" style="margin:10px 0 0 32px">You agreed on <%= event_day(current_enrollment.spending_agreed_at) %>.</p>

@@ -89,9 +89,11 @@ If every child asks for $200 and donors give 75% of the total asked, every list 
 ### Households
 
 - Staff verify a household before any of its lists go live.
-- The caregiver agrees to spend the funds on holiday gifts for the child each list is for.
-- Every household customizes one Love Box per event. It is separate from the gift funds.
-- Caregivers are not asked for receipts.
+- The caregiver agrees to spend the funds on holiday gifts for the child each list is for, and to
+  share photos of what they bought and/or the receipts after the holidays. Collecting those is
+  not built; staff ask for them.
+- Every household customizes one Love Box per event. It is separate from the gift funds, and it
+  always comes in a decorated cardboard box.
 
 ### What donors can see
 

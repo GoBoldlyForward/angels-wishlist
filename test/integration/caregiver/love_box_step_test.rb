@@ -22,6 +22,14 @@ module Caregiver
       assert_select ".disclosure", /separate from the gift funds/
     end
 
+    test "one craft kit is offered among two activities, and the box itself is not a choice" do
+      get caregiver_intake_love_box_path
+
+      assert_select "input[type=checkbox][name=?][value=?]", "love_box[activity][picks][]", "Family craft kit", 1
+      assert_select "input[name=?]", "love_box[activity][picks][]", 6
+      assert_select "fieldset legend", text: /container/i, count: 0
+    end
+
     test "options read alphabetically with no thank you last, however the event lists them" do
       @event.update!(love_box_options: [ { id: "grocery", label: "$25 grocery gift card",
                                            options: [ "Walmart", "No thank you", "ALDI", "Trader Joe's" ] } ])

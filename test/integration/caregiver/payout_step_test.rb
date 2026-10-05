@@ -19,6 +19,7 @@ module Caregiver
       assert_select ".step-lede", /#{@event.closes_at.strftime("%B %-d")}/
       assert_select "label.agree", /By accepting these funds, I agree to use them for holiday gifts for the\s+child each list is for\./
       assert_select "label.agree", /I will spend that\s+money on what that child actually needs\./
+      assert_select "label.agree", /After the holidays, I will upload photos of what I bought and\/or\s+the receipts\./
     end
 
     test "connecting with Stripe goes to onboarding and comes back connected" do

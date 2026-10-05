@@ -38,18 +38,15 @@ class LoveBox
     { id: "game", label: "Family game", picks: 2, large_household_only: true,
       options: [ "Herd Mentality", "Sushi Go!", "Taboo", "Taco Cat Goat Cheese", "Tapple", "Throw Throw Burrito",
                  "Uno", DECLINED ] },
-    { id: "activity", label: "Family activity", picks: 1,
+    { id: "activity", label: "Family activity", picks: 2, hint: "Pick up to two.",
       options: [ "Coloring book for kids, with crayons", "Coloring book for teens and adults, with gel pens",
-                 "Family craft kit #1", "Family craft kit #2", "Family puzzle", "Family word search book",
-                 DECLINED ] },
+                 "Family craft kit", "Family puzzle", "Family word search book", DECLINED ] },
     { id: "book", label: "Holiday or winter themed book", picks: 1,
       options: [ "Santa Mouse", "The Night Before Christmas", "The Polar Express", "The Snowy Day", DECLINED ] },
     { id: "grocery", label: "$25 grocery gift card", picks: 1,
       options: [ "ALDI", "Publix", "Target", "Trader Joe's", "Walmart" ] },
     { id: "cozy", label: "Cozy item", picks: 1,
-      options: [ "Holiday blanket", "Holiday candle", DECLINED ] },
-    { id: "container", label: "Love Box container", picks: 1,
-      options: [ "Cardboard, ready to decorate", "Cloth" ] }
+      options: [ "Holiday blanket", "Holiday candle", DECLINED ] }
   ].map { |row| Group.from(row).to_h }.freeze
 
   attr_reader :enrollment

@@ -43,7 +43,7 @@ class LoveBox
                  "Family craft kit", "Family puzzle", "Family word search book", DECLINED ] },
     { id: "book", label: "Holiday or winter themed book", picks: 1,
       options: [ "Santa Mouse", "The Night Before Christmas", "The Polar Express", "The Snowy Day", DECLINED ] },
-    { id: "grocery", label: "$25 grocery gift card", picks: 1,
+    { id: "grocery", label: "Your preferred grocery store", picks: 1,
       options: [ "ALDI", "Publix", "Target", "Trader Joe's", "Walmart" ] },
     { id: "cozy", label: "Cozy item", picks: 1,
       options: [ "Holiday blanket", "Holiday candle", DECLINED ] }

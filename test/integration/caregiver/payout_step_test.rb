@@ -15,6 +15,7 @@ module Caregiver
 
       assert_response :success
       assert_select "input[type=radio][name=?]", "payout[payout_method]", 2
+      assert_select "li", "In your account one to two business days after Atlanta Angels releases the funds"
       assert_select ".step-lede", /your household's share/
       assert_select ".step-lede", /#{@event.closes_at.strftime("%B %-d")}/
       assert_select "label.agree", /By accepting these funds, I agree to use them for holiday gifts for the\s+child each list is for\./

@@ -33,7 +33,7 @@ and both describe rules the program no longer follows. Neither should be built f
 | --- | --- |
 | `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` | A banner says test mode. Checkout records the donation without charging. Caregiver onboarding and transfers succeed at once without moving money |
 | `SMTP_ADDRESS`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `MAIL_FROM` | Every message is skipped and logged. Password reset emails do not arrive |
-| An S3 bucket and its credentials | Catalog items show the photos bundled with the app. Uploading a photo or a logo fails |
+| An S3 bucket and its credentials | Catalog items show the photos bundled with the app, and a chapter's header mark is the one bundled under `app/assets/images/chapters/<slug>.png` when there is one. Uploading a photo or a logo fails |
 | `CAREGIVER_HELP_PHONE` | The caregiver help dialog says to call a coordinator but gives no number |
 
 ### Where the build departs from this plan

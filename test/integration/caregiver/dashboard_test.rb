@@ -17,6 +17,7 @@ module Caregiver
       get caregiver_root_path
 
       assert_response :success
+      assert_select ".brand img[src*=?]", "chapters/atlanta-angels"
       assert_select "h1", "Your lists for #{@event.name}"
       assert_select "#list-#{@list.id} .status-in_review", "In review"
       assert_select "#list-#{@list.id} .gift-row", 2

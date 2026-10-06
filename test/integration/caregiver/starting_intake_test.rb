@@ -28,11 +28,11 @@ module Caregiver
       assert_response :success
       assert_select "input[name=?]", "home[password]"
       assert_select "select[name=?] option", "home[county]", count: Household::COUNTIES.size + 1
+      assert_select "input[name=?]", "home[street_line_1]", count: 0
     end
 
-    test "starting intake creates the caregiver, the household, its address, and the enrollment" do
-      assert_difference -> { User.caregiver.count } => 1, -> { Household.count } => 1, -> { Address.count } => 1,
-                        -> { Enrollment.count } => 1 do
+    test "starting intake creates the caregiver, the household, and the enrollment" do
+      assert_difference -> { User.caregiver.count } => 1, -> { Household.count } => 1, -> { Enrollment.count } => 1 do
         submit_home(home_fields)
       end
 
@@ -44,30 +44,10 @@ module Caregiver
       assert_equal "The Okafor home", household.display_name
       assert_equal "DeKalb", household.county
       assert_equal "pending", household.verification_status
-      assert_equal "1420 Peachtree Way, Decatur, GA 30030", household.mailing_address.to_s
       assert_equal "children", household.enrollment_for(@event).intake_step
 
       follow_redirect!
       assert_response :success, "the new caregiver is signed in"
-    end
-
-    test "the address is optional" do
-      assert_no_difference -> { Address.count } do
-        submit_home(home_fields(street_line_1: "", city: "", zipcode: ""))
-      end
-
-      assert_redirected_to caregiver_intake_children_path
-      assert_nil User.find_by!(email: "tanya.okafor@example.com").households.sole.mailing_address
-    end
-
-    test "half an address is refused" do
-      assert_no_difference -> { User.count } do
-        submit_home(home_fields(city: "", zipcode: "3003"))
-      end
-
-      assert_response :unprocessable_entity
-      assert_select ".field-error", "City can't be blank."
-      assert_select ".field-error", "ZIP must be 5 or 9 digits."
     end
 
     test "missing answers are named" do
@@ -113,7 +93,6 @@ module Caregiver
 
       assert_redirected_to caregiver_intake_children_path
       assert_equal "Henry", household.reload.county
-      assert_equal "Decatur", household.mailing_address.city
       assert_equal "lists", enrollment.reload.intake_step
       assert users(:caregiver).reload.valid_password?("password123")
     end

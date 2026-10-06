@@ -48,8 +48,7 @@ module Caregiver
 
     def home_fields(**overrides)
       { first_name: "Tanya", last_name: "Okafor", email: "tanya.okafor@example.com", password: "password123",
-        phone: "(404) 867-5309", county: "DeKalb", street_line_1: "1420 Peachtree Way", city: "Decatur",
-        zipcode: "30030" }.merge(overrides)
+        phone: "(404) 867-5309", county: "DeKalb" }.merge(overrides)
     end
   end
 end

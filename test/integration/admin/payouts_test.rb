@@ -7,7 +7,7 @@ module Admin
     setup do
       @brooks, = build_list(asking: [ 20_000 ], display_name: "The Brooks home")
       @okafor, = build_list(asking: [ 10_000, 3_333 ], display_name: "The Okafor home", payout_method: "gift_card",
-                            stripe_account_id: nil, mailing_address: build_address)
+                            stripe_account_id: nil, gift_card_email: "okafor@example.com")
       @pending, = build_list(asking: [ 15_000 ], display_name: "The Pending home", verification_status: "pending")
       @no_method, = build_list(asking: [ 7_001 ], display_name: "The Nowhere home", payout_method: "none",
                                stripe_account_id: nil)
@@ -82,7 +82,8 @@ module Admin
 
       get admin_payouts_path(f: { method: "gift_card" })
       assert_select "tbody tr", 1
-      assert_select "td", text: /Mailed gift card/
+      assert_select "td", text: /Emailed gift card/
+      assert_select "td", text: "okafor@example.com"
     end
 
     test "the index exports to CSV" do
@@ -112,21 +113,34 @@ module Admin
       assert payout.sent_at.present?
     end
 
-    test "a gift card payout needs its tracking number" do
+    test "a gift card payout is recorded as ordered in Tremendous, with the order ID when staff have it" do
+      post build_admin_payouts_path
+      payout = @event.payouts.find_by(household: @okafor)
+      assert_equal "okafor@example.com", payout.gift_card_email
+
+      get admin_payout_path(payout)
+      assert_select "p", /Order a \$[\d.,]+ gift card in Tremendous for okafor@example\.com/
+      assert_select "input[name=?][required]", "payout[gift_card_order_id]", count: 0
+
+      assert_enqueued_emails 1 do
+        patch send_funds_admin_payout_path(payout), params: { payout: { gift_card_order_id: " ORD-7F3K " } }
+      end
+      assert payout.reload.sent?
+      assert_equal "ORD-7F3K", payout.gift_card_order_id
+
+      email = CaregiverMailer.payout_sent(payout)
+      assert_match(/sent as a gift card to okafor@example\.com/, email.body.to_s)
+      assert_match(/email from Tremendous/, email.body.to_s)
+      assert_no_match(/mailed|tracking/, email.body.to_s)
+    end
+
+    test "a gift card household with no email for it is blocked" do
+      @okafor.update!(gift_card_email: nil)
       post build_admin_payouts_path
       payout = @event.payouts.find_by(household: @okafor)
 
-      assert_no_enqueued_emails do
-        patch send_funds_admin_payout_path(payout), params: { payout: { gift_card_tracking_number: " " } }
-      end
-      assert payout.reload.scheduled?
-      assert_match(/tracking number/, flash[:alert])
-
-      assert_enqueued_emails 1 do
-        patch send_funds_admin_payout_path(payout), params: { payout: { gift_card_tracking_number: "9400 1000 0000" } }
-      end
-      assert payout.reload.sent?
-      assert_equal "9400 1000 0000", payout.gift_card_tracking_number
+      assert payout.blocked?
+      assert_equal "No email address for the gift card.", payout.blocker
     end
 
     test "a blocked payout cannot be sent and says why" do
@@ -203,12 +217,6 @@ module Admin
       assert_no_changes -> { payout.reload.amount_in_cents } do
         patch send_funds_admin_payout_path(payout), params: { payout: { amount_in_cents: 1 } }
       end
-    end
-
-    private
-
-    def build_address
-      Address.create!(street_line_1: "12 Peachtree St", city: "Atlanta", state: "GA", zipcode: "30303")
     end
   end
 end

@@ -26,7 +26,7 @@ module Caregiver
     end
 
     def payout_params
-      params.expect(payout: %i[payout_method agreed street_line_1 city zipcode])
+      params.expect(payout: %i[payout_method agreed gift_card_email])
     end
   end
 end

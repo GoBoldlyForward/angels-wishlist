@@ -79,12 +79,11 @@ module Caregiver
       assert_select ".field-error", "We need this before your share can be sent."
       assert_select "a[href=?]", caregiver_intake_payout_path, text: "Set it up"
 
-      patch caregiver_intake_payout_path, params: { payout: {
-        payout_method: "gift_card", agreed: "1", street_line_1: "88 Magnolia Court", city: "Jonesboro", zipcode: "30236"
-      } }
+      patch caregiver_intake_payout_path, params: { payout: { payout_method: "gift_card", agreed: "1" } }
 
       assert_redirected_to caregiver_root_path
       assert @household.reload.payout_via_gift_card?
+      assert_equal users(:caregiver).email, @household.gift_card_email, "the account email unless another is given"
       assert @enrollment.reload.spending_agreed?
     end
   end

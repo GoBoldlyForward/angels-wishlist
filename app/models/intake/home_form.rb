@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
 module Intake
-  # Step one: the caregiver's account, the household, where it lives, and its
+  # Step one: the caregiver's account, the household, its county, and its
   # place in this event.
   class HomeForm
     include ActiveModel::Model
     include ActiveModel::Attributes
-    include MailingAddress
 
-    LABELS = { phone: "Mobile number", street_line_1: "Home address", zipcode: "ZIP" }.freeze
+    LABELS = { phone: "Mobile number" }.freeze
     PHONE_COUNTRY = "US"
 
     attribute :first_name, :string
@@ -42,7 +41,6 @@ module Intake
         user.update!(account_attributes)
         @household ||= Household.new(organization: @organization, caregiver: user)
         household.update!(county: county)
-        write_address_to(household)
         @enrollment = household.enrollments.find_or_create_by!(event: @event)
         enrollment.advance_to!(:children)
       end
@@ -77,7 +75,6 @@ module Intake
       assign_attributes(user.slice(:first_name, :last_name, :email))
       self.phone = parsed_phone(user.phone).national if user.phone.present?
       self.county = household&.county
-      read_address_from(household)
     end
 
     def account_attributes

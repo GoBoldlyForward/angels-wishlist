@@ -66,7 +66,7 @@
         [ "Phone", caregiver&.phone ],
         [ "Preferred language", caregiver&.preferred_language ],
         [ "County", @household.county ],
-        [ "Mailing address", @household.mailing_address&.to_s ],
+        [ "Email for the gift card", (@household.gift_card_email if @household.payout_via_gift_card?) ],
         [ "Joined", safe_join([ l(@household.created_at.to_date, format: :long), (" · returning caregiver" if @household.returning?) ]) ]
       ] %>
     <% end %>

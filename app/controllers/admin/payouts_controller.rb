@@ -24,7 +24,7 @@ module Admin
     end
 
     def send_funds
-      dispatch = PayoutDispatch.new(@payout, tracking_number: params.dig(:payout, :gift_card_tracking_number))
+      dispatch = PayoutDispatch.new(@payout, order_id: params.dig(:payout, :gift_card_order_id))
 
       if dispatch.call
         redirect_to admin_payout_path(@payout), notice: "Sent. #{@payout.household.caregiver.email} has been told."
@@ -43,7 +43,7 @@ module Admin
     private
 
     def set_payout
-      @payout = Payout.where(event: current_chapter.events).includes(household: %i[caregiver mailing_address])
+      @payout = Payout.where(event: current_chapter.events).includes(household: :caregiver)
                       .find(params[:id])
     end
   end

@@ -5,7 +5,7 @@ class Household < ApplicationRecord
   include PgSearch::Model
   acts_as_paranoid
   has_paper_trail only: %i[verification_status verified_at hold_reason payout_method stripe_account_id
-                           stripe_onboarded_at mailing_address_id],
+                           stripe_onboarded_at gift_card_email],
                   meta: { organization_id: :organization_id }
 
   COUNTIES = [ "Clayton", "Cobb", "DeKalb", "Douglas", "Fulton", "Gwinnett", "Henry", "Rockdale",
@@ -14,7 +14,6 @@ class Household < ApplicationRecord
   belongs_to :organization
   belongs_to :placing_organization, class_name: "Organization", optional: true
   belongs_to :caregiver, class_name: "User"
-  belongs_to :mailing_address, class_name: "Address", optional: true
 
   has_many :children, dependent: :destroy
   has_many :wishlists, through: :children
@@ -23,13 +22,14 @@ class Household < ApplicationRecord
   has_many :payouts, dependent: :destroy
 
   accepts_nested_attributes_for :children, allow_destroy: true
-  accepts_nested_attributes_for :mailing_address, update_only: true
 
   pg_search_scope :search, against: %i[display_name county],
                   associated_against: { caregiver: %i[first_name last_name email] },
                   using: { tsearch: { prefix: true } }
 
   friendly_id :display_name, use: :slugged
+
+  normalizes :gift_card_email, with: ->(email) { email.strip.downcase.presence }
 
   enum :verification_status, { pending: "pending", verified: "verified", hold: "hold" },
        prefix: :verification, validate: true
@@ -41,6 +41,7 @@ class Household < ApplicationRecord
 
   validates :display_name, presence: true
   validates :hold_reason, presence: true, if: :verification_hold?
+  validates :gift_card_email, 'valid_email_2/email': { mx: false }, allow_blank: true
 
   before_validation :name_after_caregiver, on: :create
 
@@ -76,7 +77,7 @@ class Household < ApplicationRecord
     return "Verification has not cleared." unless verification_verified?
     return "No payout method on file." if payout_via_none?
     return "Stripe onboarding is not finished." if payout_via_stripe? && !stripe_connected?
-    return "No mailing address for the gift card." if payout_via_gift_card? && mailing_address.blank?
+    return "No email address for the gift card." if payout_via_gift_card? && gift_card_email.blank?
 
     nil
   end

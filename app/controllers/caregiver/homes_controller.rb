@@ -46,7 +46,7 @@ module Caregiver
     end
 
     def home_params
-      params.expect(home: %i[first_name last_name email password phone county street_line_1 city zipcode])
+      params.expect(home: %i[first_name last_name email password phone county])
     end
   end
 end

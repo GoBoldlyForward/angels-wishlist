@@ -16,6 +16,10 @@ module Caregiver
       assert_response :success
       assert_select "input[type=radio][name=?]", "payout[payout_method]", 2
       assert_select "li", "In your account one to two business days after Atlanta Angels releases the funds"
+      assert_select "h3", "Visa gift card by email"
+      assert_select "li", "Emailed as soon as Atlanta Angels releases the funds"
+      assert_select "li", text: /mail\b/, count: 0
+      assert_select "input[name=?][value=?]", "payout[gift_card_email]", users(:caregiver).email
       assert_select ".step-lede", /your household's share/
       assert_select ".step-lede", /#{@event.closes_at.strftime("%B %-d")}/
       assert_select "label.agree", /By accepting these funds, I agree to use them for holiday gifts for the\s+child each list is for\./
@@ -84,21 +88,32 @@ module Caregiver
       assert_equal "review", @enrollment.intake_step
     end
 
-    test "a gift card is mailed to the address given" do
+    test "a gift card goes to the email given" do
       patch caregiver_intake_payout_path, params: { payout: {
-        payout_method: "gift_card", agreed: "1", street_line_1: "88 Magnolia Court", city: "Jonesboro", zipcode: "30236"
+        payout_method: "gift_card", agreed: "1", gift_card_email: " Denise.Cards@Example.com "
       } }
 
       assert_redirected_to caregiver_intake_review_path
       assert @household.reload.payout_via_gift_card?
-      assert_equal "88 Magnolia Court, Jonesboro, GA 30236", @household.mailing_address.to_s
+      assert_equal "denise.cards@example.com", @household.gift_card_email
+
+      follow_redirect!
+      assert_select ".review-side", /Visa gift card emailed to denise\.cards@example\.com/
     end
 
     test "a gift card needs somewhere to go" do
-      patch caregiver_intake_payout_path, params: { payout: { payout_method: "gift_card", agreed: "1" } }
+      patch caregiver_intake_payout_path, params: { payout: { payout_method: "gift_card", agreed: "1", gift_card_email: "" } }
 
       assert_response :unprocessable_entity
-      assert_select ".field-error", "Mailing address can't be blank."
+      assert_select ".field-error", "Email for the gift card can't be blank."
+      assert @household.reload.payout_via_none?
+    end
+
+    test "the gift card email has to be one" do
+      patch caregiver_intake_payout_path, params: { payout: { payout_method: "gift_card", agreed: "1", gift_card_email: "denise at example" } }
+
+      assert_response :unprocessable_entity
+      assert_select ".field-error", "Email for the gift card is invalid."
       assert @household.reload.payout_via_none?
     end
 

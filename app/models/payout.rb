@@ -2,12 +2,11 @@
 
 class Payout < ApplicationRecord
   acts_as_paranoid
-  has_paper_trail only: %i[status amount_in_cents hold_reason stripe_debit_id stripe_transfer_id gift_card_tracking_number],
+  has_paper_trail only: %i[status amount_in_cents hold_reason stripe_debit_id stripe_transfer_id gift_card_email gift_card_order_id],
                   meta: { organization_id: ->(payout) { payout.event.organization_id } }
 
   belongs_to :household
   belongs_to :event
-  belongs_to :mailing_address, class_name: "Address", optional: true
 
   enum :method, { stripe: "stripe", gift_card: "gift_card" }, prefix: :via, validate: { allow_nil: true }
   enum :status, { blocked: "blocked", scheduled: "scheduled", sent: "sent", delivered: "delivered",
@@ -28,7 +27,7 @@ class Payout < ApplicationRecord
   end
 
   def destination
-    via_stripe? ? household.stripe_account_id : mailing_address&.to_s
+    via_stripe? ? household.stripe_account_id : gift_card_email
   end
 
   def blocker
@@ -46,17 +45,17 @@ class Payout < ApplicationRecord
     update!(
       amount_in_cents: share_in_cents,
       method: household.payout_via_none? ? nil : household.payout_method,
-      mailing_address: household.payout_via_gift_card? ? household.mailing_address : nil,
+      gift_card_email: household.payout_via_gift_card? ? household.gift_card_email : nil,
       scheduled_for: event.payout_at,
       status: household.verification_hold? ? "held" : blocker ? "blocked" : "scheduled",
       hold_reason: blocker
     )
   end
 
-  def mark_sent!(stripe_transfer_id: nil, gift_card_tracking_number: nil)
+  def mark_sent!(stripe_transfer_id: nil, gift_card_order_id: nil)
     update!(status: "sent", sent_at: Time.current, hold_reason: nil,
             stripe_transfer_id: stripe_transfer_id.presence || self.stripe_transfer_id,
-            gift_card_tracking_number: gift_card_tracking_number.presence || self.gift_card_tracking_number)
+            gift_card_order_id: gift_card_order_id.presence || self.gift_card_order_id)
   end
 
   def mark_delivered!

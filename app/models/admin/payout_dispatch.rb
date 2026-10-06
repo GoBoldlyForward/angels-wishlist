@@ -1,18 +1,19 @@
 # frozen_string_literal: true
 
 module Admin
-  # Sends one payout, by transfer or by recording the mailed gift card, and tells the caregiver.
+  # Sends one payout, by transfer or by recording the gift card ordered through
+  # Tremendous, and tells the caregiver.
   class PayoutDispatch
     attr_reader :payout, :error
 
-    def initialize(payout, tracking_number: nil, share_in_cents: nil)
+    def initialize(payout, order_id: nil, share_in_cents: nil)
       @payout = payout
-      @tracking_number = tracking_number.to_s.strip
+      @order_id = order_id.to_s.strip
       @share_in_cents = share_in_cents
     end
 
     def call
-      @error = refusal || missing_tracking_number
+      @error = refusal
       return false if @error
 
       payout.refresh! if payout.failed?
@@ -52,15 +53,11 @@ module Admin
       @share_in_cents ||= payout.share_in_cents
     end
 
-    def missing_tracking_number
-      "Enter the gift card's tracking number." if payout.via_gift_card? && @tracking_number.blank?
-    end
-
     def deliver
       if payout.via_stripe?
         PaymentGateway.transfer(payout)
       else
-        payout.mark_sent!(gift_card_tracking_number: @tracking_number)
+        payout.mark_sent!(gift_card_order_id: @order_id)
       end
     end
 

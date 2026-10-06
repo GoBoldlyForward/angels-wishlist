@@ -2,7 +2,7 @@
 
 module Admin
   module FamiliesHelper
-    PAYOUT_METHOD_LABELS = { "stripe" => "Direct deposit via Stripe", "gift_card" => "Mailed Visa gift card" }.freeze
+    PAYOUT_METHOD_LABELS = { "stripe" => "Direct deposit via Stripe", "gift_card" => "Visa gift card by email" }.freeze
 
     # crumbs are labels, or [label, path] pairs for the ones that link somewhere.
     def families_breadcrumbs(*crumbs)
@@ -57,7 +57,7 @@ module Admin
       if household.payout_via_stripe?
         return household.stripe_connected? ? household.stripe_account_id : "Stripe onboarding not finished"
       end
-      return household.mailing_address&.to_s.presence || "No mailing address" if household.payout_via_gift_card?
+      return household.gift_card_email.presence || "No email for the gift card" if household.payout_via_gift_card?
 
       "No destination"
     end

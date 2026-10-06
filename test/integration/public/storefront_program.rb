@@ -6,7 +6,6 @@ module StorefrontProgram
   LEGAL_NAMES = %w[Zephyrine Bartholomew Guinevere].freeze
   HOUSEHOLD_NAME = "The Quackenbush home"
   CAREGIVER_LAST_NAME = "Quackenbush"
-  STREET = "411 Marigold Terrace"
   AGENCY = "Longleaf Family Services"
 
   BROWSER = { "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " \
@@ -33,10 +32,9 @@ module StorefrontProgram
 
   def build_private_household(**attrs)
     caregiver = build_caregiver(first_name: "Philippa", last_name: CAREGIVER_LAST_NAME)
-    address = Address.create!(street_line_1: STREET, city: "Decatur", state: "GA", zipcode: "30030")
     agency = Organization.find_by(name: AGENCY) || build_organization(name: AGENCY, kind: "agency")
     build_household(organization: @chapter, caregiver: caregiver, display_name: HOUSEHOLD_NAME,
-                    county: "DeKalb County", mailing_address: address, placing_organization: agency, **attrs)
+                    county: "DeKalb County", gift_card_email: "philippa.cards@example.com", placing_organization: agency, **attrs)
   end
 
   def build_listed_child(household, name, age:, gender:, legal_first_name: nil, interests: [], note: nil,
@@ -73,6 +71,6 @@ module StorefrontProgram
   end
 
   def private_details
-    LEGAL_NAMES + [ HOUSEHOLD_NAME, CAREGIVER_LAST_NAME, STREET, AGENCY, "Philippa" ]
+    LEGAL_NAMES + [ HOUSEHOLD_NAME, CAREGIVER_LAST_NAME, "philippa.cards", AGENCY, "Philippa" ]
   end
 end

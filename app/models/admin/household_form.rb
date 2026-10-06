@@ -2,22 +2,20 @@
 
 module Admin
   # What staff fill in to add or edit a household: the caregiver, the home,
-  # and where a gift card would be mailed, saved together or not at all.
+  # and how it is paid, saved together or not at all.
   class HouseholdForm
     include ActiveModel::Model
 
     CAREGIVER_FIELDS = %i[first_name last_name email phone preferred_language].freeze
-    HOUSEHOLD_FIELDS = %i[display_name county placing_organization_id payout_method].freeze
-    ADDRESS_FIELDS = %i[street_line_1 street_line_2 city state zipcode].freeze
-    FIELDS = (CAREGIVER_FIELDS + HOUSEHOLD_FIELDS + ADDRESS_FIELDS).freeze
+    HOUSEHOLD_FIELDS = %i[display_name county placing_organization_id payout_method gift_card_email].freeze
+    FIELDS = (CAREGIVER_FIELDS + HOUSEHOLD_FIELDS).freeze
 
     attr_accessor(*FIELDS)
-    attr_reader :household, :caregiver, :address
+    attr_reader :household, :caregiver
 
     def initialize(household, attributes = nil)
       @household = household
       @caregiver = household.caregiver || household.build_caregiver(role: "caregiver")
-      @address = household.mailing_address || Address.new(state: "GA")
       super(current_values.merge((attributes || {}).to_h.symbolize_keys.slice(*FIELDS)))
     end
 
@@ -34,8 +32,6 @@ module Admin
 
       Household.transaction do
         caregiver.save!
-        address.save! if mailing?
-        household.mailing_address = mailing? ? address : nil
         household.save!
         household.enrollments.find_or_create_by!(event: event) if event
       end
@@ -54,8 +50,7 @@ module Admin
     private
 
     def current_values
-      caregiver.slice(*CAREGIVER_FIELDS).merge(household.slice(*HOUSEHOLD_FIELDS))
-               .merge(address.slice(*ADDRESS_FIELDS)).symbolize_keys
+      caregiver.slice(*CAREGIVER_FIELDS).merge(household.slice(*HOUSEHOLD_FIELDS)).symbolize_keys
     end
 
     def assign
@@ -64,15 +59,10 @@ module Admin
       caregiver.password = Devise.friendly_token(32) if caregiver.new_record?
       household.assign_attributes(HOUSEHOLD_FIELDS.index_with { |field| public_send(field).presence }
                                                   .merge(payout_method: payout_method.presence || "none"))
-      address.assign_attributes(ADDRESS_FIELDS.index_with { |field| public_send(field).presence }) if mailing?
-    end
-
-    def mailing?
-      ADDRESS_FIELDS.excluding(:state).any? { |field| public_send(field).present? }
     end
 
     def all_valid?
-      records = [ caregiver, (address if mailing?), household ].compact
+      records = [ caregiver, household ]
       records.map(&:valid?)
       records.each { |record| record.errors.each { |error| errors.add(:base, error.full_message) } }
       errors.empty?

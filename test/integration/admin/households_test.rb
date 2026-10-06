@@ -145,7 +145,7 @@ module Admin
           post admin_households_path, params: { household: {
             first_name: "Rosa", last_name: "Delgado", email: "rosa.delgado@example.com", phone: "",
             county: "Fulton", placing_organization_id: @agency.id, payout_method: "gift_card",
-            street_line_1: "12 Peachtree Way", city: "Atlanta", state: "GA", zipcode: "30303"
+            gift_card_email: "Rosa.Cards@example.com"
           } }
         end
       end
@@ -155,7 +155,7 @@ module Admin
       assert household.verification_pending?
       assert_equal @chapter, household.organization
       assert_equal @agency, household.placing_organization
-      assert_equal "12 Peachtree Way, Atlanta, GA 30303", household.mailing_address.to_s
+      assert_equal "rosa.cards@example.com", household.gift_card_email
       assert_equal @event, household.enrollments.sole.event
       assert_equal [ "rosa.delgado@example.com" ], ActionMailer::Base.deliveries.last.to
       assert_not household.caregiver.valid_password?("")
@@ -175,7 +175,7 @@ module Admin
       patch admin_household_path(@household), params: { household: {
         first_name: "Denise", last_name: "Brooks", email: @household.caregiver.email, phone: "+14045550134",
         display_name: "The Brooks home", county: "Cobb", placing_organization_id: "", payout_method: "gift_card",
-        street_line_1: "48 Oak Street", city: "Marietta", state: "GA", zipcode: "30060"
+        gift_card_email: "denise.cards@example.com"
       } }
 
       assert_redirected_to admin_household_path(@household)
@@ -183,7 +183,7 @@ module Admin
       assert_equal "Cobb", @household.county
       assert_nil @household.placing_organization
       assert @household.payout_via_gift_card?
-      assert_equal "Marietta", @household.mailing_address.city
+      assert_equal "denise.cards@example.com", @household.gift_card_email
       assert_equal "+14045550134", @household.caregiver.phone
       assert_recorded_by_staff @household, "payout_method", %w[stripe gift_card]
     end

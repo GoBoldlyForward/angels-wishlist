@@ -43,7 +43,7 @@ module Caregiver
       if household.payout_via_stripe?
         "Bank account or debit card, through Stripe"
       elsif household.payout_via_gift_card?
-        "Visa gift card mailed to #{household.mailing_address || 'your address'}"
+        "Visa gift card emailed to #{household.gift_card_email}"
       else
         "Not chosen yet"
       end

@@ -9,7 +9,7 @@
     <b><%= event_day(event.payout_at) || "After lists close" %></b>
     <span>
       We total everything raised across all lists, spread it evenly, and send your household's
-      share<%= { "gift_card" => " as a Visa gift card in the mail", "stripe" => " to the account you connected through Stripe" }[household.payout_method] %>.
+      share<%= { "gift_card" => " as a Visa gift card by email", "stripe" => " to the account you connected through Stripe" }[household.payout_method] %>.
     </span>
   </div>
   <div class="flow-step">

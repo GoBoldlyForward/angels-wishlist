@@ -7,7 +7,7 @@
               method: (@form.new_account? ? :post : :patch) do |f| %>
   <main class="container flow-screen">
     <%= render "caregiver/shared/step_header", title: "Start with your home",
-               lede: "This is how #{chapter} verifies your household and how we pay you. None of it is ever shown to a donor." %>
+               lede: "This is how #{chapter} verifies your household and reaches you. None of it is ever shown to a donor." %>
 
     <% if @form.email_taken? %>
       <div class="flash flash-alert form-errors" role="alert">
@@ -58,24 +58,6 @@
           <%= f.label :county, "County", class: "f" %>
           <%= f.select :county, Household::COUNTIES, { include_blank: "Choose one" }, class: input_class(@form, :county), required: true %>
           <%= field_error(@form, :county) %>
-        </div>
-      </div>
-      <div class="field">
-        <%= f.label :street_line_1, "Home address", class: "f" %>
-        <%= f.text_field :street_line_1, class: input_class(@form, :street_line_1), placeholder: "1420 Peachtree Way", autocomplete: "address-line1" %>
-        <%= field_error(@form, :street_line_1) %>
-        <p class="hint">Only used if you choose a mailed gift card instead of direct deposit.</p>
-      </div>
-      <div class="row2">
-        <div class="field">
-          <%= f.label :city, "City", class: "f" %>
-          <%= f.text_field :city, class: input_class(@form, :city), placeholder: "Jonesboro", autocomplete: "address-level2" %>
-          <%= field_error(@form, :city) %>
-        </div>
-        <div class="field">
-          <%= f.label :zipcode, "ZIP", class: "f" %>
-          <%= f.text_field :zipcode, class: input_class(@form, :zipcode), placeholder: "30236", inputmode: "numeric", autocomplete: "postal-code" %>
-          <%= field_error(@form, :zipcode) %>
         </div>
       </div>
       <% if @form.new_account? %><%= invisible_captcha :nickname %><% end %>

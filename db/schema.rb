@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_05_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_05_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -237,8 +237,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_120000) do
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
     t.string "display_name", null: false
+    t.string "gift_card_email"
     t.text "hold_reason"
-    t.bigint "mailing_address_id"
     t.bigint "organization_id", null: false
     t.string "payout_method", default: "none", null: false
     t.bigint "placing_organization_id"
@@ -251,7 +251,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_120000) do
     t.index ["ahoy_visit_id"], name: "index_households_on_ahoy_visit_id"
     t.index ["caregiver_id"], name: "index_households_on_caregiver_id"
     t.index ["deleted_at"], name: "index_households_on_deleted_at"
-    t.index ["mailing_address_id"], name: "index_households_on_mailing_address_id"
     t.index ["organization_id"], name: "index_households_on_organization_id"
     t.index ["placing_organization_id"], name: "index_households_on_placing_organization_id"
     t.index ["slug"], name: "index_households_on_slug", unique: true
@@ -328,10 +327,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_120000) do
     t.integer "debited_in_cents"
     t.datetime "deleted_at"
     t.bigint "event_id", null: false
-    t.string "gift_card_tracking_number"
+    t.string "gift_card_email"
+    t.string "gift_card_order_id"
     t.text "hold_reason"
     t.bigint "household_id", null: false
-    t.bigint "mailing_address_id"
     t.string "method"
     t.datetime "scheduled_for"
     t.datetime "sent_at"
@@ -343,7 +342,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_120000) do
     t.index ["event_id"], name: "index_payouts_on_event_id"
     t.index ["household_id", "event_id"], name: "index_payouts_on_household_id_and_event_id", unique: true
     t.index ["household_id"], name: "index_payouts_on_household_id"
-    t.index ["mailing_address_id"], name: "index_payouts_on_mailing_address_id"
     t.index ["status"], name: "index_payouts_on_status"
   end
 
@@ -603,7 +601,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_120000) do
   add_foreign_key "enrollments", "events"
   add_foreign_key "enrollments", "households"
   add_foreign_key "events", "organizations"
-  add_foreign_key "households", "addresses", column: "mailing_address_id"
   add_foreign_key "households", "organizations"
   add_foreign_key "households", "organizations", column: "placing_organization_id"
   add_foreign_key "households", "users", column: "caregiver_id"
@@ -615,7 +612,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_120000) do
   add_foreign_key "organizations", "addresses", column: "mailing_address_id"
   add_foreign_key "organizations", "organizations", column: "parent_id"
   add_foreign_key "organizations", "users", column: "primary_contact_id"
-  add_foreign_key "payouts", "addresses", column: "mailing_address_id"
   add_foreign_key "payouts", "events"
   add_foreign_key "payouts", "households"
   add_foreign_key "solid_queue_batch_executions", "solid_queue_batches", column: "batch_id", on_delete: :cascade

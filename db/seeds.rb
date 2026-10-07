@@ -171,14 +171,10 @@ ActiveRecord::Base.transaction do
                              first_name: first, last_name: last, role: "caregiver",
                              preferred_language: facts[:language])
 
-    address = Address.create!(street_line_1: "#{100 + rand(800)} Peachtree Way",
-                              city: row["area"].sub(" County", ""), state: "GA",
-                              zipcode: format("30%03d", rand(1000)))
-
     household = PaperTrail.request(whodunnit: caregiver.id) do
       Household.create!(
         organization: angels, placing_organization: facts[:agency] && agencies[facts[:agency]],
-        caregiver: caregiver, mailing_address: address,
+        caregiver: caregiver, gift_card_email: facts[:payout] == "gift_card" ? caregiver.email : nil,
         display_name: row["name"], county: row["area"],
         payout_method: facts[:payout],
         stripe_account_id: facts[:payout] == "stripe" ? "acct_seed_#{row['id']}" : nil,

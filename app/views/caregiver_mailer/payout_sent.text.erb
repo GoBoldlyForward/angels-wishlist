@@ -5,7 +5,7 @@ Your household's share for <%= @payout.event.name %> is on the way: <%= number_t
 <% if @payout.via_stripe? -%>
 It was sent by direct deposit and should land in one to two business days.
 <% else -%>
-It was mailed as a Visa gift card and should arrive in seven to ten days.<% if @payout.gift_card_tracking_number.present? %> Tracking number: <%= @payout.gift_card_tracking_number %><% end %>
+It was sent as a gift card to <%= @payout.gift_card_email %>. Look for an email from Tremendous with a link where you choose a Visa or another gift card. If it is not there, check your spam folder.
 <% end -%>
 
 You agreed to use these funds for holiday gifts for the child each list is for. If something on a list no longer fits or is no longer wanted, spend it on what that child needs. After the holidays, we will ask you for photos of what you bought and/or the receipts.

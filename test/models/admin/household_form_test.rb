@@ -21,21 +21,21 @@ module Admin
       assert household.verification_pending?
       assert household.payout_via_none?
       assert household.caregiver.caregiver?
-      assert_nil household.mailing_address
+      assert_nil household.gift_card_email
       assert_equal [ @event.id ], household.enrollments.pluck(:event_id)
     end
 
     test "nothing is saved when any part is invalid" do
       form = HouseholdForm.new(Household.new(organization: @chapter),
                                first_name: "Rosa", last_name: "Delgado", email: "rosa@example.com",
-                               street_line_1: "12 Peachtree Way", city: "Atlanta", state: "GA", zipcode: "303")
+                               payout_method: "gift_card", gift_card_email: "rosa at example")
 
       assert_no_emails do
-        assert_no_difference [ "User.count", "Household.count", "Address.count", "Enrollment.count" ] do
+        assert_no_difference [ "User.count", "Household.count", "Enrollment.count" ] do
           assert_not form.save(event: @event)
         end
       end
-      assert_includes form.errors.full_messages, "Zipcode must be a 5 or 9 digit ZIP"
+      assert_includes form.errors.full_messages, "Gift card email is invalid"
     end
 
     test "an email already in use is refused" do
@@ -59,13 +59,12 @@ module Admin
       assert household.caregiver.valid_password?("password123")
     end
 
-    test "clearing the address takes it off the household" do
-      address = Address.create!(street_line_1: "1 Main St", city: "Atlanta", state: "GA", zipcode: "30303")
-      household = build_household(organization: @chapter, mailing_address: address)
-      form = HouseholdForm.new(household, street_line_1: "", city: "", zipcode: "")
+    test "clearing the gift card email takes it off the household" do
+      household = build_household(organization: @chapter, gift_card_email: "cards@example.com")
+      form = HouseholdForm.new(household, gift_card_email: "")
 
       assert form.save
-      assert_nil household.reload.mailing_address
+      assert_nil household.reload.gift_card_email
     end
   end
 end

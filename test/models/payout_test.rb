@@ -61,7 +61,11 @@ class PayoutTest < ActiveSupport::TestCase
   test "a gift card needs somewhere to go" do
     @household.update!(payout_method: "gift_card")
 
-    assert_equal "No mailing address for the gift card.", @household.payout_blocker
+    assert_equal "No email address for the gift card.", @household.payout_blocker
+
+    @household.update!(gift_card_email: "cards@example.com")
+    assert_nil @household.payout_blocker
+    assert_equal "cards@example.com", @event.build_payouts!.first.destination
   end
 
   test "one payout per household per event" do

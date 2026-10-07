@@ -24,7 +24,6 @@
               <li>In your account one to two business days after <%= chapter %> releases the funds</li>
               <li>Instant to a debit card for a $0.50 fee</li>
               <li>Works online, in store, anywhere</li>
-              <li>Nothing to lose in the mail</li>
             </ul>
           </div>
         </div>
@@ -35,12 +34,11 @@
         <div class="pick-body">
           <span class="pick-icon" style="background:var(--brand-wash)"><i class="fa-solid fa-credit-card c-brand"></i></span>
           <div>
-            <h3 class="t-md" style="margin-bottom:6px">Visa gift card in the mail</h3>
-            <p class="t-base" style="margin:0 0 12px">No bank needed. We mail a prepaid Visa to your home address.</p>
+            <h3 class="t-md" style="margin-bottom:6px">Visa gift card by email</h3>
+            <p class="t-base" style="margin:0 0 12px">No bank needed. We email you a link through Tremendous, and you choose a Visa or another gift card.</p>
             <ul class="t-sm" style="color:var(--soft)">
-              <li>Arrives seven to ten days after lists close</li>
+              <li>Emailed as soon as <%= chapter %> releases the funds</li>
               <li>Some online checkouts reject prepaid cards</li>
-              <li>If it is lost or stolen, the money is gone</li>
               <li>Cannot be split across two stores easily</li>
             </ul>
           </div>
@@ -81,28 +79,18 @@
 
     <div class="form-card mt-5 pay-detail pay-detail-gift-card">
       <div class="panel" style="max-width:640px">
-        <h3 class="t-md" style="margin-bottom:14px">Where should we mail it?</h3>
-        <p class="t-base" style="margin:0 0 14px">It is addressed to <b class="ink"><%= current_user.full_name %></b>.</p>
+        <h3 class="t-md" style="margin-bottom:14px">Where should we email it?</h3>
+        <p class="t-base" style="margin:0 0 14px">The email comes from Tremendous, addressed to <b class="ink"><%= current_user.full_name %></b>.
+          It has a link where you pick a Visa gift card, or a gift card to a store you prefer.</p>
         <div class="field">
-          <%= f.label :street_line_1, "Mailing address", class: "f" %>
-          <%= f.text_field :street_line_1, class: input_class(@form, :street_line_1), placeholder: "1420 Peachtree Way", autocomplete: "address-line1" %>
-          <%= field_error(@form, :street_line_1) %>
-        </div>
-        <div class="row2">
-          <div class="field" style="margin-bottom:8px">
-            <%= f.label :city, "City", class: "f" %>
-            <%= f.text_field :city, class: input_class(@form, :city), placeholder: "Jonesboro", autocomplete: "address-level2" %>
-            <%= field_error(@form, :city) %>
-          </div>
-          <div class="field" style="margin-bottom:8px">
-            <%= f.label :zipcode, "ZIP", class: "f" %>
-            <%= f.text_field :zipcode, class: input_class(@form, :zipcode), placeholder: "30236", inputmode: "numeric", autocomplete: "postal-code" %>
-            <%= field_error(@form, :zipcode) %>
-          </div>
+          <%= f.label :gift_card_email, "Email for the gift card", class: "f" %>
+          <%= f.email_field :gift_card_email, class: input_class(@form, :gift_card_email), placeholder: "denise@example.com", autocomplete: "email" %>
+          <%= field_error(@form, :gift_card_email) %>
+          <p class="hint">Your account email, unless you would rather it went somewhere else.</p>
         </div>
         <div class="panel panel-warm" style="margin-top:18px">
           <div class="note"><i class="fa-solid fa-triangle-exclamation"></i>
-            <div>Gift cards are the slowest and riskiest way we pay. If a bank or debit card is possible
+            <div>Some stores will not take a prepaid card at checkout. If a bank or debit card is possible
             at all, take that instead. You can switch later without redoing your lists.</div></div>
         </div>
       </div>

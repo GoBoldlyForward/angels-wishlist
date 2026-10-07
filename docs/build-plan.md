@@ -70,7 +70,8 @@ These come from the prototype as Atlanta Angels left it. Each is a requirement.
 - A household's share is the sum of its children's list shares.
 - A list that is withdrawn, or whose household leaves, drops out of the total. Its share moves to
   the other lists.
-- A household is paid by direct deposit through Stripe or by a mailed Visa gift card.
+- A household is paid by direct deposit through Stripe or by a gift card emailed through
+  Tremendous, where the caregiver chooses a Visa or another gift card.
 - A household on hold, unverified, or without a payout method is not paid.
 
 If every child asks for $200 and donors give 75% of the total asked, every list receives $150.
@@ -240,7 +241,7 @@ The six steps in the prototype, saved as the caregiver goes so they can return.
 | The children | each child, an assigned alias, and a draft wishlist holding interests and the note |
 | Their lists | line items, matched to the catalog where one name fits |
 | Love Box | the enrollment's choices |
-| Getting paid | the payout method, a Stripe Connect account or a mailing address, and the agreement |
+| Getting paid | the payout method, a Stripe Connect account or an email for the gift card, and the agreement |
 | Review | submits every list for review |
 
 - Starting intake creates the caregiver with no password. An emailed link lets them set one and
@@ -328,7 +329,8 @@ with a Stripe test card, and receives one receipt.
 - When the event closes, create one payout per enrolled household for its share.
 - Staff review the run before anything is sent: each household's asked, share, method, and
   whether it is blocked and why.
-- Send through Stripe Connect, or record a mailed gift card with its tracking number.
+- Send through Stripe Connect, or record a gift card ordered in Tremendous, with its order ID
+  when staff have it. Tremendous emails the caregiver the moment the order is placed.
 - A blocked payout stays blocked until its household is verified, off hold, and has a method.
 - A failed transfer is marked and can be retried.
 
@@ -366,7 +368,7 @@ Donations land in the chapter's own Stripe balance. The platform only touches mo
 | --- | --- |
 | A donor checks out | A **destination charge** to the chapter's Express account, `on_behalf_of` the chapter. The chapter is on the donor's statement and receipt. The application fee is card processing plus the platform fee |
 | A payout is sent | An **account debit** pulls the household's share from the chapter's balance to the platform, and a transfer sends it to the caregiver's Express account |
-| After payouts | Chapter staff send the rest of the balance to the chapter's bank. It holds the gift card households' shares, which the chapter buys itself, and any surplus |
+| After payouts | Chapter staff send the rest of the balance to the chapter's bank. It holds the gift card households' shares, which the chapter orders through Tremendous, and any surplus |
 
 Caregivers' accounts stay connected to the platform. Stripe does not let a connected account have
 connected accounts of its own, and a transfer to a caregiver can only come from the platform's

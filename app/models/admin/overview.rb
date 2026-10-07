@@ -57,7 +57,7 @@ module Admin
     def unpayable_households
       @unpayable_households ||= households.where(id: lists.where(status: %w[in_review live closed])
                                                           .select("children.household_id"))
-                                          .preload(:mailing_address).order(:display_name).reject(&:payable?)
+                                          .order(:display_name).reject(&:payable?)
     end
 
     def nothing_chosen_count

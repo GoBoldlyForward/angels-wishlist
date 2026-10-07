@@ -4,7 +4,7 @@ module Admin
   # The Households index: every active household of the chapter, with what it
   # asked for and is owed in one event.
   class HouseholdsTable < Table
-    PAYOUT_METHODS = { "Direct deposit" => "stripe", "Mailed gift card" => "gift_card", "Not set up" => "none" }.freeze
+    PAYOUT_METHODS = { "Direct deposit" => "stripe", "Emailed gift card" => "gift_card", "Not set up" => "none" }.freeze
     SEARCHED = %w[households.display_name households.county users.first_name users.last_name users.email
                   users.phone organizations.name].freeze
 
@@ -18,12 +18,12 @@ module Admin
     end
 
     def rows
-      Figures.households(super, event).preload(:caregiver, :placing_organization, :mailing_address)
+      Figures.households(super, event).preload(:caregiver, :placing_organization)
     end
 
     def summary
       @summary ||= begin
-        all = households.preload(:mailing_address).to_a
+        all = households.to_a
         { households: all.size, children: Child.active.where(household_id: all.map(&:id)).count,
           verified: all.count(&:verification_verified?), payable: all.count(&:payable?) }
       end

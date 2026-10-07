@@ -4,7 +4,7 @@ module Admin
   # One event's payouts, built or not: every household with a counted list,
   # what it asked for, and its share of the pool.
   class PayoutRun
-    METHOD_LABELS = { "stripe" => "Direct deposit", "gift_card" => "Mailed gift card" }.freeze
+    METHOD_LABELS = { "stripe" => "Direct deposit", "gift_card" => "Emailed gift card" }.freeze
 
     Row = Data.define(:household, :payout, :lists, :share_in_cents) do
       def children
@@ -34,7 +34,7 @@ module Admin
       def destination
         return payout.destination if payout
 
-        household.payout_via_stripe? ? household.stripe_account_id : household.mailing_address&.to_s
+        household.payout_via_stripe? ? household.stripe_account_id : household.gift_card_email
       end
 
       def blocker
@@ -157,12 +157,12 @@ module Admin
     end
 
     def households
-      Household.where(id: household_ids).preload(:caregiver, :mailing_address).order(:display_name)
+      Household.where(id: household_ids).preload(:caregiver).order(:display_name)
     end
 
     # Payouts share this run's event and households, so reading one never queries again.
     def payouts
-      @payouts ||= event.payouts.preload(:mailing_address, household: %i[caregiver mailing_address])
+      @payouts ||= event.payouts.preload(household: :caregiver)
                         .each { |payout| payout.association(:event).target = event }
                         .index_by(&:household_id)
     end

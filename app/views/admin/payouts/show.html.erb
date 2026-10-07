@@ -77,7 +77,7 @@
         <%= detail_section "Record the gift card" do %>
           <p class="text-muted small">Order a <%= money_exact(@payout.amount_in_cents) %> gift card in Tremendous for <%= @payout.gift_card_email %>,
             then record it here. Tremendous emails the caregiver a link to choose a Visa or another gift card.</p>
-          <%= form_with scope: :payout, url: send_funds_admin_payout_path(), method: :patch,
+          <%= form_with scope: :payout, url: send_funds_admin_payout_path(@payout), method: :patch,
                         data: { turbo_confirm: "Record a #{money_exact(@payout.amount_in_cents)} gift card as ordered in Tremendous for #{household.display_name}?" } do |form| %>
             <div class="row g-2 align-items-end">
               <div class="col-md-7">

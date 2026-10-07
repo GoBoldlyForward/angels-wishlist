@@ -6,10 +6,15 @@ module ApplicationHelper
     current_chapter&.name || "Wish List"
   end
 
-  # The chapter's own logo when it has uploaded one.
+  # The chapter's own logo when it has uploaded one, else the one shipped with the app.
   def chapter_mark(**options)
     logo = current_chapter&.logo
-    image_tag(logo&.attached? ? logo : "logo-mark.svg", alt: "", **options)
+    image_tag(logo&.attached? ? logo : bundled_chapter_mark, alt: "", **options)
+  end
+
+  def bundled_chapter_mark
+    bundled = "chapters/#{current_chapter&.slug}.png"
+    Rails.application.assets.load_path.find(bundled) ? bundled : "logo-mark.svg"
   end
 
   # Whole dollars, the way every figure on the site reads.

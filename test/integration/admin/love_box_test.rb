@@ -27,7 +27,7 @@ module Admin
       end
       assert_equal({ "Hot chocolate" => 2 }, totals["Family drink"])
       assert_equal({ "One holiday mug per caregiver" => 3 }, totals["Festive cups"])
-      assert_equal({ "Publix" => 1 }, totals["$25 grocery gift card"])
+      assert_equal({ "Publix" => 1 }, totals["Your preferred grocery store"])
       assert_not totals.key?("Cozy item")
     end
 
@@ -51,7 +51,7 @@ module Admin
       assert_equal "Hot chocolate", rows.first["Family drink"]
       assert_equal "yes", rows.first["Verified"]
       assert_equal "no", rows.last["Verified"]
-      assert_equal "Publix", rows.last["$25 grocery gift card"]
+      assert_equal "Publix", rows.last["Your preferred grocery store"]
     end
 
     test "the totals export to CSV" do

@@ -8,8 +8,8 @@ class Household < ApplicationRecord
                            stripe_onboarded_at gift_card_email],
                   meta: { organization_id: :organization_id }
 
-  COUNTIES = [ "Clayton", "Cobb", "DeKalb", "Douglas", "Fulton", "Gwinnett", "Henry", "Rockdale",
-               "South Fulton" ].freeze
+  COUNTIES = [ "Cherokee", "Clayton", "Cobb", "DeKalb", "Douglas", "Fayette", "Forsyth", "Fulton", "Gwinnett",
+               "Henry", "Rockdale" ].freeze
 
   belongs_to :organization
   belongs_to :placing_organization, class_name: "Organization", optional: true

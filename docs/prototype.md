@@ -179,8 +179,8 @@ and kinship caregivers."
 | 5. Getting paid | Bank or debit card through Stripe, or a mailed Visa gift card. The spending agreement | a method is set and the agreement is checked |
 | 6. Review | Nothing new. Shows each child as donors will see them, the Love Box, and the payout method | submitted |
 
-**Counties offered:** Clayton, Cobb, DeKalb, Douglas, Fulton, Gwinnett, Henry, Rockdale, and South
-Fulton.
+**Counties offered:** Cherokee, Clayton, Cobb, DeKalb, Douglas, Fayette, Forsyth, Fulton, Gwinnett,
+Henry, and Rockdale.
 
 **Aliases are assigned by the system** from a fixed pool of twenty names. The caregiver sees the
 alias beside the first-name field and is never asked to invent one.

@@ -212,7 +212,7 @@ GEM
     google-protobuf (4.36.2-x86_64-linux-musl)
       bigdecimal
       rake (~> 13.3)
-    holidays (11.6.0)
+    holidays (11.7.0)
     httparty (0.24.2)
       csv
       mini_mime (>= 1.0.0)

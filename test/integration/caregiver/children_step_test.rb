@@ -60,13 +60,23 @@ module Caregiver
       assert_select ".field-error", "Gender must be chosen."
     end
 
-    test "a child older than eighteen is refused" do
-      assert_no_difference -> { Child.count } do
+    test "a youth up to twenty-three is accepted" do
+      assert_difference -> { @household.children.count } => 1 do
         patch caregiver_intake_children_path,
-              params: { children: { "n1" => child_fields(birthdate: 19.years.ago.to_date) } }
+              params: { children: { "n1" => child_fields(birthdate: 22.years.ago.to_date) } }
       end
 
-      assert_select ".field-error", "Birthdate must make them 18 or younger."
+      assert_redirected_to caregiver_intake_lists_path
+      assert_equal 22, @household.children.sole.age
+    end
+
+    test "a youth older than twenty-three is refused" do
+      assert_no_difference -> { Child.count } do
+        patch caregiver_intake_children_path,
+              params: { children: { "n1" => child_fields(birthdate: 24.years.ago.to_date) } }
+      end
+
+      assert_select ".field-error", "Birthdate must make them 23 or younger."
     end
 
     test "a sentence over 400 characters is refused" do

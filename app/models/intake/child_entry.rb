@@ -8,7 +8,7 @@ module Intake
     include ActiveModel::Attributes
 
     GENDERS = %w[girl boy].freeze
-    OLDEST_AGE = 18
+    OLDEST_AGE = 23
     MOST_INTERESTS = 12
     LONGEST_INTEREST = 40
     SUGGESTED_INTERESTS = [ "drawing", "basketball", "dinosaurs", "reading", "music", "soccer", "Legos", "baking",

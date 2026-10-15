@@ -26,11 +26,11 @@
           </div>
           <div class="col-md-3">
             <%= form.label :min_age, "Youngest age", class: "form-label" %>
-            <%= form.number_field :min_age, class: "form-control", min: 0, max: 18 %>
+            <%= form.number_field :min_age, class: "form-control", min: 0, max: Intake::ChildEntry::OLDEST_AGE %>
           </div>
           <div class="col-md-3">
             <%= form.label :max_age, "Oldest age", class: "form-label" %>
-            <%= form.number_field :max_age, class: "form-control", min: 0, max: 18 %>
+            <%= form.number_field :max_age, class: "form-control", min: 0, max: Intake::ChildEntry::OLDEST_AGE %>
           </div>
           <div class="col-md-3">
             <%= form.label :icon, class: "form-label" %>

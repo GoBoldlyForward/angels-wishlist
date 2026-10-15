@@ -3,7 +3,7 @@
 module Admin
   # Age is read off the birthdate, so a band of ages is a range of birthdates.
   module AgeBand
-    OPTIONS = { "0 to 5" => "0-5", "6 to 11" => "6-11", "12 to 18" => "12-18" }.freeze
+    OPTIONS = { "0 to 5" => "0-5", "6 to 11" => "6-11", "12 to 18" => "12-18", "19 to 23" => "19-23" }.freeze
 
     module_function
 

@@ -31,7 +31,7 @@ module Storefront
     end
 
     test "the oldest band has no upper edge" do
-      assert Filters.new(age: "13-18").matches_child?(Child.new("boy", 19))
+      assert Filters.new(age: "13-23").matches_child?(Child.new("boy", 19))
     end
 
     test "price bands include both of their edges" do

@@ -75,7 +75,7 @@ module Public
       assert_select ".grid a.tile", 1
       assert_select ".grid a.tile .tile-name", "Art supply set"
 
-      visit root_path(age: "13-18")
+      visit root_path(age: "13-23")
 
       assert_select ".grid a.tile", 1
       assert_select ".grid a.tile .tile-for", /For Theo, 14/

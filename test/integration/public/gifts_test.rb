@@ -158,7 +158,7 @@ module Public
     end
 
     test "category filters narrow the grid" do
-      visit category_path(id: "clothes-shoes", age: "13-18")
+      visit category_path(id: "clothes-shoes", age: "13-23")
 
       assert_select ".grid a.tile .tile-for", /For Theo, 14/
 

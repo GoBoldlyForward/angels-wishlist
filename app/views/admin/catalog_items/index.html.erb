@@ -44,7 +44,7 @@
             </td>
             <td><span class="tag-soft"><%= item.category.name %></span></td>
             <td class="text-end"><span class="num"><%= money_exact item.price_in_cents %></span></td>
-            <td><%= [ item.min_age, item.max_age ].any? ? "#{item.min_age || 0} to #{item.max_age || 18}" : "Any age" %></td>
+            <td><%= [ item.min_age, item.max_age ].any? ? "#{item.min_age || 0} to #{item.max_age || Intake::ChildEntry::OLDEST_AGE}" : "Any age" %></td>
             <td>
               <% if item.photo.attached? %>Uploaded<% elsif item.stock_photo.present? %>Bundled<% else %>None<% end %>
               <%= cell_sub item.photo_attribution if item.photo_attribution.present? %>

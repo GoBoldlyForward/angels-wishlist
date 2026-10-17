@@ -9,13 +9,13 @@ module Storefront
       Group.new(key: :gender, icon: "fa-child-reaching", any_label: "Anyone",
                 options: { "girl" => "A girl", "boy" => "A boy" }),
       Group.new(key: :age, icon: "fa-cake-candles", any_label: "Any age",
-                options: { "0-5" => "0 to 5", "6-9" => "6 to 9", "10-12" => "10 to 12", "13-18" => "13 to 18" }),
+                options: { "0-5" => "0 to 5", "6-9" => "6 to 9", "10-12" => "10 to 12", "13-23" => "13 to 23" }),
       Group.new(key: :price, icon: "fa-tag", any_label: "Any price",
                 options: { "u25" => "Under $25", "25-50" => "$25 to $50", "50-100" => "$50 to $100",
                            "100+" => "$100 and up" })
     ].freeze
 
-    AGE_BANDS = { "0-5" => 0..5, "6-9" => 6..9, "10-12" => 10..12, "13-18" => 13.. }.freeze
+    AGE_BANDS = { "0-5" => 0..5, "6-9" => 6..9, "10-12" => 10..12, "13-23" => 13.. }.freeze
     PRICE_BANDS = { "u25" => ..2_500, "25-50" => 2_500..5_000, "50-100" => 5_000..10_000,
                     "100+" => 10_000.. }.freeze
 

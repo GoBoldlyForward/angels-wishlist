@@ -19,6 +19,8 @@ module Admin
     end
 
     test "the overview shows the five figures" do
+      # Exact seconds, so a daylight-saving change in the next two weeks can't add an hour.
+      @event.update!(closes_at: Time.current + 14.days.in_seconds)
       get admin_root_path
 
       assert_response :success

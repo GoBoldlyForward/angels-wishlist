@@ -34,7 +34,7 @@
           [ "Chosen gifts", money_exact(@donation.gift_in_cents) ],
           [ "General gift", money_exact(@donation.general_gift_in_cents) ],
           [ "Card fee", @donation.fee_covered? ? "#{money_exact(@donation.fee_in_cents)}, covered by the donor" : "Not covered" ],
-          [ "Processing and platform fee", (money_exact(@donation.application_fee_in_cents) if @donation.application_fee_in_cents.positive?) ],
+          [ "Card processing", (money_exact(@donation.processing_fee_in_cents) if @donation.processing_fee_in_cents.positive?) ],
           [ "Joins the pool", money_exact(@donation.pool_in_cents) ],
           [ "Charged", money_exact(@donation.charged_in_cents) ],
           [ "Method", @donation.payment_method_label ],

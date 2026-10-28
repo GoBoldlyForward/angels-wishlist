@@ -85,14 +85,13 @@ module Admin
 
       post admin_organizations_path, params: { organization: {
         name: "Nashville Angels", kind: "chapter", hostname: "https://Wishlist.NashvilleAngels.example/",
-        legal_name: "Nashville Angels, Inc.", ein: "12-3456789", platform_fee_basis_points: 150
+        legal_name: "Nashville Angels, Inc.", ein: "12-3456789"
       } }
 
       chapter = Organization.find_by!(name: "Nashville Angels")
       assert_redirected_to admin_organization_path(chapter)
       assert_nil chapter.parent
-      assert_equal [ "wishlist.nashvilleangels.example", "12-3456789", 150 ],
-                   [ chapter.hostname, chapter.ein, chapter.platform_fee_basis_points ]
+      assert_equal [ "wishlist.nashvilleangels.example", "12-3456789" ], [ chapter.hostname, chapter.ein ]
       assert_equal [ "Toys & Games" ], chapter.categories.pluck(:name)
       assert_equal [ [ "Building blocks", 3_500 ] ], chapter.catalog_items.pluck(:name, :price_in_cents)
     end
@@ -101,8 +100,7 @@ module Admin
       sign_in build_organizer(organization: @chapter)
 
       post admin_organizations_path, params: { organization: {
-        name: "Nashville Angels", kind: "chapter", hostname: "wishlist.nashvilleangels.example",
-        platform_fee_basis_points: 0
+        name: "Nashville Angels", kind: "chapter", hostname: "wishlist.nashvilleangels.example"
       } }
 
       added = Organization.find_by!(name: "Nashville Angels")
@@ -111,11 +109,11 @@ module Admin
       assert_nil added.hostname
     end
 
-    test "an organizer cannot change the chapter's host name or fee" do
+    test "an organizer cannot change the chapter's host name" do
       sign_in build_organizer(organization: @chapter)
 
       patch admin_organization_path(@chapter), params: { organization: {
-        legal_name: "Atlanta Angels, Inc.", hostname: "evil.example", platform_fee_basis_points: 0
+        legal_name: "Atlanta Angels, Inc.", hostname: "evil.example"
       } }
 
       assert_redirected_to admin_organization_path(@chapter)

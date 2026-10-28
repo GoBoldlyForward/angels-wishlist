@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_05_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_28_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -167,7 +167,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_130000) do
     t.datetime "note_approved_at"
     t.text "note_to_family"
     t.string "payment_method_label"
-    t.integer "platform_fee_in_cents", default: 0, null: false
     t.integer "processing_fee_in_cents", default: 0, null: false
     t.datetime "receipt_sent_at"
     t.string "status", default: "pending", null: false
@@ -302,12 +301,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_130000) do
     t.bigint "mailing_address_id"
     t.string "name", null: false
     t.bigint "parent_id"
-    t.integer "platform_fee_basis_points", default: 0, null: false
     t.bigint "primary_contact_id"
     t.string "short_name"
     t.string "slug"
-    t.string "stripe_account_id"
-    t.boolean "stripe_charges_enabled", default: false, null: false
     t.jsonb "theme", default: {}, null: false
     t.datetime "updated_at", null: false
     t.string "website_url"
@@ -324,7 +320,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_130000) do
     t.text "adjustment_note"
     t.integer "amount_in_cents", default: 0, null: false
     t.datetime "created_at", null: false
-    t.integer "debited_in_cents"
     t.datetime "deleted_at"
     t.bigint "event_id", null: false
     t.string "gift_card_email"
@@ -335,7 +330,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_130000) do
     t.datetime "scheduled_for"
     t.datetime "sent_at"
     t.string "status", default: "blocked", null: false
-    t.string "stripe_debit_id"
     t.string "stripe_transfer_id"
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_payouts_on_deleted_at"

@@ -35,7 +35,6 @@ class Organization < ApplicationRecord
   validates :hostname, uniqueness: { allow_nil: true },
                        format: { with: /\A[a-z0-9.-]+(:\d+)?\z/, allow_nil: true, message: "is a host name like wishlist.example.org" }
   validates :ein, format: { with: /\A\d{2}-\d{7}\z/, allow_blank: true, message: "is nine digits written 12-3456789" }
-  validates :platform_fee_basis_points, numericality: { only_integer: true, in: 0..2_000 }
 
   def display_name
     short_name.presence || name

@@ -5,7 +5,6 @@ require_relative "funding_case"
 module Admin
   class ChapterFundsTest < FundingCase
     setup do
-      @chapter.update!(stripe_account_id: "acct_chapter", stripe_charges_enabled: true)
       @by_deposit, = build_list(asking: [ 10_000 ], payout_method: "stripe")
       @by_card, = build_list(asking: [ 10_000 ], payout_method: "gift_card")
       build_donation(event: @event, gift_in_cents: 0, general_gift_in_cents: 20_000)
@@ -21,7 +20,7 @@ module Admin
 
     test "a share already paid is no longer held" do
       @event.build_payouts!
-      @event.payouts.find_by!(household: @by_deposit).update!(status: "sent", debited_in_cents: 10_000)
+      @event.payouts.find_by!(household: @by_deposit).update!(status: "sent")
 
       with_balance(15_000) { get admin_chapter_funds_path }
 
@@ -33,7 +32,7 @@ module Admin
       released = nil
 
       with_balance(25_000) do
-        swapping(PaymentGateway, :release_to_bank, ->(_chapter, cents) { released = cents }) do
+        swapping(PaymentGateway, :release_to_bank, ->(cents) { released = cents }) do
           post release_admin_chapter_funds_path, params: { amount_in_dollars: "200" }
         end
       end
@@ -47,7 +46,7 @@ module Admin
       released = nil
 
       with_balance(25_000) do
-        swapping(PaymentGateway, :release_to_bank, ->(_chapter, cents) { released = cents }) do
+        swapping(PaymentGateway, :release_to_bank, ->(cents) { released = cents }) do
           post release_admin_chapter_funds_path, params: { amount_in_dollars: "150" }
         end
       end
@@ -59,7 +58,7 @@ module Admin
     private
 
     def with_balance(cents, &)
-      swapping(PaymentGateway, :chapter_balance_in_cents, ->(_chapter) { cents }, &)
+      swapping(PaymentGateway, :balance_in_cents, -> { cents }, &)
     end
   end
 end

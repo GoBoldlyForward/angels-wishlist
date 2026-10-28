@@ -1,7 +1,7 @@
 <% content_for :breadcrumbs do %><li class="breadcrumb-item active">Chapter funds</li><% end %>
 
 <%= render "admin/shared/page_header", title: "Chapter funds",
-           lede: "Donations land in #{current_chapter.display_name}'s own Stripe account. What caregivers are still owed by direct deposit stays there until they are paid." %>
+           lede: "Donations land in #{current_chapter.display_name}'s Stripe account. What caregivers are still owed by direct deposit stays there until they are paid." %>
 
 <% if @funds %>
   <div class="stat-cards">
@@ -54,7 +54,7 @@
           <% else %>
             <div class="drawer-note">Nothing is free to send yet.</div>
           <% end %>
-          <div class="form-text mt-3">The account pays out only when sent from here, so caregivers' shares are there on payout day.</div>
+          <div class="form-text mt-3">Set the account's payout schedule to manual in Stripe, so caregivers' shares are still here on payout day.</div>
         <% end %>
       </div>
     </div>

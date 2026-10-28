@@ -41,6 +41,22 @@ module Admin
       assert_select ".empty-state"
     end
 
+    test "a partner's page gets its own count of gifts and dollars" do
+      passion = build_organization(name: "Passion City Church", short_name: "Passion", kind: "partner", parent: @chapter)
+      through_passion = build_donation(event: @event, storefront_organization: passion,
+                                       gift_in_cents: 3_000, general_gift_in_cents: 2_000)
+      @helmet.fund!(through_passion)
+      build_donation(event: @event, storefront_organization: passion, status: "pending")
+      @mixed.update!(storefront_organization: @chapter)
+
+      get admin_donations_path
+
+      assert_select ".stat-card", text: /Gifts through Passion/ do
+        assert_select ".stat-value", "1"
+        assert_select ".stat-change", "$50 given in 1 donation"
+      end
+    end
+
     test "search finds a donation by reference or donor" do
       get admin_donations_path(q: @general.uuid.first(8))
       assert_select "tbody tr", 1

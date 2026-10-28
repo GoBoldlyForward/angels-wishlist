@@ -20,6 +20,15 @@
                 note: "#{@table.count_of(:refunded)} refunded this season" %>
 </div>
 
+<% if @table.partner_totals.any? %>
+  <div class="stat-cards">
+    <% @table.partner_totals.each do |total| %>
+      <%= stat_card "Gifts through #{total.partner.display_name}", total.gifts, icon: "people", color: "blue",
+                    note: "#{money(total.given_in_cents)} given in #{pluralize(total.donations, 'donation')}" %>
+    <% end %>
+  </div>
+<% end %>
+
 <%= render "admin/shared/table_controls", table: @table, placeholder: "Search references, donors, emails..." %>
 
 <div class="data-table-wrapper">

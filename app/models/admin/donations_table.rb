@@ -6,6 +6,9 @@ module Admin
     CHARGED = "(donations.gift_in_cents + donations.general_gift_in_cents + donations.fee_in_cents)"
     GIVEN = "(donations.gift_in_cents + donations.general_gift_in_cents)"
 
+    # What came in through one partner's own page, such as /with/passion.
+    PartnerTotal = Data.define(:partner, :donations, :gifts, :given_in_cents)
+
     CSV_COLUMNS = {
       "Reference" => ->(row) { row.uuid.first(8) },
       "Date" => ->(row) { row.created_at.to_date },
@@ -53,7 +56,28 @@ module Admin
       statuses.sum { |status| totals.dig(status.to_s, :count).to_i }
     end
 
+    # One per partner, so staff can tell a partner how many gifts its people funded.
+    def partner_totals
+      @partner_totals ||= begin
+        donations = event.donations.succeeded.where(storefront_organization: partners)
+        given = donations.group(:storefront_organization_id)
+                         .pluck(:storefront_organization_id, Arel.sql("COUNT(*)"), Arel.sql("SUM(#{GIVEN})"))
+                         .to_h { |id, count, cents| [ id, [ count, cents ] ] }
+        gifts = LineItem.joins(:donation).merge(donations).group("donations.storefront_organization_id").count
+
+        partners.map do |partner|
+          count, cents = given.fetch(partner.id, [ 0, 0 ])
+          PartnerTotal.new(partner:, donations: count, gifts: gifts.fetch(partner.id, 0), given_in_cents: cents.to_i)
+        end
+      end
+    end
+
     private
+
+    # The chapter's own page records the chapter, so only partners count here.
+    def partners
+      @partners ||= Organization.partner.where(parent_id: event.organization_id).order(:name).to_a
+    end
 
     def ledger
       event.donations.joins(:donor).preload(:donor, line_items: { wishlist: :child })

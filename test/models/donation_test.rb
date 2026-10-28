@@ -112,27 +112,18 @@ class DonationTest < ActiveSupport::TestCase
     assert_equal 8_500, 8_500 + fee - Donation.processing_fee_for(8_500 + fee)
   end
 
-  test "the fee also covers the chapter's platform fee" do
-    fee = Donation.fee_for(10_000, platform_fee_basis_points: 500)
-
-    assert_equal 844, fee
-    assert_equal 10_000, 10_000 + fee - Donation.processing_fee_for(10_000 + fee) - 500
-  end
-
   test "a covered donation joins the pool whole, and an uncovered one less its fees" do
     event = build_event
-    covered = build_donation(event: event, gift_in_cents: 10_000, fee_in_cents: 844,
-                             platform_fee_in_cents: 500, processing_fee_in_cents: 344)
-    uncovered = build_donation(event: event, gift_in_cents: 10_000, fee_in_cents: 0,
-                               platform_fee_in_cents: 500, processing_fee_in_cents: 320)
+    covered = build_donation(event: event, gift_in_cents: 10_000, fee_in_cents: 330, processing_fee_in_cents: 330)
+    uncovered = build_donation(event: event, gift_in_cents: 10_000, fee_in_cents: 0, processing_fee_in_cents: 320)
 
-    assert_equal [ 10_000, 9_180 ], [ covered.pool_in_cents, uncovered.pool_in_cents ]
-    assert_equal 19_180, event.raised_in_cents
+    assert_equal [ 10_000, 9_680 ], [ covered.pool_in_cents, uncovered.pool_in_cents ]
+    assert_equal 19_680, event.raised_in_cents
   end
 
-  test "an offline gift carries no application fee and joins the pool whole" do
+  test "an offline gift carries no processing fee and joins the pool whole" do
     donation = build_donation(event: build_event, gift_in_cents: 0, general_gift_in_cents: 5_000)
 
-    assert_equal [ 0, 5_000 ], [ donation.application_fee_in_cents, donation.pool_in_cents ]
+    assert_equal [ 0, 5_000 ], [ donation.processing_fee_in_cents, donation.pool_in_cents ]
   end
 end

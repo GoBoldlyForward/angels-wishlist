@@ -23,7 +23,7 @@ and both describe rules the program no longer follows. Neither should be built f
 | 5. Donor storefront and checkout | Built. Runs in test mode until Stripe keys are set |
 | 6. Close and payouts | Built. Transfers run in test mode until Stripe keys are set |
 | 7. Communications | Written. Nothing is sent until a mail provider is set |
-| 8. Multiple chapters on Stripe Connect | Built. Chapter accounts, destination charges, and account debits run in test mode until Stripe keys are set |
+| 8. Multiple chapters | Built for tenancy and branding. Money runs through one Stripe account, the chapter's own, in test mode until its keys are set |
 
 **Deployed:** Heroku app `angels-wishlist`, deploying from `main` after CI passes.
 
@@ -56,15 +56,14 @@ These come from the prototype as Atlanta Angels left it. Each is a requirement.
 - A line is funded whole, once, by one donation. Funding drives the storefront's counters and the
   donor's receipt. It does not decide what any household is paid.
 - A general gift is $5 or more.
-- Covering the fees is checked by default. It adds what card processing and the platform fee
-  take, so the whole gift reaches the families. The fee is stored apart from the gift.
+- Covering the fee is checked by default. It adds what card processing takes, so the whole gift
+  reaches the families. The fee is stored apart from the gift.
 - A refunded or disputed donation leaves the pool, and its lines return to open.
 
 ### Money going out
 
 - **Everything raised is pooled and spread evenly.** The pool is every succeeded donation's gift
-  and general gift for the event, less whatever of card processing and the platform fee its donor
-  did not cover.
+  and general gift for the event, less whatever of card processing its donor did not cover.
 - **Every list is funded to the same percentage.** That percentage is the pool divided by the
   total asked across every live list of a verified household, and never more than 100%.
 - A household's share is the sum of its children's list shares.
@@ -127,15 +126,15 @@ assumption in the last column until Atlanta Angels says otherwise.
 | 9 | Age or birthdate at intake? | Birthdate, seen by staff only. Donors see the age computed from it |
 | 10 | Can a caregiver name a brand or size? | Not at intake. Staff add the detail when a caregiver asks |
 | 11 | What does the staff Inbox hold? | Households to verify, lists to review, lines to review, donor notes to approve. Messages, donor questions, and agency letters stay in email |
-| 12 | How much is the fee a donor may cover? | Whatever lets the whole gift reach the families after card processing and the platform fee. It is worked out from the gift, not a flat 3% |
+| 12 | How much is the fee a donor may cover? | Whatever lets the whole gift reach the families after card processing. It is worked out from the gift, not a flat 3% |
 | 13 | Where does a partner's storefront live? | At its own path on the same site, skinned throughout, checkout included |
 | 14 | Do the Love Box choices change each year? | Yes. They are set per event and staff can edit them |
 | 15 | Is there more than one kind of staff? | Two. Admins (us) reach every chapter. Organizers reach the chapters they are members of and can do everything inside them |
 | 16 | Whose product photographs? | The prototype's are placeholders. Atlanta Angels supplies or licenses replacements before launch |
 | 17 | How does a visitor reach a chapter? | By hostname. Each chapter has its own domain or subdomain. A partner storefront stays at `/with/<partner>` under its chapter's host |
-| 18 | Where does our platform fee come from? | Out of each donation, together with card processing, as Stripe's application fee. A donor who covers the fees pays both. When a donor does not, both come out of that gift before it joins the pool |
-| 19 | What is the platform fee? | A percentage of each gift, stored on the chapter so it can differ per chapter. Each donation records the fee it was charged |
-| 20 | Which Stripe account type does a chapter get? | Express, with card payments and transfers, onboarded as a nonprofit. Account debits need the platform to carry the account's losses, which Express does |
+| 18 | Is there a platform fee? | No. The chapter's own Stripe account takes the donations, so only card processing comes out of a gift. A donor who covers the fee pays it; when a donor does not, it comes out of that gift before it joins the pool |
+| 19 | What is the fee a donor may cover? | Card processing, estimated at 2.9% plus 30¢ on what is charged. Each donation records the estimate |
+| 20 | Whose Stripe account is it? | The chapter's own. Caregivers get Express accounts connected to it for direct deposit |
 | 21 | Is the catalog shared across chapters? | No. Each chapter has its own categories and catalog, copied from a starter set when the chapter is created |
 | 22 | Can one person staff two chapters? | Yes. An organizer's memberships list their chapters, and a switcher picks the one they are working in. Donors and caregivers are not tied to a chapter |
 
@@ -354,41 +353,34 @@ services were provided in return.
 
 Production has no mail provider configured. Choosing one is part of this step.
 
-### 8. Multiple chapters on Stripe Connect
+### 8. Multiple chapters
 
 The application serves any number of chapters. Each chapter runs its own events, families,
-storefront, catalog, and staff, and links its own Stripe account. We take a platform fee on every
-gift.
+storefront, catalog, and staff. Money runs through one Stripe account, the chapter's own, so a
+second chapter with its own account is a second deployment with its own keys.
 
 #### How money moves
 
-Donations land in the chapter's own Stripe balance. The platform only touches money in passing.
+Donations land in the chapter's own Stripe balance. Nobody sits between the donor and the chapter.
 
 | When | What happens in Stripe |
 | --- | --- |
-| A donor checks out | A **destination charge** to the chapter's Express account, `on_behalf_of` the chapter. The chapter is on the donor's statement and receipt. The application fee is card processing plus the platform fee |
-| A payout is sent | An **account debit** pulls the household's share from the chapter's balance to the platform, and a transfer sends it to the caregiver's Express account |
+| A donor checks out | A Checkout payment into the chapter's account. The chapter is on the donor's statement and receipt |
+| A payout is sent | A transfer from the chapter's balance to the caregiver's Express account, which is connected to the chapter |
 | After payouts | Chapter staff send the rest of the balance to the chapter's bank. It holds the gift card households' shares, which the chapter orders through Tremendous, and any surplus |
 
-Caregivers' accounts stay connected to the platform. Stripe does not let a connected account have
-connected accounts of its own, and a transfer to a caregiver can only come from the platform's
-balance. That is what the account debit is for. Each caregiver's account is tied to a chapter
-through the household, and carries the chapter in its Stripe metadata.
-
-Each donation records its platform fee and its card processing. Processing is estimated at the
-platform's rate, 2.9% plus 30¢, when the donation is created. The pool is every succeeded gift,
-less whatever of those two fees the donor did not cover.
+Each donation records its card processing, estimated at 2.9% plus 30¢ when the donation is
+created. The pool is every succeeded gift, less whatever of that the donor did not cover.
 
 What this commits us to:
 
-- **Chapter accounts pay out manually.** The balance has to be there on payout day, because a
-  debit cannot take an account below zero. The staff funds page shows what is held back for
-  unsent payouts and sends the rest to the bank.
-- **Every chapter signs consent to account debits.** Stripe charges extra for each one.
-- **Stripe charges processing to the platform** on a destination charge. The application fee
-  covers it. A card that costs more than 2.9% plus 30¢ costs the platform the difference.
-- **A refund reverses the chapter's transfer and returns the application fee.** It fails when the
-  chapter's balance cannot cover it, and staff see Stripe's reason.
+- **The account pays out manually.** The balance has to be there on payout day, because a
+  transfer cannot take it below zero. The schedule is set in the Stripe Dashboard. The staff funds
+  page shows what is held back for unsent payouts and sends the rest to the bank.
+- **Connect is on, for caregivers.** Each caregiver paid by direct deposit is an Express account
+  connected to the chapter. Stripe bills per active Express account and per payout.
+- **A refund is a plain refund.** It fails when the balance cannot cover it, and staff see
+  Stripe's reason.
 
 #### Tenancy
 
@@ -420,23 +412,20 @@ held in the session.
 
 #### Chapter onboarding
 
-1. A platform administrator creates the chapter, its hostname, and its fee rate. Its categories
-   and catalog are copied from the oldest chapter.
+1. An administrator creates the chapter and its hostname. Its categories and catalog are copied
+   from the oldest chapter.
 2. Organizers are added from the chapter's Staff page and choose a password from an emailed link.
-3. An organizer completes Stripe's hosted onboarding for an Express account, as the nonprofit.
-4. Returning from Stripe, and every `account.updated` webhook, records whether the account can
-   take charges.
-5. The storefront refuses checkout until it can.
+3. The chapter's Stripe keys are set in the environment. Until then the storefront runs in test
+   mode.
 
 #### Schema
 
-- `organizations`: `hostname` (unique), `legal_name`, `ein`, `mail_from`,
-  `platform_fee_basis_points`, `stripe_charges_enabled`. `stripe_account_id` already exists.
+- `organizations`: `hostname` (unique), `legal_name`, `ein`, `mail_from`.
 - `categories` and `catalog_items`: `organization_id`.
-- `donations`: `platform_fee_in_cents`, `processing_fee_in_cents`.
-- `payouts`: `stripe_debit_id`, so a retried payout never debits twice.
+- `donations`: `processing_fee_in_cents`.
 - `versions`: `organization_id`, so the audit trail filters to a chapter.
-- A Connect webhook endpoint beside the existing one, with its own signing secret.
+- A Connect webhook endpoint beside the existing one, with its own signing secret, for caregivers'
+  `account.updated` events.
 
 #### Order of work
 
@@ -444,15 +433,16 @@ held in the session.
 | --- | --- |
 | a. Tenancy | Two chapters on two hosts each run a season, and a test walks the admin as each chapter's organizer and never reaches the other chapter's records |
 | b. Chapter branding | Nothing in `app/` names Atlanta Angels, and each chapter's storefront, emails, and receipt carry its own name and EIN |
-| c. Chapter Stripe onboarding | A chapter reaches charges enabled through hosted onboarding, and checkout is refused before then |
-| d. Destination charges | A donation goes to the chapter's account with the application fee, and the pool is net of what the donor did not cover |
-| e. Payouts by account debit | A Stripe payout debits the chapter once and transfers once, even when retried |
-| f. Chapter funds | Staff see the chapter's balance, what is held for unsent payouts, and send the rest to the bank |
+| c. Charges into the chapter's account | A donation goes into the account the keys belong to, and the pool is net of what the donor did not cover |
+| d. Payouts by transfer | A Stripe payout is one transfer from the balance to the caregiver, and a failed one can be retried |
+| e. Chapter funds | Staff see the balance, what is held for unsent payouts, and send the rest to the bank |
 
 ## Before launch
 
-- [ ] Stripe keys, webhook secret, and a Connect platform account. A caregiver counts as connected once Stripe
-      reports its onboarding form finished, checked when they return to the payout step
+- [ ] The chapter's Stripe keys and both webhook secrets, with Connect and Express accounts enabled
+      on the account and its payout schedule set to manual. A caregiver counts as connected once
+      Stripe reports its onboarding form finished, from the webhook or when they return to the
+      payout step
 - [ ] S3 bucket and credentials
 - [ ] A mail provider and a sending domain
 - [ ] Font Awesome kit
@@ -461,6 +451,4 @@ held in the session.
 - [ ] A real staff administrator in production. The seeds create demo accounts with a known
       password and must not run there
 - [ ] Every decision above answered
-- [ ] Account debits enabled on the platform, and each chapter's signed consent to them
-- [ ] `STRIPE_CONNECT_WEBHOOK_SECRET` for the Connect webhook endpoint
 - [ ] A hostname and TLS certificate for each chapter

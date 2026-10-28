@@ -18,7 +18,7 @@ module Admin
     end
 
     def balance_in_cents
-      @balance_in_cents ||= PaymentGateway.chapter_balance_in_cents(chapter)
+      @balance_in_cents ||= PaymentGateway.balance_in_cents
     end
 
     def events
@@ -40,7 +40,7 @@ module Admin
       return "Choose an amount above zero." unless cents.positive?
       return "Only #{Dollars.from_cents(releasable_in_cents)} is free to send. The rest is owed to caregivers." if cents > releasable_in_cents
 
-      PaymentGateway.release_to_bank(chapter, cents)
+      PaymentGateway.release_to_bank(cents)
       nil
     end
 
@@ -50,9 +50,7 @@ module Admin
     def held_for(event)
       by_card = event.counted_wishlists.where(households: { payout_method: "gift_card" }).pluck(:id)
       owed = event.shares.sum { |wishlist_id, cents| by_card.include?(wishlist_id) ? 0 : cents }
-      stripe = event.payouts.via_stripe
-      paid = stripe.where(status: SENT).sum(:amount_in_cents) +
-             stripe.where.not(status: SENT).sum("COALESCE(debited_in_cents, 0)")
+      paid = event.payouts.via_stripe.where(status: SENT).sum(:amount_in_cents)
       Held.new(event:, owed_in_cents: owed, paid_in_cents: paid)
     end
   end

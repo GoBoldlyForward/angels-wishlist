@@ -60,40 +60,6 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "35d386d8af623f7fb727646a0e11db4ecc7fb36cfe39e27a94eb4ad963e9fbc8",
-      "check_name": "LinkToHref",
-      "message": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/admin/organizations/show.html.erb",
-      "line": 28,
-      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(Organization.friendly.find(params[:id]).website_url, Organization.friendly.find(params[:id]).website_url, :target => \"_blank\", :rel => \"noopener\")",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Admin::OrganizationsController",
-          "method": "show",
-          "line": 12,
-          "file": "app/controllers/admin/organizations_controller.rb",
-          "rendered": {
-            "name": "admin/organizations/show",
-            "file": "app/views/admin/organizations/show.html.erb"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "admin/organizations/show"
-      },
-      "user_input": "Organization.friendly.find(params[:id]).website_url",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "The address passes the url validator on its model, which accepts only http and https."
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 4,
       "fingerprint": "535313a729611f42da27461e711fea30e9e2b23d1305f039d9b9bc108ce97bb7",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",

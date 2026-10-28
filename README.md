@@ -112,9 +112,9 @@ Every key the app reads comes from the environment. Locally they go in `.env`, c
 | `RAILS_MASTER_KEY` or `SECRET_KEY_BASE` | production | Signs sessions and Devise tokens. The master key decrypts `config/credentials.yml.enc` | Production does not boot |
 | `DATABASE_URL` | production | Postgres. Heroku sets it | Development and test use the databases named in `config/database.yml` |
 | `APP_HOST` | production | The host in links inside emails, such as password resets | Links point at `localhost:3000` |
-| `STRIPE_SECRET_KEY` | live money | Every call to Stripe: checkout, refunds, chapter and caregiver onboarding, account debits, transfers, chapter balances and bank payouts | Test mode: a banner says so, checkout records the donation without charging, and onboarding and payouts succeed at once without moving money |
-| `STRIPE_WEBHOOK_SECRET` | live money | Verifies the platform's own events at `/stripe/webhooks`: checkouts, refunds, disputes | Webhooks are refused, so a donor who closes the tab after paying is not recorded until they return |
-| `STRIPE_CONNECT_WEBHOOK_SECRET` | live money | Verifies connected accounts' events at the same URL. `account.updated` is what turns a chapter's donations on | A chapter's account is only rechecked when an organizer returns from Stripe onboarding |
+| `STRIPE_SECRET_KEY` | live money | The chapter's own Stripe account. Every call goes through it: checkout, refunds, caregiver onboarding, transfers, the balance and bank payouts | Test mode: a banner says so, checkout records the donation without charging, and onboarding and payouts succeed at once without moving money |
+| `STRIPE_WEBHOOK_SECRET` | live money | Verifies the account's own events at `/stripe/webhooks`: checkouts, refunds, disputes | Webhooks are refused, so a donor who closes the tab after paying is not recorded until they return |
+| `STRIPE_CONNECT_WEBHOOK_SECRET` | live money | Verifies connected accounts' events at the same URL. `account.updated` marks a caregiver's onboarding finished | A caregiver's account is only rechecked when they return from Stripe onboarding |
 | `SMTP_ADDRESS`, `SMTP_USERNAME`, `SMTP_PASSWORD` | sending mail | The mail provider. `SMTP_PORT` defaults to 587 | Production skips and logs every message, password resets included |
 | `MAIL_FROM` | sending mail | The default sender, such as `Wish List <wishlist@example.org>`. A chapter with its own verified address sends as that instead | Mail comes from `wishlist@example.org` |
 | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | uploads | Active Storage on S3, for catalog photos and logos. `AWS_REGION` defaults to `us-east-1` and `AWS_BUCKET` to `angels-wishlist`, with the environment name appended | Catalog items show their bundled photos, and uploading a photo or logo fails |
@@ -128,12 +128,14 @@ Every key the app reads comes from the environment. Locally they go in `.env`, c
 `STRIPE_PUBLISHABLE_KEY` is not read. Checkout and onboarding both use Stripe's hosted pages, so
 no key reaches the browser.
 
-Stripe needs more than keys before live money moves: a Connect platform account with account
-debits enabled, and each chapter's signed consent to account debits. Point both webhook endpoints,
-the platform's and Connect's, at `https://<host>/stripe/webhooks`. The Connect endpoint needs
-`account.updated`. The platform endpoint needs `checkout.session.completed`,
-`checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`,
-`checkout.session.expired`, `charge.refunded`, and `charge.dispute.created`.
+The keys come from the chapter's own Stripe account, which donations land in directly. That
+account needs Connect enabled with Express accounts, since each caregiver paid by direct deposit
+gets one, and a manual payout schedule, so the balance is still there when caregivers are paid.
+Point both webhook endpoints, the account's own and Connect's, at `https://<host>/stripe/webhooks`.
+The Connect endpoint needs `account.updated`. The account's own endpoint needs
+`checkout.session.completed`, `checkout.session.async_payment_succeeded`,
+`checkout.session.async_payment_failed`, `checkout.session.expired`, `charge.refunded`, and
+`charge.dispute.created`.
 
 ## The three scopes
 
@@ -155,8 +157,7 @@ and a controller namespace of the same name collides with it.
 
 - **Organizations are one table.** Chapters, placing agencies, and co-branding partners share it,
   distinguished by `kind` and nested through `parent_id`. A partner-hosted drive is an organization
-  with a theme. A partner skin changes who hosts the drive, never who holds the funds, so the
-  Stripe account is looked up through the tree.
+  with a theme. A partner skin changes who hosts the drive, never who holds the funds.
 - **Events belong to an organization.** A chapter can run several drives a year or skip a year.
   Households persist across events; a wishlist is one child in one event.
 - **Every person is a user.** Admins, organizers, caregivers, and donors share the table with one
@@ -239,9 +240,10 @@ heroku run bin/rails console -a angels-wishlist
       `--on-brand` contrast: Angels gold on white is 2.9:1 and fails.
 - [ ] **S3.** Create the bucket and set `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`,
       and `AWS_BUCKET`. Production Active Storage already points at the `amazon` service.
-- [ ] **Stripe.** Set `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and
-      `STRIPE_CONNECT_WEBHOOK_SECRET`, enable account debits, and register both webhook endpoints.
-      See [Configuration](#configuration).
+- [ ] **Stripe.** In the chapter's account, enable Connect with Express accounts, set payouts to
+      manual, register both webhook endpoints, and set `STRIPE_SECRET_KEY`,
+      `STRIPE_WEBHOOK_SECRET`, and `STRIPE_CONNECT_WEBHOOK_SECRET`. See
+      [Configuration](#configuration).
 - [ ] **Mail.** Choose a provider and a sending domain, then set `SMTP_ADDRESS`, `SMTP_USERNAME`,
       `SMTP_PASSWORD`, `MAIL_FROM`, and `APP_HOST`.
 - [ ] **Decisions.** Sixteen questions in the build plan are waiting on Atlanta Angels. The build

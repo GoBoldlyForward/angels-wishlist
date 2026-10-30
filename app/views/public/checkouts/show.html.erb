@@ -50,6 +50,10 @@
         </div>
       <% end %>
 
+      <% if year_end_appeal.enabled? %>
+        <%= render "public/checkouts/year_end_appeal", appeal: year_end_appeal, cart: cart %>
+      <% end %>
+
       <div class="panel panel-warm">
         <h2 class="t-md">What your <%= money total %> actually does</h2>
         <div class="flow checkout-flow">
@@ -63,7 +67,8 @@
     <div>
       <%= form_with model: @checkout, scope: :checkout, url: checkout_path, class: "panel checkout-form",
                     data: { turbo: false, controller: "checkout-fee",
-                            checkout_fee_total_value: total, checkout_fee_fee_value: cart.fee_in_cents } do |form| %>
+                            checkout_fee_total_value: cart.grand_total_in_cents,
+                            checkout_fee_fee_value: cart.fee_in_cents } do |form| %>
         <% if @checkout.errors[:base].any? %>
           <div class="flash flash-alert" role="alert"><%= @checkout.errors[:base].to_sentence %></div>
         <% end %>
@@ -115,6 +120,14 @@
           </span>
         </label>
 
+        <% if cart.year_end_gift? %>
+          <div class="total-row total-row-sub">
+            <span class="muted">Wish list gifts</span><span><%= money_exact total %></span>
+          </div>
+          <div class="total-row total-row-sub">
+            <span class="muted">Year-end gift</span><span><%= money_exact cart.year_end_gift_in_cents %></span>
+          </div>
+        <% end %>
         <div class="total-row">
           <span class="muted">Total charged</span>
           <b data-checkout-fee-target="total"><%= money_exact @checkout.charged_in_cents %></b>
@@ -130,6 +143,7 @@
       <div class="disclosure checkout-disclosure">
         <%= chapter %> is a 501(c)(3). Your gift is a tax-deductible donation designated to the holiday wish
         list program, not a purchase of goods, and no goods or services are provided to you in return.
+        <% if cart.year_end_gift? %>Your year-end gift is an unrestricted donation to <%= chapter %>'s programs.<% end %>
       </div>
     </div>
   </div>

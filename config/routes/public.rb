@@ -15,6 +15,7 @@ scope "(/with/:storefront)", module: "public" do
   resource :cart, only: :show do
     resources :gifts, only: %i[create destroy], module: :carts
     resources :general_gifts, only: %i[create destroy], module: :carts
+    resource :year_end_gift, only: %i[create destroy], module: :carts
   end
   resource :checkout, only: %i[show create]
   resources :donations, only: :show, param: :uuid

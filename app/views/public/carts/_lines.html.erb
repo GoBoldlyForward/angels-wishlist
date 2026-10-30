@@ -30,4 +30,16 @@
       <div class="price"><%= money cents %></div>
     </div>
   <% end %>
+  <% if cart.year_end_gift? %>
+    <div class="line" style="--i:<%= cart.count %>">
+      <div class="line-art t5" aria-hidden="true">🌟</div>
+      <div class="line-body">
+        <div class="line-name">Year-end gift</div>
+        <div class="line-sub">Directly to <%= chapter_name %>, on top of the lists</div>
+        <%= button_to "Remove", cart_year_end_gift_path, method: :delete, class: "rm",
+                      form: { data: { turbo_frame: "_top" } }, aria: { label: "Remove the year-end gift" } %>
+      </div>
+      <div class="price"><%= money cart.year_end_gift_in_cents %></div>
+    </div>
+  <% end %>
 <% end %>

@@ -148,3 +148,43 @@ input.step-n:focus-visible { box-shadow: var(--ring); border-radius: 8px; outlin
   .modal { padding: 10px; }
   .stepper-row .btn { width: 100%; }
 }
+
+/* Year-end appeal at checkout. */
+.yeg { background: linear-gradient(180deg, #fff 0%, var(--brand-wash) 100%); border-color: var(--brand-edge); margin-bottom: 18px; scroll-margin-top: 90px; }
+.yeg-title { margin: 12px 0 10px; }
+.yeg-lede { color: var(--body); line-height: 1.55; margin: 0 0 20px; }
+.yeg-stats { display: grid; gap: 10px; grid-template-columns: repeat(2, 1fr); }
+.yeg-stat { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px 14px; }
+.yeg-stat b { color: var(--brand-deep); display: block; font-size: var(--fs-2xl); font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+.yeg-stat span { color: var(--soft); display: block; font-size: var(--fs-sm); line-height: 1.35; margin-top: 6px; }
+.yeg-source { margin: 10px 0 20px; }
+.yeg-chosen { align-items: flex-start; background: var(--green-bg); border: 1px solid #cfe6da; border-radius: 14px; display: flex; gap: 12px; margin-bottom: 14px; padding: 14px 16px; }
+.yeg-chosen > i { color: var(--green); font-size: var(--fs-lg); margin-top: 2px; }
+.yeg-chosen-body { flex: 1; min-width: 0; }
+.yeg-chosen .rm { align-self: center; }
+.yeg-reveal > summary { list-style: none; }
+.yeg-reveal > summary::-webkit-details-marker { display: none; }
+.yeg-open i { font-size: var(--fs-xs); margin-left: 8px; transition: transform .16s; }
+.yeg-reveal[open] .yeg-open i { transform: rotate(180deg); }
+.yeg-form { margin-top: 18px; }
+.yeg-form-lede { margin: 0 0 12px; }
+.yeg-tiers { display: grid; gap: 10px; }
+.yeg-tier { background: #fff; border: 1.5px solid var(--line); border-radius: 14px; cursor: pointer; display: grid; gap: 12px; grid-template-columns: auto 1fr; padding: 14px 16px; transition: .14s; }
+.yeg-tier:hover { border-color: var(--brand); }
+.yeg-tier:has(input:checked) { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.yeg-tier input[type="radio"] { accent-color: var(--ink); height: 18px; margin: 3px 0 0; width: 18px; }
+.yeg-tier-body { display: grid; gap: 4px; min-width: 0; }
+.yeg-tier-head { align-items: baseline; display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.yeg-amount { color: var(--ink); font-size: var(--fs-lg); font-weight: 700; letter-spacing: -.02em; }
+.yeg-tier-title { color: var(--brand-deep); font-weight: 650; }
+.yeg-teaser { color: var(--soft); font-size: var(--fs-sm); }
+.yeg-tier-text { color: var(--body); font-size: var(--fs-sm); line-height: 1.5; }
+.yeg-custom-in { margin-top: 6px; max-width: 200px; position: relative; }
+.yeg-custom-in > span { color: var(--soft); font-weight: 600; left: 14px; position: absolute; top: 50%; transform: translateY(-50%); }
+.yeg-custom-in input.i { padding-left: 30px; }
+.yeg-custom-in input::-webkit-outer-spin-button, .yeg-custom-in input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.yeg-custom-in input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+.yeg-add { margin-top: 14px; }
+.total-row-sub { gap: 12px; margin-bottom: 6px; }
+.total-row-sub span:last-child { color: var(--body); font-weight: 600; }
+.total-row-sub + .total-row { border-top: 1px solid var(--line-soft); margin-top: 10px; padding-top: 10px; }

@@ -60,4 +60,5 @@ namespace :admin do
   resources :catalog_items, except: :show
   resources :organizations, except: :destroy
   resources :organizers, only: %i[index new create destroy]
+  resource :year_end_appeal, only: %i[show update]
 end

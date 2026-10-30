@@ -1,0 +1,115 @@
+<% content_for :breadcrumbs do %>
+  <li class="breadcrumb-item active">Year-end appeal</li>
+<% end %>
+
+<%= render "admin/shared/page_header", title: "Year-end appeal",
+           lede: "What donors read at checkout before they give, and the gifts they can add on top of the lists." do %>
+  <%= link_to root_path(anchor: "shop"), class: "btn btn-outline-secondary", target: "_blank", rel: "noopener" do %>
+    <i class="bi bi-shop"></i> Open the shop
+  <% end %>
+<% end %>
+
+<%= form_with model: @form, scope: :year_end_appeal, url: admin_year_end_appeal_path, method: :patch do |form| %>
+  <%= render "admin/shared/error_summary", record: @form %>
+
+  <div class="row g-3">
+    <div class="col-lg-6">
+      <div class="panel-card p-4">
+        <%= detail_section "What donors read" do %>
+          <div class="form-check mb-3">
+            <%= form.check_box :enabled, class: "form-check-input", checked: @form.enabled %>
+            <%= form.label :enabled, "Show the appeal at checkout", class: "form-check-label" %>
+          </div>
+          <div class="mb-3">
+            <%= form.label :headline, class: "form-label" %>
+            <%= form.text_field :headline, class: "form-control", maxlength: 120 %>
+          </div>
+          <div class="mb-3">
+            <%= form.label :lede, "Paragraph under the headline", class: "form-label" %>
+            <%= form.text_area :lede, class: "form-control", rows: 4, maxlength: 600 %>
+            <div class="form-text">Two or three sentences. Say what the cart funds and what a year-end gift funds.</div>
+          </div>
+        <% end %>
+
+        <%= detail_section "Where the figures come from" do %>
+          <div class="mb-3">
+            <%= form.label :period, "Period the figures cover", class: "form-label" %>
+            <%= form.text_field :period, class: "form-control", placeholder: "January through June 2026" %>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-5">
+              <%= form.label :source_label, "Source, as it reads", class: "form-label" %>
+              <%= form.text_field :source_label, class: "form-control" %>
+            </div>
+            <div class="col-md-7">
+              <%= form.label :source_url, "Link to the source", class: "form-label" %>
+              <%= form.url_field :source_url, class: "form-control", placeholder: "https://" %>
+            </div>
+          </div>
+          <div class="form-text">Shown in small print under the figures. Leave the link blank to show the source as plain text.</div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="panel-card p-4">
+        <%= detail_section "The figures" do %>
+          <p class="small text-muted">Four read best. A row left blank is dropped.</p>
+          <% @form.stat_rows.each_with_index do |stat, index| %>
+            <div class="row g-2 mb-2 align-items-center">
+              <div class="col-4">
+                <%= text_field_tag "year_end_appeal[stats][#{index}][figure]", stat["figure"], class: "form-control fw-semibold",
+                                   placeholder: "163", aria: { label: "Figure #{index + 1}" } %>
+              </div>
+              <div class="col-8">
+                <%= text_field_tag "year_end_appeal[stats][#{index}][label]", stat["label"], class: "form-control",
+                                   placeholder: "kids matched in Love Box®", aria: { label: "Label for figure #{index + 1}" } %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="panel-card p-4">
+        <%= detail_section "Gift tiers" do %>
+          <p class="small text-muted">
+            Shown smallest first. The largest amount reads with a plus sign. A row without an amount or a title is dropped.
+          </p>
+          <% @form.tier_rows.each_with_index do |tier, index| %>
+            <div class="row g-2 mb-3 pb-3 border-bottom">
+              <div class="col-md-2">
+                <label class="form-label small" for="tier_<%= index %>_dollars">Amount</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <%= text_field_tag "year_end_appeal[tiers][#{index}][dollars]", tier["dollars"], class: "form-control",
+                                     id: "tier_#{index}_dollars", inputmode: "numeric", placeholder: "250" %>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small" for="tier_<%= index %>_title">Title</label>
+                <%= text_field_tag "year_end_appeal[tiers][#{index}][title]", tier["title"], class: "form-control",
+                                   id: "tier_#{index}_title", maxlength: 60 %>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small" for="tier_<%= index %>_teaser">Short line, in italics</label>
+                <%= text_field_tag "year_end_appeal[tiers][#{index}][teaser]", tier["teaser"], class: "form-control",
+                                   id: "tier_#{index}_teaser", maxlength: 160 %>
+              </div>
+              <div class="col-12">
+                <label class="form-label small" for="tier_<%= index %>_body">What the gift can do</label>
+                <%= text_area_tag "year_end_appeal[tiers][#{index}][body]", tier["body"], class: "form-control",
+                                  id: "tier_#{index}_body", rows: 2, maxlength: 300 %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+
+        <div class="drawer-actions">
+          <%= form.submit "Save the appeal", class: "btn btn-primary" %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -24,6 +24,10 @@ module Storefront
       Array(store["general_gifts"]).map(&:to_i)
     end
 
+    def year_end_gift_in_cents
+      store["year_end_gift"].to_i
+    end
+
     # The lines still open, in the order they were added. One that closed since
     # it was added leaves the cart here and is counted in dropped_count.
     def lines
@@ -59,8 +63,13 @@ module Storefront
       gift_in_cents + general_gift_in_cents
     end
 
+    # What the card is charged before fees: the wish list gifts and the year-end gift.
+    def grand_total_in_cents
+      total_in_cents + year_end_gift_in_cents
+    end
+
     def fee_in_cents
-      Donation.fee_for(total_in_cents)
+      Donation.fee_for(grand_total_in_cents)
     end
 
     def count
@@ -93,8 +102,21 @@ module Storefront
     end
 
     def add_general_gift_in_dollars(dollars)
-      amount = BigDecimal(dollars.to_s.delete("$, "), exception: false)
-      amount&.finite? ? add_general_gift((amount * 100).round) : false
+      cents = cents_from(dollars)
+      cents ? add_general_gift(cents) : false
+    end
+
+    # One year-end gift at a time; choosing another replaces it.
+    def set_year_end_gift(cents)
+      return false unless cents.to_i.between?(Donation::MINIMUM_GENERAL_GIFT_IN_CENTS, LARGEST_GENERAL_GIFT_IN_CENTS)
+
+      write("year_end_gift" => cents.to_i)
+      true
+    end
+
+    def set_year_end_gift_in_dollars(dollars)
+      cents = cents_from(dollars)
+      cents ? set_year_end_gift(cents) : false
     end
 
     def remove_gift(key)
@@ -113,6 +135,10 @@ module Storefront
       write("general_gifts" => amounts)
     end
 
+    def remove_year_end_gift
+      write("year_end_gift" => 0)
+    end
+
     def clear
       @session.delete(SESSION_KEY)
       @lines = nil
@@ -126,6 +152,10 @@ module Storefront
       lines.any?
     end
 
+    def year_end_gift?
+      year_end_gift_in_cents.positive?
+    end
+
     private
 
     def store
@@ -133,11 +163,17 @@ module Storefront
     end
 
     def write(changes)
-      @session[SESSION_KEY] = { "line_item_ids" => line_item_ids, "general_gifts" => general_gifts }.merge(changes)
+      @session[SESSION_KEY] = { "line_item_ids" => line_item_ids, "general_gifts" => general_gifts,
+                                "year_end_gift" => year_end_gift_in_cents }.merge(changes)
     end
 
     def shoppable
       Catalog.shoppable_lines(@event)
+    end
+
+    def cents_from(dollars)
+      amount = BigDecimal(dollars.to_s.delete("$, "), exception: false)
+      (amount * 100).round if amount&.finite?
     end
 
     def add(open_lines, limit: nil)

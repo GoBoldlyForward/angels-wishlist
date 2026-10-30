@@ -1,0 +1,77 @@
+<%# locals: (appeal:, cart:) -%>
+<% chosen = appeal.tier_for(cart.year_end_gift_in_cents) %>
+<section class="panel yeg" id="year-end" aria-labelledby="yeg_title">
+  <span class="tag tag-accent">Year-end giving</span>
+  <h2 class="t-xl yeg-title text-balance" id="yeg_title"><%= appeal.headline %></h2>
+  <p class="yeg-lede"><%= appeal.lede %></p>
+
+  <div class="yeg-stats">
+    <% appeal.stats.each do |stat| %>
+      <div class="yeg-stat"><b><%= stat.figure %></b><span><%= stat.label %></span></div>
+    <% end %>
+  </div>
+  <p class="tiny muted yeg-source">
+    <%= appeal.period %>, from
+    <%= link_to "#{chapter_name}' mid-year impact snapshot", appeal.source_url, class: "link", target: "_blank",
+                rel: "noopener" %>.
+  </p>
+
+  <% if cart.year_end_gift? %>
+    <div class="yeg-chosen" role="status">
+      <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+      <div class="yeg-chosen-body">
+        <div class="t-base w-600 ink">
+          <%= money cart.year_end_gift_in_cents %> year-end gift<%= " · #{chosen.title}" if chosen %>
+        </div>
+        <div class="tiny muted">
+          <%= chosen ? chosen.body : "Goes directly to #{chapter_name}, on top of the gifts in your cart." %>
+        </div>
+      </div>
+      <%= button_to "Remove", cart_year_end_gift_path, method: :delete, class: "rm",
+                    aria: { label: "Remove the year-end gift" } %>
+    </div>
+  <% end %>
+
+  <details class="yeg-reveal">
+    <summary class="btn <%= cart.year_end_gift? ? "btn-ghost" : "btn-ink" %> yeg-open">
+      <%= cart.year_end_gift? ? "Change my year-end gift" : "Add a year-end gift" %>
+      <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+    </summary>
+    <%= form_with url: cart_year_end_gift_path, class: "yeg-form", data: { controller: "year-end-gift" } do |form| %>
+      <p class="t-sm muted yeg-form-lede">Choose what your gift can do. It is added to the donation in your cart.</p>
+      <div class="yeg-tiers" role="radiogroup" aria-label="Year-end gift amount">
+        <% appeal.tiers.each do |tier| %>
+          <label class="yeg-tier">
+            <%= form.radio_button :amount, tier.dollars, checked: tier.cents == cart.year_end_gift_in_cents,
+                                                         data: { action: "year-end-gift#refresh" } %>
+            <span class="yeg-tier-body">
+              <span class="yeg-tier-head">
+                <b class="yeg-amount"><%= tier.amount_label %></b>
+                <span class="yeg-tier-title"><%= tier.title %></span>
+              </span>
+              <em class="yeg-teaser"><%= tier.teaser %></em>
+              <span class="yeg-tier-text"><%= tier.body %></span>
+            </span>
+          </label>
+        <% end %>
+        <label class="yeg-tier yeg-tier-custom">
+          <%= form.radio_button :amount, "custom", checked: cart.year_end_gift? && chosen.nil?,
+                                                   data: { year_end_gift_target: "customChoice",
+                                                           action: "year-end-gift#refresh" } %>
+          <span class="yeg-tier-body">
+            <span class="yeg-tier-head"><b class="yeg-amount">Another amount</b></span>
+            <span class="yeg-custom-in">
+              <span aria-hidden="true">$</span>
+              <%= form.number_field :custom_amount, min: 5, step: 1, inputmode: "numeric", placeholder: 75,
+                                                    value: (cart.year_end_gift_in_cents / 100 if cart.year_end_gift? && chosen.nil?),
+                                                    aria: { label: "Another amount, in dollars" },
+                                                    data: { year_end_gift_target: "custom",
+                                                            action: "input->year-end-gift#typed" } %>
+            </span>
+          </span>
+        </label>
+      </div>
+      <%= form.button "Add to my donation", class: "btn btn-primary yeg-add", data: { year_end_gift_target: "submit" } %>
+    <% end %>
+  </details>
+</section>

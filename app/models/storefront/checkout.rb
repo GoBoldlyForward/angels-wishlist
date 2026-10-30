@@ -33,7 +33,7 @@ module Storefront
     end
 
     def charged_in_cents
-      cart.total_in_cents + fee_in_cents
+      cart.grand_total_in_cents + fee_in_cents
     end
 
     def save

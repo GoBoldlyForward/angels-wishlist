@@ -112,6 +112,37 @@ module Storefront
       assert_equal [ [ "Maya", [ "Hoodie", "Book set" ] ], [ "Theo", [ "Hoodie" ] ] ], groups
     end
 
+    test "a year-end gift sits on top of the wish list total and is charged the fee" do
+      @cart.add_general_gift(2_500)
+
+      assert @cart.set_year_end_gift_in_dollars("250")
+      assert @cart.year_end_gift?
+      assert_equal 25_000, @cart.year_end_gift_in_cents
+      assert_equal 2_500, @cart.total_in_cents
+      assert_equal 27_500, @cart.grand_total_in_cents
+      assert_equal Donation.fee_for(27_500), @cart.fee_in_cents
+      assert_equal 1, @cart.count
+    end
+
+    test "choosing another year-end gift replaces the first, and it can be removed" do
+      @cart.set_year_end_gift(5_000)
+      @cart.set_year_end_gift(10_000)
+
+      assert_equal 10_000, @cart.year_end_gift_in_cents
+
+      @cart.remove_year_end_gift
+
+      assert_not @cart.year_end_gift?
+      assert_equal 0, @cart.grand_total_in_cents
+    end
+
+    test "a year-end gift is five dollars or more" do
+      assert_not @cart.set_year_end_gift_in_dollars("4.99")
+      assert_not @cart.set_year_end_gift_in_dollars("")
+      assert_not @cart.set_year_end_gift_in_dollars("NaN")
+      assert @cart.set_year_end_gift_in_dollars("$5")
+    end
+
     test "clearing the cart empties the session" do
       @cart.add_general_gift(2_500)
 

@@ -50,7 +50,9 @@
         </div>
       <% end %>
 
-      <%= render "public/checkouts/year_end_appeal", appeal: year_end_appeal, cart: cart %>
+      <% if year_end_appeal.enabled? %>
+        <%= render "public/checkouts/year_end_appeal", appeal: year_end_appeal, cart: cart %>
+      <% end %>
 
       <div class="panel panel-warm">
         <h2 class="t-md">What your <%= money total %> actually does</h2>

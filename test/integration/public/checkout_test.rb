@@ -69,6 +69,16 @@ module Public
       assert_select ".total-row b", "$41.50"
     end
 
+    test "a chapter can switch the year-end appeal off" do
+      @chapter.update!(year_end_appeal: { "enabled" => false })
+      add_to_cart @mayas_hoodie
+
+      visit checkout_path
+
+      assert_response :success
+      assert_select "#year-end", 0
+    end
+
     test "a year-end gift typed as another amount has to be five dollars or more" do
       add_to_cart @mayas_hoodie
 

@@ -10,11 +10,16 @@
       <div class="yeg-stat"><b><%= stat.figure %></b><span><%= stat.label %></span></div>
     <% end %>
   </div>
-  <p class="tiny muted yeg-source">
-    <%= appeal.period %>, from
-    <%= link_to "#{chapter_name}' mid-year impact snapshot", appeal.source_url, class: "link", target: "_blank",
-                rel: "noopener" %>.
-  </p>
+  <% if appeal.period.present? || appeal.source_label.present? %>
+    <p class="tiny muted yeg-source">
+      <%= [ appeal.period.presence, ("from" if appeal.source_label.present?) ].compact.join(", ") %>
+      <% if appeal.source_url.present? %>
+        <%= link_to appeal.source_label, appeal.source_url, class: "link", target: "_blank", rel: "noopener" %>.
+      <% else %>
+        <%= appeal.source_label %>.
+      <% end %>
+    </p>
+  <% end %>
 
   <% if cart.year_end_gift? %>
     <div class="yeg-chosen" role="status">
@@ -62,7 +67,7 @@
             <span class="yeg-tier-head"><b class="yeg-amount">Another amount</b></span>
             <span class="yeg-custom-in">
               <span aria-hidden="true">$</span>
-              <%= form.number_field :custom_amount, min: 5, step: 1, inputmode: "numeric", placeholder: 75,
+              <%= form.number_field :custom_amount, class: "i", min: 5, step: 1, inputmode: "numeric", placeholder: "75",
                                                     value: (cart.year_end_gift_in_cents / 100 if cart.year_end_gift? && chosen.nil?),
                                                     aria: { label: "Another amount, in dollars" },
                                                     data: { year_end_gift_target: "custom",

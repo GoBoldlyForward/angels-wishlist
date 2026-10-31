@@ -15,6 +15,18 @@ class DonorMailerTest < ActionMailer::TestCase
     assert_match(/Nashville Angels, Inc\. is a 501\(c\)\(3\), EIN 62-1234567\./, mail.body.to_s)
   end
 
+  test "a receipt itemizes a year-end gift and says it is unrestricted" do
+    chapter = build_organization(name: "Nashville Angels")
+    donation = build_donation(event: build_event(organization: chapter), gift_in_cents: 4_800,
+                              year_end_gift_in_cents: 25_000)
+
+    body = DonorMailer.receipt(donation).body.to_s
+
+    assert_match(/Year-end gift to Nashville Angels: \$250\.00/, body)
+    assert_match(/Total: \$298\.00/, body)
+    assert_match(/designated to the holiday wish list program\. The year-end gift is an unrestricted donation to Nashville Angels\./, body)
+  end
+
   test "a chapter with no sending address of its own uses the application's" do
     donation = build_donation(event: build_event)
 

@@ -79,7 +79,8 @@ module Admin
       event.donations.group(:donor_id).select(
         "donations.donor_id",
         "COUNT(*) AS donations_count",
-        "COALESCE(SUM(donations.gift_in_cents + donations.general_gift_in_cents) #{SUCCEEDED}, 0) AS given_in_cents",
+        "COALESCE(SUM(donations.gift_in_cents + donations.general_gift_in_cents + donations.year_end_gift_in_cents) " \
+        "#{SUCCEEDED}, 0) AS given_in_cents",
         "COALESCE(SUM(donations.fee_in_cents) #{SUCCEEDED}, 0) AS fees_in_cents",
         "COALESCE(SUM((#{GIFTS_CHOSEN})), 0)::integer AS gifts_count",
         "BOOL_OR(donations.anonymous) AS gives_anonymously",

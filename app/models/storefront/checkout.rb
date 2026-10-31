@@ -74,6 +74,7 @@ module Storefront
       { donor: donor, event: @event, status: "pending", storefront_organization: @storefront,
         ahoy_visit_id: @visit&.id,
         gift_in_cents: cart.gift_in_cents, general_gift_in_cents: cart.general_gift_in_cents,
+        year_end_gift_in_cents: cart.year_end_gift_in_cents,
         fee_in_cents: fee_in_cents, processing_fee_in_cents: Donation.processing_fee_for(charged_in_cents),
         display_name: display_name.to_s.strip.presence, anonymous: anonymous?,
         note_to_family: (note_to_family.to_s.strip.presence if note_offered?),

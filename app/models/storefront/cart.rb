@@ -73,7 +73,7 @@ module Storefront
     end
 
     def count
-      lines.size + general_gifts.size
+      lines.size + general_gifts.size + (year_end_gift? ? 1 : 0)
     end
 
     def add_gift(key)
@@ -150,6 +150,11 @@ module Storefront
 
     def holds_gifts?
       lines.any?
+    end
+
+    # Anything bound for the lists, as opposed to a year-end gift on its own.
+    def holds_wishlist?
+      lines.any? || general_gifts.any?
     end
 
     def year_end_gift?

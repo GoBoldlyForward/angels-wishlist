@@ -188,3 +188,13 @@ input.step-n:focus-visible { box-shadow: var(--ring); border-radius: 8px; outlin
 .total-row-sub { gap: 12px; margin-bottom: 6px; }
 .total-row-sub span:last-child { color: var(--body); font-weight: 600; }
 .total-row-sub + .total-row { border-top: 1px solid var(--line-soft); margin-top: 10px; padding-top: 10px; }
+.year-end-page { max-width: 760px; padding-bottom: 60px; padding-top: 30px; }
+.yeg-hero { margin-bottom: 20px; }
+.yeg-hero .yeg-title { font-size: clamp(1.9rem, 4.4vw, 2.6rem); margin: 14px 0 12px; }
+.yeg-hero .yeg-lede { font-size: var(--fs-md); }
+.yeg-hero .yeg-source { margin-bottom: 0; }
+.yeg-standalone h2 { margin-bottom: 4px; }
+.yeg-standalone .yeg-form { margin-top: 10px; }
+.yeg-standalone .yeg-chosen { margin: 12px 0 6px; }
+.yeg-standalone .yeg-chosen .btn { align-self: center; flex: none; }
+.yeg-disclosure { margin-top: 20px; }

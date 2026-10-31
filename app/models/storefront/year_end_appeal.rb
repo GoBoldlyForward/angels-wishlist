@@ -96,9 +96,9 @@ module Storefront
       {
         "enabled" => true,
         "headline" => "The lists are for December. #{@name} is there all year.",
-        "lede" => "Your cart is designated to the wish list program. A year-end gift goes directly to #{@name} " \
-                  "and carries the rest of the work: Love Box® families, Dare to Dream® mentors, and urgent " \
-                  "needs between holidays.",
+        "lede" => "The wish lists fund gifts for December. A year-end gift goes directly to #{@name} and carries " \
+                  "the rest of the work: Love Box® families, Dare to Dream® mentors, and urgent needs between " \
+                  "holidays.",
         "period" => "January through June 2026",
         "source_label" => "#{@name}' mid-year impact snapshot",
         "source_url" => "https://heyzine.com/flip-book/7c3a3be980.html",

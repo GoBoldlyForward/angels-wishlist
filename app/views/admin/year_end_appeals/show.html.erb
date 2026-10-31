@@ -4,8 +4,8 @@
 
 <%= render "admin/shared/page_header", title: "Year-end appeal",
            lede: "What donors read at checkout before they give, and the gifts they can add on top of the lists." do %>
-  <%= link_to root_path(anchor: "shop"), class: "btn btn-outline-secondary", target: "_blank", rel: "noopener" do %>
-    <i class="bi bi-shop"></i> Open the shop
+  <%= link_to year_end_url, class: "btn btn-outline-secondary", target: "_blank", rel: "noopener" do %>
+    <i class="bi bi-box-arrow-up-right"></i> Open the year-end page
   <% end %>
 <% end %>
 
@@ -16,9 +16,13 @@
     <div class="col-lg-6">
       <div class="panel-card p-4">
         <%= detail_section "What donors read" do %>
-          <div class="form-check mb-3">
+          <div class="form-check mb-2">
             <%= form.check_box :enabled, class: "form-check-input", checked: @form.enabled %>
-            <%= form.label :enabled, "Show the appeal at checkout", class: "form-check-label" %>
+            <%= form.label :enabled, "Show the appeal at checkout and open the year-end page", class: "form-check-label" %>
+          </div>
+          <div class="form-text mb-3">
+            The page to link to from email and social, with nothing to shop:
+            <%= link_to year_end_url, year_end_url, target: "_blank", rel: "noopener" %>
           </div>
           <div class="mb-3">
             <%= form.label :headline, class: "form-label" %>
@@ -27,7 +31,10 @@
           <div class="mb-3">
             <%= form.label :lede, "Paragraph under the headline", class: "form-label" %>
             <%= form.text_area :lede, class: "form-control", rows: 4, maxlength: 600 %>
-            <div class="form-text">Two or three sentences. Say what the cart funds and what a year-end gift funds.</div>
+            <div class="form-text">
+              Two or three sentences, read both at checkout and on the year-end page. Say what the lists fund and
+              what a year-end gift funds.
+            </div>
           </div>
         <% end %>
 

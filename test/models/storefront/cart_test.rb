@@ -121,7 +121,8 @@ module Storefront
       assert_equal 2_500, @cart.total_in_cents
       assert_equal 27_500, @cart.grand_total_in_cents
       assert_equal Donation.fee_for(27_500), @cart.fee_in_cents
-      assert_equal 1, @cart.count
+      assert_equal 2, @cart.count
+      assert @cart.holds_wishlist?
     end
 
     test "choosing another year-end gift replaces the first, and it can be removed" do
@@ -134,6 +135,7 @@ module Storefront
 
       assert_not @cart.year_end_gift?
       assert_equal 0, @cart.grand_total_in_cents
+      assert @cart.empty?
     end
 
     test "a year-end gift is five dollars or more" do

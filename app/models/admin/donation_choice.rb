@@ -4,6 +4,7 @@ module Admin
   # What one donation went toward, in the words the ledger uses.
   class DonationChoice
     GENERAL = "Where it is needed most"
+    YEAR_END = "Year-end gift"
     RELEASED = "Chosen gifts, since returned to open"
 
     attr_reader :donation
@@ -17,7 +18,7 @@ module Admin
     end
 
     def parts
-      [ gifts_part, general_part ].compact
+      [ gifts_part, general_part, year_end_part ].compact
     end
 
     def to_s
@@ -39,6 +40,10 @@ module Admin
 
     def general_part
       GENERAL if donation.general_gift_in_cents.positive?
+    end
+
+    def year_end_part
+      YEAR_END if donation.year_end_gift?
     end
 
     def aliases

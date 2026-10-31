@@ -1,0 +1,34 @@
+<% content_for :title, "Year-end giving | #{chapter_name}" %>
+<% chosen = @appeal.tier_for(cart.year_end_gift_in_cents) %>
+
+<main class="container year-end-page">
+  <section class="yeg-hero" aria-labelledby="yeg_title">
+    <%= render "public/year_end/hero", appeal: @appeal, heading: "h1" %>
+  </section>
+
+  <section class="panel yeg yeg-standalone" aria-labelledby="yeg_choose">
+    <h2 class="t-lg" id="yeg_choose">Choose your gift</h2>
+
+    <% if cart.year_end_gift? %>
+      <div class="yeg-chosen" role="status">
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+        <div class="yeg-chosen-body">
+          <div class="t-base w-600 ink">
+            <%= money cart.year_end_gift_in_cents %> year-end gift<%= " · #{chosen.title}" if chosen %>
+          </div>
+          <div class="tiny muted">Chosen. Pick another below, or go on to give.</div>
+        </div>
+        <%= link_to "Give now", checkout_path, class: "btn btn-ink btn-sm" %>
+      </div>
+    <% end %>
+
+    <%= render "public/year_end/tiers", appeal: @appeal, cart: cart,
+               lede: "Pick the gift that speaks to you, or name your own amount. You give on the next page.",
+               submit_label: "Continue", label_pattern: "Continue with %{amount}" %>
+
+    <div class="disclosure yeg-disclosure">
+      <%= chapter_name %> is a 501(c)(3). A year-end gift is a tax-deductible, unrestricted donation to
+      <%= chapter_name %>, and no goods or services are provided to you in return.
+    </div>
+  </section>
+</main>

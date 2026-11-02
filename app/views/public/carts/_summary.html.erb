@@ -5,7 +5,12 @@
   <div class="total-row"><span class="muted">Total</span><b><%= money cart.grand_total_in_cents %></b></div>
   <%= link_to "Review and give", checkout_path, class: "btn btn-primary btn-block" %>
   <p class="tiny muted cart-fineprint">
-    Donations to <%= chapter_name %>, pooled and shared evenly across every
-    child's list. Nothing ships.
+    <% if year_end_appeal.enabled? %>
+      Wish list gifts are pooled and shared evenly across every child's list. Year-end gifts go directly
+      to <%= chapter_name %>. Nothing ships.
+    <% else %>
+      Donations to <%= chapter_name %>, pooled and shared evenly across every
+      child's list. Nothing ships.
+    <% end %>
   </p>
 <% end %>

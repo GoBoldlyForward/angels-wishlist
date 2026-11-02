@@ -5,14 +5,21 @@ module Storefront
   # is pooled, and what donors read about a child comes from the caregiver.
   class Content
     Reason = Data.define(:icon, :title, :body)
-    Question = Data.define(:question, :answer)
+    Question = Data.define(:question, :answer, :link) do
+      def initialize(question:, answer:, link: nil)
+        super
+      end
+    end
+    Link = Data.define(:label, :path)
     Step = Data.define(:title, :body)
 
     GENERAL_GIFT_PRESETS_IN_DOLLARS = [ 25, 50, 100, 250 ].freeze
 
-    def initialize(chapter:, event:)
+    # year_end_path is the chapter's year-end giving page, or nil while its appeal is switched off.
+    def initialize(chapter:, event:, year_end_path: nil)
       @name = chapter&.name || "Wish List"
       @event = event
+      @year_end_path = year_end_path
     end
 
     def reasons
@@ -41,8 +48,8 @@ module Storefront
         Step.new(title: "You check out",
                  body: "Your card is charged by #{@name}. You get an itemized receipt showing what you chose."),
         Step.new(title: "The list closes",
-                 body: "#{closing_day.upcase_first} we total everything raised and spread it evenly across " \
-                       "every child's list, so each one is funded to the same share."),
+                 body: "#{closing_day.upcase_first} we total everything raised for the lists and spread it " \
+                       "evenly across every child's list, so each one is funded to the same share."),
         Step.new(title: "The household is paid",
                  body: "Funds land in their bank account in one to two days through Stripe, or on a Visa gift " \
                        "card if they cannot use a bank."),
@@ -58,8 +65,8 @@ module Storefront
     def checkout_steps
       [
         Step.new(title: "Pooled, then shared evenly",
-                 body: "Everything raised is pooled and spread evenly across every child's list, so every " \
-                       "list is funded to the same share."),
+                 body: "Everything raised for the lists is pooled and spread evenly across every child's " \
+                       "list, so every list is funded to the same share."),
         Step.new(title: "Paid, not shipped",
                  body: "#{@name} pays each verified household its share. No warehouse in between."),
         Step.new(title: "Spent by the family",
@@ -72,19 +79,22 @@ module Storefront
         Question.new(
           question: "Am I actually buying this gift?",
           answer: "No. You are making a donation to #{@name} in the amount of the gift you picked. Everything " \
-                  "raised is pooled and spread evenly across every child's list, and each household is paid " \
-                  "its share so the caregiver can do the shopping. Nothing ships from us, no merchant is " \
-                  "involved, and the tile you clicked is a wish a caregiver typed in, not inventory."
+                  "raised for the lists is pooled and spread evenly across every child's list, and each " \
+                  "household is paid its share so the caregiver can do the shopping. Nothing ships from us, " \
+                  "no merchant is involved, and the tile you clicked is a wish a caregiver typed in, not " \
+                  "inventory."
         ),
         Question.new(
           question: "So where does my money actually go?",
-          answer: "To #{@name}, a 501(c)(3), as a charitable donation. We pool it with every other gift, " \
-                  "spread the total evenly across every child's list, and pay each household its share. As " \
-                  "with any gift to a nonprofit, #{@name} holds final discretion over how the funds are " \
-                  "used, which is what the IRS requires in order for your gift to be tax-deductible. If a " \
-                  "child leaves a placement or a household withdraws, their share moves to the other lists " \
-                  "rather than back to you."
+          answer: "To #{@name}, a 501(c)(3), as a charitable donation. We pool wish list gifts together, " \
+                  "spread the total evenly across every child's list, and pay each household its share. " \
+                  "#{"A year-end gift is separate and stays out of the pool. " if year_end?}As with any gift " \
+                  "to a nonprofit, #{@name} holds final discretion over how the funds are used, which is " \
+                  "what the IRS requires in order for your gift to be tax-deductible. If a child leaves a " \
+                  "placement or a household withdraws, their share moves to the other lists rather than " \
+                  "back to you."
         ),
+        *year_end_faqs,
         Question.new(
           question: "Where does the information about each child come from?",
           answer: "Their caregiver, directly. The age, the interests, the one-line note, and every gift on the " \
@@ -118,16 +128,17 @@ module Storefront
         ),
         Question.new(
           question: "What happens if a list is not fully funded?",
-          answer: "The household still receives its share. We spread everything raised evenly across every " \
-                  "child's list, so each one is funded to the same percentage. If every child asked for " \
-                  "$200 and donors covered 75 percent of the total, every child's list receives $150. We do " \
-                  "not hold funds back waiting for a list to complete."
+          answer: "The household still receives its share. We spread everything raised for the lists evenly " \
+                  "across every child's list, so each one is funded to the same percentage. If every child " \
+                  "asked for $200 and donors covered 75 percent of the total, every child's list receives " \
+                  "$150. We do not hold funds back waiting for a list to complete."
         ),
         Question.new(
           question: "Is my gift tax-deductible?",
-          answer: "Yes. #{@name} is a registered 501(c)(3), and you will get an itemized receipt by email. " \
-                  "No goods or services are provided to you in exchange, which is the other reason the " \
-                  "money has to be a donation to us rather than a purchase from a family."
+          answer: "Yes#{", for wish list gifts and year-end gifts alike" if year_end?}. #{@name} is a " \
+                  "registered 501(c)(3), and you will get an itemized receipt by email. No goods or services " \
+                  "are provided to you in exchange, which is the other reason the money has to be a donation " \
+                  "to us rather than a purchase from a family."
         ),
         Question.new(
           question: "What will I hear back?",
@@ -156,6 +167,40 @@ module Storefront
 
     def closing_day
       closing_date ? "on #{closing_date}" : "when the lists close"
+    end
+
+    def year_end?
+      @year_end_path.present?
+    end
+
+    # What a year-end gift is, asked only while the chapter's appeal is on.
+    def year_end_faqs
+      return [] unless year_end?
+
+      [
+        Question.new(
+          question: "What is a year-end gift?",
+          answer: "A gift directly to #{@name}, separate from the wish lists. It does not join the wish list " \
+                  "pool or go to any one child's list. It carries the rest of our work through the year, like " \
+                  "supporting our Love Box® and Dare to Dream® programs, urgent needs between holidays, " \
+                  "supplemental support for our families and youth, and other general operations. You can " \
+                  "add one at checkout, or give one on its own.",
+          link: Link.new(label: "Give a year-end gift", path: @year_end_path)
+        ),
+        Question.new(
+          question: "How is that different from \"Give any amount\"?",
+          answer: "\"Give any amount\" goes into the wish list pool and is spread evenly across every child's " \
+                  "list. Your receipt calls it \"Where it is needed most.\" A year-end gift supports #{@name}' " \
+                  "year-round programs and operations and stays out of the wish list pool, ensuring we can " \
+                  "support our kids and families all year long, not just at the holidays. You can give " \
+                  "either one or both, and your receipt lists each one on its own line."
+        ),
+        Question.new(
+          question: "Will my year-end gift pay for the exact thing at the level I chose?",
+          answer: "The levels show what a gift of that size can do, such as new shoes for a child or a new " \
+                  "mentor match. A year-end gift is unrestricted, so #{@name} decides how it is used."
+        )
+      ]
     end
   end
 end

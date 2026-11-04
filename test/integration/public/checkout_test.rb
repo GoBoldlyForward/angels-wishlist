@@ -47,7 +47,7 @@ module Public
       assert_select "#year-end .yeg-stat b", "163"
       assert_select "#year-end summary", text: /Add a year-end gift/
       assert_select "#year-end input[type=radio][name=amount][value='250']"
-      assert_select "#year-end .yeg-tier", text: /\$5,000\+\s+A year of showing up/
+      assert_select "#year-end .yeg-tier", text: /\$5,000\s+A year of showing up/
       assert_select ".total-row-sub", 0
 
       post cart_year_end_gift_path, params: { amount: "250" }, headers: BROWSER

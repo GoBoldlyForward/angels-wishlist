@@ -11,7 +11,7 @@ module Storefront
       assert_equal "The lists are for December. Austin Angels is there all year.", appeal.headline
       assert_equal 4, appeal.stats.size
       assert_equal [ 50, 100, 250, 500, 1_000, 2_500, 5_000 ], appeal.tiers.map(&:dollars)
-      assert_equal "$5,000+", appeal.tiers.last.amount_label
+      assert_equal "$5,000", appeal.tiers.last.amount_label
       assert_equal "Their day, remembered", appeal.tier_for(25_000).title
     end
 
@@ -25,7 +25,7 @@ module Storefront
       assert_equal "Our year.", appeal.headline
       assert_equal "", appeal.lede
       assert_equal "January through June 2026", appeal.period
-      assert_equal [ [ "$20", "A" ], [ "$500+", "B" ] ], appeal.tiers.map { |tier| [ tier.amount_label, tier.title ] }
+      assert_equal [ [ "$20", "A" ], [ "$500", "B" ] ], appeal.tiers.map { |tier| [ tier.amount_label, tier.title ] }
       assert_nil appeal.tier_for(5_000)
     end
 

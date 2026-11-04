@@ -198,3 +198,11 @@ input.step-n:focus-visible { box-shadow: var(--ring); border-radius: 8px; outlin
 .yeg-standalone .yeg-chosen { margin: 12px 0 6px; }
 .yeg-standalone .yeg-chosen .btn { align-self: center; flex: none; }
 .yeg-disclosure { margin-top: 20px; }
+.yeg-other { scroll-margin-top: 90px; }
+.yeg-other-lede { margin: 4px 0 16px; }
+.yeg-ways { display: grid; gap: 12px; margin-bottom: 14px; }
+.yeg-way { background: #fff; border: 1px solid var(--line); border-radius: 14px; display: grid; gap: 14px; grid-template-columns: auto 1fr; padding: 14px 16px; }
+.yeg-way > i { color: var(--brand-deep); font-size: var(--fs-lg); margin-top: 2px; width: 22px; }
+.yeg-way h3 { margin: 0 0 4px; }
+.yeg-way p { margin: 0; }
+.checkout-other-ways { margin: 12px 0 0; }

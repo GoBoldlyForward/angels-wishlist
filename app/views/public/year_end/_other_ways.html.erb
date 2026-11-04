@@ -1,0 +1,39 @@
+<%# locals: (appeal:) -%>
+<section class="panel yeg-other" id="other-ways" aria-labelledby="other_ways_title">
+  <h2 class="t-lg" id="other_ways_title">Other ways to give</h2>
+  <p class="t-sm muted yeg-other-lede">
+    <%= chapter_name %> also takes gifts by check, money order, stock, cryptocurrency, donor-advised fund, and
+    wire transfer.
+  </p>
+  <div class="yeg-ways">
+    <% if appeal.check_address.present? %>
+      <div class="yeg-way">
+        <i class="fa-solid fa-money-check-dollar" aria-hidden="true"></i>
+        <div>
+          <h3 class="t-base w-600 ink">Check or money order</h3>
+          <p class="t-sm">
+            Make it payable to <b><%= appeal.check_payee %></b> and mail it to <%= appeal.check_address %>.
+            To put it toward the holiday wish lists, write &ldquo;Wish List&rdquo; in the memo.
+          </p>
+        </div>
+      </div>
+    <% end %>
+    <% if appeal.other_ways_url.present? %>
+      <div class="yeg-way">
+        <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+        <div>
+          <h3 class="t-base w-600 ink">Stock, crypto, donor-advised fund, or wire</h3>
+          <p class="t-sm">
+            <%= link_to "Give through the #{chapter_name} giving page", appeal.other_ways_url, class: "link",
+                        target: "_blank", rel: "noopener" %>,
+            which walks you through each one.
+          </p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <p class="tiny muted m-0">
+    <%= chapter_name %> is a 501(c)(3)<% if appeal.tax_id.present? %>, EIN <%= appeal.tax_id %><% end %>. Gifts
+    made these ways are receipted by <%= chapter_name %> directly, not through this site.
+  </p>
+</section>

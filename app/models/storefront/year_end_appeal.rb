@@ -2,7 +2,8 @@
 
 module Storefront
   # The chapter's year-end appeal, shown once at checkout: what the year has
-  # looked like so far, and the gifts a donor can add on top of the lists.
+  # looked like so far, the gifts a donor can add on top of the lists, and how
+  # to give by check, stock, or donor-advised fund instead.
   # Staff edit it under Setup; a field they have never saved falls back to this.
   class YearEndAppeal
     Stat = Data.define(:figure, :label)
@@ -18,7 +19,7 @@ module Storefront
       end
     end
 
-    TEXT_FIELDS = %w[headline lede period source_label source_url].freeze
+    TEXT_FIELDS = %w[headline lede period source_label source_url check_payee check_address tax_id other_ways_url].freeze
 
     # Atlanta Angels' 2026 mid-year impact snapshot.
     STATS = [
@@ -60,6 +61,7 @@ module Storefront
 
     def initialize(chapter:)
       @name = chapter&.name || "Atlanta Angels"
+      @chapter = chapter
       @settings = defaults.merge((chapter&.year_end_appeal || {}).compact)
     end
 
@@ -90,6 +92,10 @@ module Storefront
       ActiveModel::Type::Boolean.new.cast(@settings["enabled"]) != false
     end
 
+    def other_ways?
+      enabled? && (check_address.present? || other_ways_url.present?)
+    end
+
     private
 
     def defaults
@@ -103,7 +109,11 @@ module Storefront
         "source_label" => "#{@name}' mid-year impact snapshot",
         "source_url" => "https://heyzine.com/flip-book/7c3a3be980.html",
         "stats" => STATS,
-        "tiers" => TIERS
+        "tiers" => TIERS,
+        "check_payee" => @name,
+        "check_address" => @chapter&.mailing_address&.to_s.presence || "2555 Northwinds Pkwy, Alpharetta, GA 30009",
+        "tax_id" => @chapter&.ein.presence || "85-2051575",
+        "other_ways_url" => "https://www.every.org/atlantaangels#/donate/card"
       }
     end
   end

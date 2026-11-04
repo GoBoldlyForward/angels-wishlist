@@ -31,4 +31,8 @@
       <%= chapter_name %>, and no goods or services are provided to you in return.
     </div>
   </section>
+
+  <% if @appeal.other_ways? %>
+    <%= render "public/year_end/other_ways", appeal: @appeal %>
+  <% end %>
 </main>

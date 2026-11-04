@@ -37,6 +37,17 @@ module Admin
       assert_equal "", appeal.source_url
     end
 
+    test "saving the other ways to give" do
+      patch admin_year_end_appeal_path, params: { year_end_appeal: {
+        check_payee: "Atlanta Angels Inc.", check_address: "PO Box 1, Atlanta, GA 30301", tax_id: "",
+        other_ways_url: "https://example.org/give"
+      } }
+
+      appeal = Storefront::YearEndAppeal.new(chapter: @chapter.reload)
+      assert_equal [ "Atlanta Angels Inc.", "PO Box 1, Atlanta, GA 30301", "", "https://example.org/give" ],
+                   [ appeal.check_payee, appeal.check_address, appeal.tax_id, appeal.other_ways_url ]
+    end
+
     test "switching the appeal off hides it at checkout" do
       patch admin_year_end_appeal_path, params: { year_end_appeal: { enabled: "0" } }
 

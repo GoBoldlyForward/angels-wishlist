@@ -219,9 +219,10 @@ mistake is deleted.
 
 Production runs on Heroku as `angels-wishlist` in the `goboldlyforward` team, on one Postgres
 add-on. Solid Queue, Solid Cache, and Solid Cable share the primary database, so their tables live
-in `db/schema.rb` like any other, and `SOLID_QUEUE_IN_PUMA=true` runs the job supervisor inside the
-web dyno rather than paying for a worker. The `release` phase in the `Procfile` migrates on every
-deploy.
+in `db/schema.rb` like any other, and `SOLID_QUEUE_IN_PUMA=true` runs jobs as threads inside the web
+process rather than paying for a worker. Solid Queue's default forked mode adds four processes, which
+overruns a 512 MB dyno, so `config/puma.rb` asks for its async mode. The `release` phase in the
+`Procfile` migrates on every deploy.
 
 The app is connected to this GitHub repository. Every merge to `main` deploys automatically once
 CI passes; nothing else needs to be pushed to Heroku by hand.

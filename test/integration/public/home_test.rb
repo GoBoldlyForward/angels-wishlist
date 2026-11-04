@@ -27,8 +27,19 @@ module Public
       assert_select ".season-leg", /2\s*children with lists/
       assert_select ".season-leg", /0\s*lists finished/
       assert_select ".season-leg", /20%\s*of the way there/
-      assert_select "#faq .faq-item", 10
+      assert_select "#faq .faq-item", 13
       assert_select "#why .why-card", 4
+    end
+
+    test "the FAQ asks about year-end gifts only while the appeal is on" do
+      visit root_path
+      assert_select "#faq .faq-item summary", text: "What is a year-end gift?"
+      assert_select "#faq a[href=?]", year_end_path, text: "Give a year-end gift"
+
+      @chapter.update!(year_end_appeal: { "enabled" => false })
+      visit root_path
+      assert_select "#faq .faq-item", 10
+      assert_select "#faq", text: /year-end/i, count: 0
     end
 
     test "browse groups lines into one tile per product under each category in position order" do

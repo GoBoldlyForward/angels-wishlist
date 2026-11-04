@@ -11,7 +11,10 @@
       <% content.faqs.each do |faq| %>
         <details class="faq-item">
           <summary><%= faq.question %></summary>
-          <p><%= faq.answer %></p>
+          <p>
+            <%= faq.answer %>
+            <%= link_to faq.link.label, faq.link.path, class: "link" if faq.link %>
+          </p>
         </details>
       <% end %>
     </div>

@@ -25,7 +25,8 @@ module Public
     end
 
     def content
-      @content ||= Storefront::Content.new(chapter: current_chapter, event: current_event)
+      @content ||= Storefront::Content.new(chapter: current_chapter, event: current_event,
+                                           year_end_path: (year_end_path if year_end_appeal.enabled?))
     end
 
     def year_end_appeal

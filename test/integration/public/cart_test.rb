@@ -41,6 +41,17 @@ module Public
       assert_select "aside.drawer[role=dialog][hidden] .line", 3
     end
 
+    test "the cart's fine print names year-end gifts only while the appeal is on" do
+      add_to_cart @mayas_hoodie
+
+      visit cart_path
+      assert_select "main .cart-fineprint", /Year-end gifts go directly\s+to Atlanta Angels/
+
+      @chapter.update!(year_end_appeal: { "enabled" => false })
+      visit cart_path
+      assert_select "main .cart-fineprint", /\ADonations to Atlanta Angels, pooled and shared evenly/
+    end
+
     test "the drawer opens once, on the page shown right after something is added" do
       post cart_gifts_path, params: { gift: gift_key(@mayas_hoodie) },
                             headers: BROWSER.merge("Referer" => root_url(tab: "unfunded"))

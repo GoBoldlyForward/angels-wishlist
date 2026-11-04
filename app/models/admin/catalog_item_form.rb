@@ -41,12 +41,14 @@ module Admin
       @photo_error = "The photo could not be stored. File storage may not be set up yet"
     end
 
-    # delete, not purge: there is no stored file to remove.
+    # Removes the rows only. Blob#delete would ask storage to remove a file it never received,
+    # and fail the same way the upload did.
     def discard_photo
       attachment = ActiveStorage::Attachment.find_by(record: record, name: "photo")
-      blob = attachment&.blob
-      attachment&.delete
-      blob&.delete
+      return unless attachment
+
+      attachment.delete
+      ActiveStorage::Blob.delete(attachment.blob_id)
     end
   end
 end

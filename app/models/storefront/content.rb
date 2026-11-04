@@ -30,9 +30,9 @@ module Storefront
                          "Every dollar of that is a dollar that never reaches a child. This program runs on " \
                          "a spreadsheet and a payout."),
         Reason.new(icon: "fa-eye", title: "You still see what your gift did",
-                   body: "You chose the science kit on Nia's list. Your receipt shows that, and in January you " \
-                         "receive an impact statement showing exactly how your support funded holiday gifts " \
-                         "for kids.")
+                   body: "You chose the science kit on Nia's list. Your receipt records that as your " \
+                         "preference, and in January you receive an impact statement showing how your support " \
+                         "funded holiday gifts for kids.")
       ]
     end
 
@@ -44,8 +44,8 @@ module Storefront
                  body: "#{closing_day.upcase_first} we total everything raised and spread it evenly across " \
                        "every child's list, so each one is funded to the same share."),
         Step.new(title: "The household is paid",
-                 body: "Funds land in their bank account in one to two days through Stripe, or on a Visa gift " \
-                       "card if they cannot use a bank."),
+                 body: "After the lists close, #{@name} pays each household into their bank account through " \
+                       "Stripe, or with an emailed gift card if they cannot use a bank."),
         Step.new(title: "They shop",
                  body: "The caregiver gets the joy of shopping for their kids, and makes sure they get exactly " \
                        "what they want and what fits in that moment."),
@@ -118,16 +118,17 @@ module Storefront
         ),
         Question.new(
           question: "What happens if a list is not fully funded?",
-          answer: "The household still receives its share. We spread everything raised evenly across every " \
-                  "child's list, so each one is funded to the same percentage. If every child asked for " \
-                  "$200 and donors covered 75 percent of the total, every child's list receives $150. We do " \
-                  "not hold funds back waiting for a list to complete."
+          answer: "The household still receives a share, at the discretion of #{@name}. We spread everything " \
+                  "raised evenly across every child's list, so each one is funded to the same percentage. If " \
+                  "every child asked for $200 and donors covered 75 percent of the total, every child's list " \
+                  "receives $150. We do not hold funds back waiting for a list to complete."
         ),
         Question.new(
           question: "Is my gift tax-deductible?",
-          answer: "Yes. #{@name} is a registered 501(c)(3), and you will get an itemized receipt by email. " \
-                  "No goods or services are provided to you in exchange, which is the other reason the " \
-                  "money has to be a donation to us rather than a purchase from a family."
+          answer: "#{@name} is recognized as tax exempt under 501(c)(3) and contributions are deductible to " \
+                  "the extent allowed by law. Consult your tax advisor. No goods or services are provided to " \
+                  "you in exchange, which is the other reason the money has to be a donation to us rather " \
+                  "than a purchase from a family."
         ),
         Question.new(
           question: "What will I hear back?",

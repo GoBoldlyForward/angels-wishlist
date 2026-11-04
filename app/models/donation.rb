@@ -23,7 +23,7 @@ class Donation < ApplicationRecord
   scope :with_unapproved_note, -> { where.not(note_to_family: [ nil, "" ]).where(note_approved_at: nil) }
   scope :offline, -> { where(stripe_payment_intent_id: nil) }
 
-  validates :gift_in_cents, :general_gift_in_cents, :fee_in_cents, :processing_fee_in_cents,
+  validates :gift_in_cents, :general_gift_in_cents, :year_end_gift_in_cents, :fee_in_cents, :processing_fee_in_cents,
             numericality: { greater_than_or_equal_to: 0 }
   validates :note_to_family, length: { maximum: 1000 }
   validate :carries_some_money
@@ -31,7 +31,7 @@ class Donation < ApplicationRecord
   before_create :assign_uuid
 
   def charged_in_cents
-    gift_in_cents + general_gift_in_cents + fee_in_cents
+    given_in_cents + fee_in_cents
   end
 
   def charged_in_dollars
@@ -39,12 +39,17 @@ class Donation < ApplicationRecord
   end
 
   def given_in_cents
+    wishlist_in_cents + year_end_gift_in_cents
+  end
+
+  # The part that is pooled and spread across the lists. A year-end gift is the chapter's, unrestricted.
+  def wishlist_in_cents
     gift_in_cents + general_gift_in_cents
   end
 
-  # What reaches the families: the gift, less whatever of card processing the donor did not cover.
+  # What reaches the families: the wish list part, less whatever of card processing the donor did not cover.
   def pool_in_cents
-    [ given_in_cents - [ processing_fee_in_cents - fee_in_cents, 0 ].max, 0 ].max
+    [ wishlist_in_cents - [ processing_fee_in_cents - fee_in_cents, 0 ].max, 0 ].max
   end
 
   def chosen_line_items
@@ -69,6 +74,10 @@ class Donation < ApplicationRecord
 
   def designated?
     line_items.any?
+  end
+
+  def year_end_gift?
+    year_end_gift_in_cents.positive?
   end
 
   def note_pending_review?
@@ -140,8 +149,8 @@ class Donation < ApplicationRecord
   end
 
   def carries_some_money
-    return if gift_in_cents.to_i.positive? || general_gift_in_cents.to_i.positive?
+    return if [ gift_in_cents, general_gift_in_cents, year_end_gift_in_cents ].any? { |cents| cents.to_i.positive? }
 
-    errors.add(:base, "A donation has to carry a gift or a general amount")
+    errors.add(:base, "A donation has to carry a gift or a general amount, or a year-end gift")
   end
 end

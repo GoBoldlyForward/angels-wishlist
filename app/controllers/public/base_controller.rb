@@ -6,7 +6,7 @@ module Public
 
     before_action :announce_dropped_gifts, if: -> { request.get? }
 
-    helper_method :cart, :content, :open_cart?
+    helper_method :cart, :content, :year_end_appeal, :open_cart?, :hide_cart?
 
     private
 
@@ -26,6 +26,10 @@ module Public
 
     def content
       @content ||= Storefront::Content.new(chapter: current_chapter, event: current_event)
+    end
+
+    def year_end_appeal
+      @year_end_appeal ||= Storefront::YearEndAppeal.new(chapter: current_chapter)
     end
 
     def filters
@@ -52,6 +56,11 @@ module Public
         flash[:alert] = "That gift is no longer open. Someone may have chosen it first."
       end
       redirect_back_or_to fallback, status: :see_other
+    end
+
+    # A page with nothing to shop leaves the cart out of the header.
+    def hide_cart?
+      false
     end
 
     # True once, on the page shown right after the cart changed.

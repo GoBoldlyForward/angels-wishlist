@@ -70,6 +70,17 @@
       </div>
     <% end %>
 
+    <% if @receipt.year_end_gift? %>
+      <div class="mini">
+        <span class="icon t5" aria-hidden="true">🌟</span>
+        <div class="mini-body">
+          <div class="t-base w-600 ink">Year-end gift</div>
+          <div class="tiny muted">Directly to <%= chapter %>, unrestricted</div>
+        </div>
+        <span class="price t-base"><%= money @receipt.year_end_gift_in_cents %></span>
+      </div>
+    <% end %>
+
     <% if @receipt.note %>
       <div class="panel panel-warm confirmation-note">
         <em>"<%= @receipt.note %>"</em>
@@ -85,7 +96,10 @@
       <div class="note">
         <i class="fa-solid fa-calendar-check c-green" aria-hidden="true"></i>
         <div>
-          <% if @closes_at %>
+          <% if !@receipt.wishlist? %>
+            <b class="ink">Next.</b>
+            Your year-end gift goes to work across the programs at <%= chapter %> right away.
+          <% elsif @closes_at %>
             <b class="ink">Next: <%= @closes_at.strftime("%B %-d") %>.</b>
             The lists close, and everything raised is pooled and spread evenly across every child's list, so
             every list is funded to the same share. Each household is paid its share that week.
@@ -100,6 +114,10 @@
   <% end %>
 
   <div class="confirmation-back">
-    <%= link_to "Back to the lists", root_path(anchor: "shop"), class: "btn btn-ghost" %>
+    <% if @receipt.wishlist? %>
+      <%= link_to "Back to the lists", root_path(anchor: "shop"), class: "btn btn-ghost" %>
+    <% else %>
+      <%= link_to "Back to year-end giving", year_end_path, class: "btn btn-ghost" %>
+    <% end %>
   </div>
 </main>

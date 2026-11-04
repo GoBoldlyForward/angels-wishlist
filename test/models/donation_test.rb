@@ -10,6 +10,24 @@ class DonationTest < ActiveSupport::TestCase
     assert_equal 7_004, donation.charged_in_cents
   end
 
+  test "a year-end gift is charged and counted as given, but never joins the pool" do
+    donation = build_donation(event: build_event, gift_in_cents: 4_800, year_end_gift_in_cents: 25_000,
+                              fee_in_cents: 0, processing_fee_in_cents: 1_000)
+
+    assert_equal 29_800, donation.charged_in_cents
+    assert_equal 29_800, donation.given_in_cents
+    assert_equal 4_800, donation.wishlist_in_cents
+    assert_equal 3_800, donation.pool_in_cents
+    assert donation.year_end_gift?
+  end
+
+  test "a year-end gift on its own is a donation" do
+    donation = Donation.new(donor: build_donor, event: build_event, year_end_gift_in_cents: 5_000)
+
+    assert donation.valid?
+    assert_equal 0, donation.pool_in_cents
+  end
+
   test "covering the fee is the presence of a fee" do
     assert build_donation(event: build_event, fee_in_cents: 144).fee_covered?
     assert_not build_donation(event: build_event, fee_in_cents: 0).fee_covered?

@@ -1,13 +1,22 @@
-<% content_for :title, "Review your cart | Wish List" %>
 <% chapter = chapter_name %>
 <% total = cart.total_in_cents %>
+<% wishlist = cart.holds_wishlist? %>
+<% content_for :title, "#{wishlist ? "Review your cart" : "Your year-end gift"} | Wish List" %>
 
 <main class="container checkout-page">
-  <%= link_to root_path(anchor: "shop"), class: "btn-plain" do %>
-    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> &nbsp;Keep shopping
+  <% if wishlist %>
+    <%= link_to root_path(anchor: "shop"), class: "btn-plain" do %>
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> &nbsp;Keep shopping
+    <% end %>
+    <h1 class="page-title">Review your cart</h1>
+    <p class="muted page-lede">Each gift is listed at the price the caregiver gave.</p>
+  <% else %>
+    <%= link_to year_end_path, class: "btn-plain" do %>
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> &nbsp;Back to year-end giving
+    <% end %>
+    <h1 class="page-title">Your year-end gift</h1>
+    <p class="muted page-lede">A direct, unrestricted gift to <%= chapter %>. Nothing here is tied to a list.</p>
   <% end %>
-  <h1 class="page-title">Review your cart</h1>
-  <p class="muted page-lede">Each gift is listed at the price the caregiver gave.</p>
 
   <div class="row2 checkout-grid">
     <div>
@@ -50,20 +59,35 @@
         </div>
       <% end %>
 
-      <div class="panel panel-warm">
-        <h2 class="t-md">What your <%= money total %> actually does</h2>
-        <div class="flow checkout-flow">
-          <% content.checkout_steps.each do |step| %>
-            <div class="flow-step"><b><%= step.title %></b><span><%= step.body %></span></div>
-          <% end %>
+      <% if year_end_appeal.enabled? %>
+        <%= render "public/checkouts/year_end_appeal", appeal: year_end_appeal, cart: cart %>
+      <% end %>
+
+      <% if wishlist %>
+        <div class="panel panel-warm">
+          <h2 class="t-md">What your <%= money total %> actually does</h2>
+          <div class="flow checkout-flow">
+            <% content.checkout_steps.each do |step| %>
+              <div class="flow-step"><b><%= step.title %></b><span><%= step.body %></span></div>
+            <% end %>
+          </div>
         </div>
-      </div>
+      <% else %>
+        <div class="panel panel-warm">
+          <h2 class="t-md">Where your <%= money cart.year_end_gift_in_cents %> goes</h2>
+          <p class="t-sm m-0">
+            Straight to <%= chapter %>, to be put to work across its programs right away. Your itemized receipt
+            arrives by email, and you hear back with an impact statement in January.
+          </p>
+        </div>
+      <% end %>
     </div>
 
     <div>
       <%= form_with model: @checkout, scope: :checkout, url: checkout_path, class: "panel checkout-form",
                     data: { turbo: false, controller: "checkout-fee",
-                            checkout_fee_total_value: total, checkout_fee_fee_value: cart.fee_in_cents } do |form| %>
+                            checkout_fee_total_value: cart.grand_total_in_cents,
+                            checkout_fee_fee_value: cart.fee_in_cents } do |form| %>
         <% if @checkout.errors[:base].any? %>
           <div class="flash flash-alert" role="alert"><%= @checkout.errors[:base].to_sentence %></div>
         <% end %>
@@ -110,11 +134,19 @@
         <label class="t-sm fee-choice">
           <%= form.check_box :cover_fee, data: { checkout_fee_target: "choice", action: "checkout-fee#refresh" } %>
           <span>
-            Add <%= money_exact cart.fee_in_cents %> to cover card processing and fees, so the full <%= money total %>
-            goes to the families.
+            Add <%= money_exact cart.fee_in_cents %> to cover card processing and fees, so the full
+            <%= money cart.grand_total_in_cents %> goes <%= wishlist && !cart.year_end_gift? ? "to the families" : "where you chose" %>.
           </span>
         </label>
 
+        <% if cart.year_end_gift? && wishlist %>
+          <div class="total-row total-row-sub">
+            <span class="muted">Wish list gifts</span><span><%= money_exact total %></span>
+          </div>
+          <div class="total-row total-row-sub">
+            <span class="muted">Year-end gift</span><span><%= money_exact cart.year_end_gift_in_cents %></span>
+          </div>
+        <% end %>
         <div class="total-row">
           <span class="muted">Total charged</span>
           <b data-checkout-fee-target="total"><%= money_exact @checkout.charged_in_cents %></b>
@@ -128,8 +160,10 @@
       <% end %>
 
       <div class="disclosure checkout-disclosure">
-        <%= chapter %> is a 501(c)(3). Your gift is a tax-deductible donation designated to the holiday wish
-        list program, not a purchase of goods, and no goods or services are provided to you in return.
+        <%= chapter %> is a 501(c)(3). Your gift is a tax-deductible donation, not a purchase of goods, and no
+        goods or services are provided to you in return.
+        <% if wishlist %>The gifts above are designated to the holiday wish list program.<% end %>
+        <% if cart.year_end_gift? %>Your year-end gift is an unrestricted donation to <%= chapter %>.<% end %>
       </div>
     </div>
   </div>

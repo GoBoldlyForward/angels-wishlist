@@ -3,8 +3,8 @@
 module Admin
   # The ledger for one event, one row per donation.
   class DonationsTable < Table
-    CHARGED = "(donations.gift_in_cents + donations.general_gift_in_cents + donations.fee_in_cents)"
-    GIVEN = "(donations.gift_in_cents + donations.general_gift_in_cents)"
+    GIVEN = "(donations.gift_in_cents + donations.general_gift_in_cents + donations.year_end_gift_in_cents)"
+    CHARGED = "(#{GIVEN} + donations.fee_in_cents)"
 
     # What came in through one partner's own page, such as /with/passion.
     PartnerTotal = Data.define(:partner, :donations, :gifts, :given_in_cents)
@@ -18,6 +18,7 @@ module Admin
       "What they chose" => ->(row) { DonationChoice.new(row).to_s },
       "Chosen gifts" => ->(row) { Dollars.from_cents(row.gift_in_cents) },
       "General gift" => ->(row) { Dollars.from_cents(row.general_gift_in_cents) },
+      "Year-end gift" => ->(row) { Dollars.from_cents(row.year_end_gift_in_cents) },
       "Fee" => ->(row) { Dollars.from_cents(row.fee_in_cents) },
       "Charged" => ->(row) { Dollars.from_cents(row.charged_in_cents) },
       "Method" => ->(row) { row.payment_method_label },
@@ -46,6 +47,10 @@ module Admin
 
     def fees_in_cents
       totals.dig("succeeded", :fee).to_i
+    end
+
+    def year_end_in_cents
+      totals.dig("succeeded", :year_end).to_i
     end
 
     def raised_in_cents
@@ -86,8 +91,11 @@ module Admin
     def totals
       @totals ||= event.donations.group(:status)
                        .pluck(:status, Arel.sql("COUNT(*)"), Arel.sql("SUM(gift_in_cents)"),
-                              Arel.sql("SUM(general_gift_in_cents)"), Arel.sql("SUM(fee_in_cents)"))
-                       .to_h { |status, count, gift, general, fee| [ status, { count:, gift:, general:, fee: } ] }
+                              Arel.sql("SUM(general_gift_in_cents)"), Arel.sql("SUM(fee_in_cents)"),
+                              Arel.sql("SUM(year_end_gift_in_cents)"))
+                       .to_h do |status, count, gift, general, fee, year_end|
+                         [ status, { count:, gift:, general:, fee:, year_end: } ]
+                       end
     end
 
     def ledger_tabs
@@ -99,6 +107,8 @@ module Admin
         Tab.new(key: "refunded", label: "Refunded", scope: ->(rows) { rows.refunded }),
         Tab.new(key: "general", label: "General giving",
                 scope: ->(rows) { rows.where("donations.general_gift_in_cents > 0") }),
+        Tab.new(key: "year_end", label: "Year-end",
+                scope: ->(rows) { rows.where("donations.year_end_gift_in_cents > 0") }),
         Tab.new(key: "offline", label: "Offline", scope: ->(rows) { rows.offline })
       ]
     end

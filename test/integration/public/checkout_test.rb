@@ -40,6 +40,100 @@ module Public
       assert_select "form[action=?][data-turbo=false]", checkout_path
     end
 
+    test "checkout offers a year-end gift, which is added on top of the wish list gifts" do
+      add_to_cart @mayas_hoodie
+
+      visit checkout_path
+      assert_select "#year-end .yeg-stat b", "163"
+      assert_select "#year-end summary", text: /Add a year-end gift/
+      assert_select "#year-end input[type=radio][name=amount][value='250']"
+      assert_select "#year-end .yeg-tier", text: /\$5,000\+\s+A year of showing up/
+      assert_select ".total-row-sub", 0
+
+      post cart_year_end_gift_path, params: { amount: "250" }, headers: BROWSER
+      assert_redirected_to checkout_path
+
+      visit checkout_path
+      assert_select "#year-end .yeg-chosen", /\$250 year-end gift · Their day, remembered/
+      assert_select "#year-end summary", text: /Change my year-end gift/
+      assert_select "#year-end input[type=radio][name=amount][value='250'][checked]"
+      assert_select ".total-row-sub", text: /Wish list gifts\s*\$40\.00/
+      assert_select ".total-row-sub", text: /Year-end gift\s*\$250\.00/
+      assert_select ".total-row b", "$298.97"
+      assert_select ".checkout-disclosure", /unrestricted donation to Atlanta Angels/
+
+      check_out
+      donation = Donation.last
+      assert_equal [ 4_000, 25_000, 29_000 + Donation.fee_for(29_000), 4_000 ],
+                   [ donation.gift_in_cents, donation.year_end_gift_in_cents, donation.charged_in_cents, donation.pool_in_cents ]
+    end
+
+    test "a year-end gift can be removed before giving" do
+      add_to_cart @mayas_hoodie
+      post cart_year_end_gift_path, params: { amount: "250" }, headers: BROWSER
+
+      delete cart_year_end_gift_path, headers: BROWSER
+
+      visit checkout_path
+      assert_select "#year-end .yeg-chosen", 0
+      assert_select ".total-row b", "$41.50"
+    end
+
+    test "a year-end gift on its own checks out without the shop and lands on its own receipt" do
+      post cart_year_end_gift_path, params: { amount: "250" }, headers: BROWSER
+
+      visit checkout_path
+      assert_response :success
+      assert_select "h1", "Your year-end gift"
+      assert_select "a[href=?]", year_end_path, text: /Back to year-end giving/
+      assert_select ".checkout-group", 0
+      assert_select "textarea", 0
+      assert_select ".panel-warm h2", "Where your $250 goes"
+      assert_select ".total-row-sub", 0
+      assert_select ".total-row b", "$257.78"
+      assert_select ".checkout-disclosure", /unrestricted donation to Atlanta Angels/
+      assert_select ".checkout-disclosure", { text: /holiday wish list program/, count: 0 }
+
+      assert_difference -> { Donation.count }, 1 do
+        check_out
+      end
+      donation = Donation.last
+      assert_equal [ 0, 0, 25_000, 0, "succeeded" ],
+                   [ donation.gift_in_cents, donation.general_gift_in_cents, donation.year_end_gift_in_cents,
+                     donation.pool_in_cents, donation.status ]
+      assert_equal 0, @event.reload.raised_in_cents
+
+      follow_redirect!
+      assert_select "h1", "Thank you. You gave $250."
+      assert_select ".mini", text: /Year-end gift\s+Directly to Atlanta Angels, unrestricted\s+\$250/
+      assert_select ".confirmation-next", /goes to work across the programs at Atlanta Angels/
+      assert_select "a[href=?]", year_end_path, text: "Back to year-end giving"
+    end
+
+    test "a chapter can switch the year-end appeal off" do
+      @chapter.update!(year_end_appeal: { "enabled" => false })
+      add_to_cart @mayas_hoodie
+
+      visit checkout_path
+
+      assert_response :success
+      assert_select "#year-end", 0
+    end
+
+    test "a year-end gift typed as another amount has to be five dollars or more" do
+      add_to_cart @mayas_hoodie
+
+      post cart_year_end_gift_path, params: { amount: "custom", custom_amount: "3" }, headers: BROWSER
+      assert_equal "A year-end gift is $5 or more.", flash[:alert]
+
+      post cart_year_end_gift_path, params: { amount: "custom", custom_amount: "75" }, headers: BROWSER
+      assert_equal "Your year-end gift was added to your donation.", flash[:notice]
+
+      visit cart_path
+      assert_select "main .line", text: /Year-end gift/
+      assert_select "main .total-row b", "$115"
+    end
+
     test "a note is offered only when the cart holds a chosen gift" do
       post cart_general_gifts_path, params: { amount: 25 }, headers: BROWSER
 

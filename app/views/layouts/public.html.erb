@@ -14,7 +14,7 @@
         data-cart-drawer-open-value="<%= open_cart? && controller_name != "carts" %>"
         data-action="keydown.esc->cart-drawer#close keydown.esc->shop-modal#close click->shop-modal#remember turbo:before-cache@document->shop-modal#close turbo:before-cache@document->cart-drawer#close">
     <%= test_payments_banner %>
-    <% content_for :header_actions do %><%= render "public/carts/button" %><% end %>
+    <% content_for :header_actions do %><%= render "public/carts/button" %><% end unless hide_cart? %>
     <%= render "shared/storefront_header" %>
     <% if flash.any? %><div class="container"><%= render "shared/flash" %></div><% end %>
     <%= yield %>

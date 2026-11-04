@@ -29,6 +29,20 @@ module Admin
       assert_select "td", text: "$149.35"
     end
 
+    test "a year-end gift shows in the ledger, the totals, and the export" do
+      build_donation(event: @event, gift_in_cents: 0, year_end_gift_in_cents: 25_000)
+
+      get admin_donations_path
+      assert_response :success
+      assert_select "td", text: /Year-end gift/
+      assert_select ".stat-card", text: /Year-end gifts.*\$250/m
+      assert_select ".nav-tabs a", text: /Year-end/
+
+      get admin_donations_path(format: :csv)
+      assert_includes csv_rows.headers, "Year-end gift"
+      assert_includes csv_rows.map { |row| row["Year-end gift"] }, Dollars.from_cents(25_000)
+    end
+
     test "tabs narrow the ledger and carry counts" do
       get admin_donations_path(tab: "pending")
       assert_select "tbody tr", 1

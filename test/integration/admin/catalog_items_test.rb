@@ -91,16 +91,21 @@ module Admin
 
     test "when storage refuses the upload the item is still saved and staff are told" do
       service = ActiveStorage::Blob.service
-      service.define_singleton_method(:upload) { |*, **| raise ActiveStorage::Error, "storage is not configured" }
+      # Storage without credentials refuses every call, including the cleanup's delete.
+      %i[upload delete].each do |call|
+        service.define_singleton_method(call) { |*, **| raise ActiveStorage::Error, "storage is not configured" }
+      end
 
-      patch admin_catalog_item_path(@blocks), params: { catalog_item: { name: "Wooden blocks", photo: png_upload } }
+      assert_no_difference -> { ActiveStorage::Blob.count } do
+        patch admin_catalog_item_path(@blocks), params: { catalog_item: { name: "Wooden blocks", photo: png_upload } }
+      end
 
       assert_redirected_to admin_catalog_items_path
       assert_match(/photo could not be stored/, flash[:alert])
       assert_equal "Wooden blocks", @blocks.reload.name
       assert_not @blocks.photo.attached?
     ensure
-      service.singleton_class.send(:remove_method, :upload)
+      %i[upload delete].each { |call| service.singleton_class.send(:remove_method, call) }
     end
 
     test "a file that is not an image is refused and the rest is saved" do

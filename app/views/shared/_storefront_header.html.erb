@@ -3,10 +3,10 @@
     <%= link_to root_path, class: "brand" do %>
       <% if current_storefront&.partner? %>
         <% if current_storefront.logo.attached? %><%= image_tag current_storefront.logo, alt: "" %><% end %>
-        <span class="brand-name"><%= current_storefront.name %><span><%= current_storefront.co_brand_line.presence || "Wish List · with #{current_chapter.name}" %></span></span>
+        <span class="brand-name"><%= current_storefront.name %><span><%= current_storefront.co_brand_line.presence || "Holiday Gift Guide · with #{current_chapter.name}" %></span></span>
       <% else %>
         <%= chapter_mark %>
-        <span class="brand-name"><%= chapter_name %><span>Wish List</span></span>
+        <span class="brand-name"><%= chapter_name %><span>Holiday Gift Guide</span></span>
       <% end %>
     <% end %>
     <nav class="hdr-nav">

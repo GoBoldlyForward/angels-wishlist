@@ -23,8 +23,7 @@ module PaymentGateway
     session = Stripe::Checkout::Session.create(
       { mode: "payment", customer_email: donation.donor.email, client_reference_id: donation.uuid,
         success_url: success_url, cancel_url: cancel_url, line_items: checkout_lines(donation),
-        payment_intent_data: { metadata: { donation: donation.uuid },
-                               description: "Donation to the holiday wish list program" },
+        payment_intent_data: { metadata: { donation: donation.uuid }, description: description_of(donation) },
         submit_type: "donate" },
       { api_key: ENV["STRIPE_SECRET_KEY"], idempotency_key: "checkout-#{donation.uuid}" }
     )
@@ -153,9 +152,16 @@ module PaymentGateway
     DonorMailer.receipt(donation).deliver_later
   end
 
+  def description_of(donation)
+    return "Donation to the holiday wish list program" if donation.wishlist_in_cents.positive?
+
+    "Year-end donation to #{donation.event.organization.name}"
+  end
+
   def checkout_lines(donation)
     lines = donation.chosen_line_items.map { |line| [ line.name, line.price_in_cents ] }
     lines << [ "Where it is needed most", donation.general_gift_in_cents ] if donation.general_gift_in_cents.positive?
+    lines << [ "Year-end gift to #{donation.event.organization.name}", donation.year_end_gift_in_cents ] if donation.year_end_gift?
     lines << [ "Card processing and fees", donation.fee_in_cents ] if donation.fee_in_cents.positive?
 
     lines.map do |name, cents|

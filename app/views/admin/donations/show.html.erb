@@ -33,6 +33,7 @@
           [ "Reference", @donation.uuid ],
           [ "Chosen gifts", money_exact(@donation.gift_in_cents) ],
           [ "General gift", money_exact(@donation.general_gift_in_cents) ],
+          [ "Year-end gift", money_exact(@donation.year_end_gift_in_cents) ],
           [ "Card fee", @donation.fee_covered? ? "#{money_exact(@donation.fee_in_cents)}, covered by the donor" : "Not covered" ],
           [ "Card processing", (money_exact(@donation.processing_fee_in_cents) if @donation.processing_fee_in_cents.positive?) ],
           [ "Joins the pool", money_exact(@donation.pool_in_cents) ],
@@ -76,6 +77,9 @@
           A donation to <%= @donation.event.organization.name %> designated to the holiday wish list program, not a purchase.
           Everything raised is pooled and spread evenly, so every list is funded to the same percentage.
           <%= @donation.event.organization.name %> holds final discretion over the funds.
+          <% if @donation.year_end_gift? %>
+            The year-end gift is an unrestricted donation to <%= @donation.event.organization.name %> and stays out of the pool.
+          <% end %>
         </div>
       <% end %>
     </div>

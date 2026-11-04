@@ -19,6 +19,25 @@ class PaymentGatewayTest < ActiveSupport::TestCase
     assert_equal 10_330, sent[:line_items].sum { |line| line.dig(:price_data, :unit_amount) }
   end
 
+  test "a year-end gift is its own line at Stripe, named for the chapter" do
+    chapter = build_organization(name: "Atlanta Angels")
+    donation = build_donation(event: build_event(organization: chapter), status: "pending", gift_in_cents: 0,
+                              year_end_gift_in_cents: 25_000, fee_in_cents: 778, processing_fee_in_cents: 778)
+    sent = nil
+    create = ->(params, _options) { sent = params; Stripe::Checkout::Session.construct_from(id: "cs_1", url: "https://pay.test") }
+
+    swapping(PaymentGateway, :live?, -> { true }) do
+      swapping(Stripe::Checkout::Session, :create, create) do
+        PaymentGateway.start_checkout(donation, success_url: "https://s.test", cancel_url: "https://c.test")
+      end
+    end
+
+    names = sent[:line_items].map { |line| line.dig(:price_data, :product_data, :name) }
+    assert_equal [ "Year-end gift to Atlanta Angels", "Card processing and fees" ], names
+    assert_equal 25_778, sent[:line_items].sum { |line| line.dig(:price_data, :unit_amount) }
+    assert_equal "Year-end donation to Atlanta Angels", sent[:payment_intent_data][:description]
+  end
+
   test "refunding a donation is a plain refund of its payment" do
     donation = build_donation(event: build_event, stripe_payment_intent_id: "pi_1", processing_fee_in_cents: 174)
     sent = nil

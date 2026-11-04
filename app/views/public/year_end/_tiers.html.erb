@@ -1,0 +1,38 @@
+<%# locals: (appeal:, cart:, lede:, submit_label:, label_pattern:) -%>
+<% chosen = appeal.tier_for(cart.year_end_gift_in_cents) %>
+<% custom = cart.year_end_gift? && chosen.nil? %>
+<%= form_with url: cart_year_end_gift_path, class: "yeg-form",
+              data: { controller: "year-end-gift", year_end_gift_label_value: label_pattern } do |form| %>
+  <p class="t-sm muted yeg-form-lede"><%= lede %></p>
+  <div class="yeg-tiers" role="radiogroup" aria-label="Year-end gift amount">
+    <% appeal.tiers.each do |tier| %>
+      <label class="yeg-tier">
+        <%= form.radio_button :amount, tier.dollars, checked: tier.cents == cart.year_end_gift_in_cents,
+                                                     data: { action: "year-end-gift#refresh" } %>
+        <span class="yeg-tier-body">
+          <span class="yeg-tier-head">
+            <b class="yeg-amount"><%= tier.amount_label %></b>
+            <span class="yeg-tier-title"><%= tier.title %></span>
+          </span>
+          <% if tier.teaser.present? %><em class="yeg-teaser"><%= tier.teaser %></em><% end %>
+          <% if tier.body.present? %><span class="yeg-tier-text"><%= tier.body %></span><% end %>
+        </span>
+      </label>
+    <% end %>
+    <label class="yeg-tier yeg-tier-custom">
+      <%= form.radio_button :amount, "custom", checked: custom,
+                                               data: { year_end_gift_target: "customChoice", action: "year-end-gift#refresh" } %>
+      <span class="yeg-tier-body">
+        <span class="yeg-tier-head"><b class="yeg-amount">Another amount</b></span>
+        <span class="yeg-custom-in">
+          <span aria-hidden="true">$</span>
+          <%= form.number_field :custom_amount, class: "i", min: 5, step: 1, inputmode: "numeric", placeholder: "75",
+                                                value: (cart.year_end_gift_in_cents / 100 if custom),
+                                                aria: { label: "Another amount, in dollars" },
+                                                data: { year_end_gift_target: "custom", action: "input->year-end-gift#typed" } %>
+        </span>
+      </span>
+    </label>
+  </div>
+  <%= form.button submit_label, class: "btn btn-primary yeg-add", data: { year_end_gift_target: "submit" } %>
+<% end %>

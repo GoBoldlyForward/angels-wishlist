@@ -5,13 +5,15 @@ module Storefront
   class Receipt
     # chosen: gifts this donation funded, or will once the payment settles.
     # pooled: gifts somebody else funded first, whose amount stayed in the pool.
-    attr_reader :key, :status, :given_in_cents, :fee_in_cents, :charged_in_cents, :note, :display_name,
-                :chosen, :pooled
+    attr_reader :key, :status, :given_in_cents, :wishlist_in_cents, :year_end_gift_in_cents, :fee_in_cents,
+                :charged_in_cents, :note, :display_name, :chosen, :pooled
 
     def initialize(donation)
       @key = donation.uuid
       @status = donation.status
       @given_in_cents = donation.given_in_cents
+      @wishlist_in_cents = donation.wishlist_in_cents
+      @year_end_gift_in_cents = donation.year_end_gift_in_cents
       @fee_in_cents = donation.fee_in_cents
       @charged_in_cents = donation.charged_in_cents
       @general_gift_in_cents = donation.general_gift_in_cents
@@ -30,6 +32,14 @@ module Storefront
 
     def children
       chosen.map(&:child).uniq(&:key)
+    end
+
+    def wishlist?
+      wishlist_in_cents.positive?
+    end
+
+    def year_end_gift?
+      year_end_gift_in_cents.positive?
     end
 
     def pending?

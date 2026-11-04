@@ -20,8 +20,12 @@
                 note: "#{@table.count_of(:refunded)} refunded this season" %>
 </div>
 
-<% if @table.partner_totals.any? %>
+<% if @table.year_end_in_cents.positive? || @table.partner_totals.any? %>
   <div class="stat-cards">
+    <% if @table.year_end_in_cents.positive? %>
+      <%= stat_card "Year-end gifts", money(@table.year_end_in_cents), icon: "stars", color: "gold",
+                    note: "unrestricted, outside the pool" %>
+    <% end %>
     <% @table.partner_totals.each do |total| %>
       <%= stat_card "Gifts through #{total.partner.display_name}", total.gifts, icon: "people", color: "blue",
                     note: "#{money(total.given_in_cents)} given in #{pluralize(total.donations, 'donation')}" %>

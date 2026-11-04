@@ -1,0 +1,20 @@
+<%# locals: (appeal:, heading: "h2") -%>
+<span class="tag tag-accent">Year-end giving</span>
+<%= content_tag heading, appeal.headline, class: "yeg-title text-balance", id: "yeg_title" %>
+<p class="yeg-lede"><%= appeal.lede %></p>
+
+<div class="yeg-stats">
+  <% appeal.stats.each do |stat| %>
+    <div class="yeg-stat"><b><%= stat.figure %></b><span><%= stat.label %></span></div>
+  <% end %>
+</div>
+<% if appeal.period.present? || appeal.source_label.present? %>
+  <p class="tiny muted yeg-source">
+    <%= [ appeal.period.presence, ("from" if appeal.source_label.present?) ].compact.join(", ") %>
+    <% if appeal.source_url.present? %>
+      <%= link_to appeal.source_label, appeal.source_url, class: "link", target: "_blank", rel: "noopener" %>.
+    <% else %>
+      <%= appeal.source_label %>.
+    <% end %>
+  </p>
+<% end %>

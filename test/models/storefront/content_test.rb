@@ -37,6 +37,13 @@ module Storefront
       assert_match(/\AOn January 9 we total everything raised/, @content.steps.second.body)
     end
 
+    test "with no event the closing step still reads as a sentence" do
+      content = Content.new(chapter: nil, event: nil)
+
+      assert_match(/\AWhen the lists close we total everything raised/, content.steps.second.body)
+      assert_match(/charged by Wish List/, content.steps.first.body)
+    end
+
     test "the money is the chapter's to direct, and no deduction is promised" do
       name = Regexp.escape(@event.organization.name)
       answers = @content.faqs.to_h { |faq| [ faq.question, faq.answer ] }
@@ -46,13 +53,6 @@ module Storefront
                    answers["What happens if a list is not fully funded?"])
       assert_match(/contributions are deductible to the extent allowed by law\. Consult your tax advisor\./,
                    answers["Is my gift tax-deductible?"])
-    end
-
-    test "with no event the closing step still reads as a sentence" do
-      content = Content.new(chapter: nil, event: nil)
-
-      assert_match(/\AWhen the lists close we total everything raised/, content.steps.second.body)
-      assert_match(/charged by Wish List/, content.steps.first.body)
     end
   end
 end

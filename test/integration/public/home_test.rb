@@ -68,6 +68,52 @@ module Public
       assert_select ".shelf", 0
     end
 
+    test "a long shelf shows twelve and links to the full list" do
+      13.times do |index|
+        ask(build_listed_child(@household, "Child #{index}", age: 8, gender: "boy"), nil, days_ago: 2,
+            name: "Scooter #{index}")
+      end
+
+      visit root_path
+
+      assert_select ".shelf", text: /Nobody has funded these yet/ do
+        assert_select "a.kid-card", 12
+        assert_select "a.sec-link[href=?]", root_path(tab: "children", anchor: "shop"), text: /See all/
+      end
+      assert_select ".shelf", text: /Everything under \$40/ do
+        assert_select "a.tile", 12
+        assert_select "a.sec-link[href=?]", root_path(tab: "unfunded", anchor: "shop")
+      end
+      assert_select ".sec", text: /Written in by a caregiver/ do
+        assert_select "a.tile", 12
+        assert_select "a.sec-link[href=?]", root_path(tab: "unfunded", anchor: "shop")
+      end
+      assert_select ".shelf", text: /Teenagers get skipped/ do
+        assert_select "a.sec-link", 0
+      end
+
+      visit root_path(tab: "children")
+
+      assert_select "a.kid-card", 15
+    end
+
+    # Seventeen, because an unstable sort keeps a shorter list in order and hides the mistake.
+    test "a full written-in shelf starts with the requests waiting longest" do
+      lines = 17.times.map do |index|
+        ask(build_listed_child(@household, "Child #{index}", age: 8, gender: "boy"), nil, days_ago: 20 - index,
+            name: "Scooter #{index}")
+      end
+      lines.first.fund!(build_donation(event: @event, gift_in_cents: 3_500))
+
+      visit root_path
+
+      assert_select ".sec", text: /Written in by a caregiver/ do
+        assert_select "a.tile .tile-name" do |names|
+          assert_equal (1..12).map { |index| "Scooter #{index}" }, names.map { |name| name.text.strip }
+        end
+      end
+    end
+
     test "filters narrow the grid to one flat list with a count" do
       visit root_path(price: "u25")
 

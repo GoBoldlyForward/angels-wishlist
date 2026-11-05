@@ -5,6 +5,8 @@ module Storefront
   # Browsing by gift and browsing by child are two views of these rows.
   class Catalog
     UNDER_IN_CENTS = 4_000
+    # A home shelf shows this many and links to the full list for the rest.
+    SHELF_SIZE = 12
 
     def initialize(event:, cart_ids: [])
       @event = event

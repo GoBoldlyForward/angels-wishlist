@@ -27,6 +27,16 @@ class DonorMailerTest < ActionMailer::TestCase
     assert_match(/designated to the holiday wish list program\. The year-end gift is an unrestricted donation to Nashville Angels\./, body)
   end
 
+  test "a receipt calls the chosen gifts preferences and promises no deduction" do
+    chapter = build_organization(name: "Nashville Angels")
+    body = DonorMailer.receipt(build_donation(event: build_event(organization: chapter))).body.to_s
+
+    assert_match(/Contributions are deductible to the extent allowed by law\./, body)
+    assert_match(/The gifts you picked are your preferences\./, body)
+    assert_match(/Nashville Angels retains full discretion over how the funds are allocated\./, body)
+    assert_no_match(/tax-deductible/, body)
+  end
+
   test "a chapter with no sending address of its own uses the application's" do
     donation = build_donation(event: build_event)
 

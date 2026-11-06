@@ -18,8 +18,8 @@ Card processing and fees: <%= number_to_currency(@donation.fee_in_cents / 100.0)
 
 Total: <%= number_to_currency(@donation.charged_in_dollars) %>
 
-<%= @chapter.legal_name_or_name %> is a 501(c)(3)<%= ", EIN #{@chapter.ein}" if @chapter.ein.present? %>. Your gift is a tax-deductible donation, not a purchase of goods, and no goods or services were provided to you in return.<% if @donation.wishlist_in_cents.positive? %> The gifts above are designated to the holiday wish list program.<% end %><% if @donation.year_end_gift? %> The year-end gift is an unrestricted donation to <%= @chapter.name %>.<% end %>
+<%= @chapter.legal_name_or_name %> is a 501(c)(3)<%= ", EIN #{@chapter.ein}" if @chapter.ein.present? %>. Your gift is a donation, not a purchase of goods, and no goods or services were provided to you in return. Contributions are deductible to the extent allowed by law.<% if @donation.wishlist_in_cents.positive? %> The gifts above are designated to the holiday wish list program.<% end %><% if @donation.year_end_gift? %> The year-end gift is an unrestricted donation to <%= @chapter.name %>.<% end %>
 <% if @donation.wishlist_in_cents.positive? -%>
 
-Everything raised for the lists is pooled and spread evenly across every child's list, so each one is funded to the same share.
+<% if @donation.gift_in_cents.positive? %>The gifts you picked are your preferences. <% end %>Everything raised for the lists is pooled and spread evenly across every child's list, and <%= @chapter.name %> retains full discretion over how the funds are allocated.
 <% end -%>

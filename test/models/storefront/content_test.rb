@@ -15,8 +15,8 @@ module Storefront
       @content = Content.new(chapter: @event.organization, event: @event)
     end
 
-    test "it carries the ten questions, four reasons, and five steps" do
-      assert_equal 10, @content.faqs.size
+    test "it carries the twelve questions, four reasons, and five steps" do
+      assert_equal 12, @content.faqs.size
       assert_equal 4, @content.reasons.size
       assert_equal 5, @content.steps.size
       assert_equal 3, @content.checkout_steps.size
@@ -35,6 +35,23 @@ module Storefront
 
     test "the closing step uses the event's own date" do
       assert_match(/\AOn January 9 we total everything raised/, @content.steps.second.body)
+    end
+
+    test "the year-end questions say how to give by check, stock, or donor-advised fund" do
+      year_end, other_ways = @content.faqs.select { |faq| faq.question.match?(/year-end|check, stock/) }
+
+      assert_match(/never joins the wish list pool/, year_end.answer)
+      assert_match(/payable to #{@event.organization.name} and mail it to 2555 Northwinds Pkwy/, other_ways.answer)
+      assert_equal "https://www.every.org/atlantaangels#/donate/card", other_ways.link.url
+    end
+
+    test "without the year-end appeal, or with nowhere to send a gift, those questions are left out" do
+      chapter = @event.organization
+      chapter.update!(year_end_appeal: { "check_address" => "", "other_ways_url" => "" })
+      assert_equal 11, Content.new(chapter:, event: @event).faqs.size
+
+      chapter.update!(year_end_appeal: { "enabled" => false })
+      assert_equal 10, Content.new(chapter:, event: @event).faqs.size
     end
 
     test "with no event the closing step still reads as a sentence" do

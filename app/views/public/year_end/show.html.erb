@@ -32,4 +32,8 @@
       deductible to the extent allowed by law.
     </div>
   </section>
+
+  <% if @appeal.other_ways? %>
+    <%= render "public/year_end/other_ways", appeal: @appeal %>
+  <% end %>
 </main>

@@ -165,6 +165,12 @@
         <% if wishlist %>The gifts above are designated to the holiday wish list program.<% end %>
         <% if cart.year_end_gift? %>Your year-end gift is an unrestricted donation to <%= chapter %>.<% end %>
       </div>
+      <% if year_end_appeal.other_ways? %>
+        <p class="tiny muted checkout-other-ways">
+          Giving by check, stock, or a donor-advised fund?
+          <%= link_to "Other ways to give", year_end_path(anchor: "other-ways"), class: "link" %>
+        </p>
+      <% end %>
     </div>
   </div>
 </main>

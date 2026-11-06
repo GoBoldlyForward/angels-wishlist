@@ -29,6 +29,23 @@ module Storefront
       assert_nil appeal.tier_for(5_000)
     end
 
+    test "other ways to give start from the chapter's own address and EIN" do
+      address = Address.create!(street_line_1: "1 Peachtree St", city: "Atlanta", state: "GA", zipcode: "30303")
+      appeal = YearEndAppeal.new(chapter: build_organization(name: "Austin Angels", ein: "12-3456789",
+                                                             mailing_address: address))
+
+      assert appeal.other_ways?
+      assert_equal "Austin Angels", appeal.check_payee
+      assert_equal "1 Peachtree St, Atlanta, GA 30303", appeal.check_address
+      assert_equal "12-3456789", appeal.tax_id
+    end
+
+    test "with no address and no link, or the appeal off, there are no other ways to show" do
+      assert_not YearEndAppeal.new(chapter: build_organization(year_end_appeal: { "check_address" => "",
+                                                                                  "other_ways_url" => "" })).other_ways?
+      assert_not YearEndAppeal.new(chapter: build_organization(year_end_appeal: { "enabled" => false })).other_ways?
+    end
+
     test "without a chapter it still reads" do
       assert_equal "The lists are for December. Atlanta Angels is there all year.", YearEndAppeal.new(chapter: nil).headline
     end

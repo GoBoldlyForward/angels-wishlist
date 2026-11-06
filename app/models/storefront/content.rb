@@ -5,7 +5,10 @@ module Storefront
   # is pooled, and what donors read about a child comes from the caregiver.
   class Content
     Reason = Data.define(:icon, :title, :body)
-    Question = Data.define(:question, :answer)
+    Question = Data.define(:question, :answer, :link) do
+      def initialize(question:, answer:, link: nil) = super
+    end
+    Link = Data.define(:label, :url)
     Step = Data.define(:title, :body)
 
     GENERAL_GIFT_PRESETS_IN_DOLLARS = [ 25, 50, 100, 250 ].freeze
@@ -13,6 +16,7 @@ module Storefront
     def initialize(chapter:, event:)
       @name = chapter&.name || "Wish List"
       @event = event
+      @appeal = YearEndAppeal.new(chapter:)
     end
 
     def reasons
@@ -30,9 +34,9 @@ module Storefront
                          "Every dollar of that is a dollar that never reaches a child. This program runs on " \
                          "a spreadsheet and a payout."),
         Reason.new(icon: "fa-eye", title: "You still see what your gift did",
-                   body: "You chose the science kit on Nia's list. Your receipt shows that, and in January you " \
-                         "receive an impact statement showing exactly how your support funded holiday gifts " \
-                         "for kids.")
+                   body: "You chose the science kit on Nia's list. Your receipt records that as your " \
+                         "preference, and in January you receive an impact statement showing how your support " \
+                         "funded holiday gifts for kids.")
       ]
     end
 
@@ -44,8 +48,8 @@ module Storefront
                  body: "#{closing_day.upcase_first} we total everything raised and spread it evenly across " \
                        "every child's list, so each one is funded to the same share."),
         Step.new(title: "The household is paid",
-                 body: "Funds land in their bank account in one to two days through Stripe, or on a Visa gift " \
-                       "card if they cannot use a bank."),
+                 body: "After the lists close, #{@name} pays each household into their bank account through " \
+                       "Stripe, or with an emailed gift card if they cannot use a bank."),
         Step.new(title: "They shop",
                  body: "The caregiver gets the joy of shopping for their kids, and makes sure they get exactly " \
                        "what they want and what fits in that moment."),
@@ -118,17 +122,19 @@ module Storefront
         ),
         Question.new(
           question: "What happens if a list is not fully funded?",
-          answer: "The household still receives its share. We spread everything raised evenly across every " \
-                  "child's list, so each one is funded to the same percentage. If every child asked for " \
-                  "$200 and donors covered 75 percent of the total, every child's list receives $150. We do " \
-                  "not hold funds back waiting for a list to complete."
+          answer: "The household still receives a share, at the discretion of #{@name}. We spread everything " \
+                  "raised evenly across every child's list, so each one is funded to the same percentage. If " \
+                  "every child asked for $200 and donors covered 75 percent of the total, every child's list " \
+                  "receives $150. We do not hold funds back waiting for a list to complete."
         ),
         Question.new(
           question: "Is my gift tax-deductible?",
-          answer: "Yes. #{@name} is a registered 501(c)(3), and you will get an itemized receipt by email. " \
-                  "No goods or services are provided to you in exchange, which is the other reason the " \
-                  "money has to be a donation to us rather than a purchase from a family."
+          answer: "#{@name} is recognized as tax exempt under 501(c)(3) and contributions are deductible to " \
+                  "the extent allowed by law. Consult your tax advisor. No goods or services are provided to " \
+                  "you in exchange, which is the other reason the money has to be a donation to us rather " \
+                  "than a purchase from a family."
         ),
+        *year_end_faqs,
         Question.new(
           question: "What will I hear back?",
           answer: "A thank-you and an impact statement from #{@name} in January. For privacy reasons you " \
@@ -153,6 +159,37 @@ module Storefront
     end
 
     private
+
+    def year_end_faqs
+      return [] unless @appeal.enabled?
+
+      [
+        Question.new(
+          question: "What is a year-end gift?",
+          answer: "A gift straight to #{@name}, added at checkout on top of the wish list gifts or given on its " \
+                  "own. The lists fund holiday gifts for December. A year-end gift is unrestricted and carries " \
+                  "the work #{@name} does the rest of the year. It never joins the wish list pool, so it does " \
+                  "not change what any household receives, and your receipt lists it on its own line."
+        ),
+        (other_ways_faq if @appeal.other_ways?)
+      ].compact
+    end
+
+    def other_ways_faq
+      by_check = if @appeal.check_address.present?
+        "Yes. Make a check or money order payable to #{@appeal.check_payee} and mail it to " \
+          "#{@appeal.check_address}. To put it toward the holiday wish lists, write \"Wish List\" in the memo."
+      end
+      by_link = "Gifts of stock, cryptocurrency, a donor-advised fund grant, or a wire transfer go through " \
+                "the #{@name} giving page." if @appeal.other_ways_url.present?
+      receipt = "#{@name} receipts these gifts directly, not through this site."
+
+      Question.new(
+        question: "Can I give by check, stock, or a donor-advised fund?",
+        answer: [ by_check || "Yes.", by_link, receipt ].compact.join(" "),
+        link: (Link.new(label: "Give stock, crypto, or a donor-advised fund grant", url: @appeal.other_ways_url) if by_link)
+      )
+    end
 
     def closing_day
       closing_date ? "on #{closing_date}" : "when the lists close"

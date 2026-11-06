@@ -1,10 +1,15 @@
-<%# locals: (kicker:, title:, blurb:, tone: nil) -%>
+<%# locals: (kicker:, title:, blurb:, items:, more:, tone: nil) -%>
 <section class="shelf reveal" data-controller="shop-reveal">
   <div class="shelf-head">
     <div>
       <h2><span class="shelf-kicker <%= tone %>"><%= kicker %></span> <%= title %></h2>
       <p><%= blurb %></p>
     </div>
+    <% if items.size > Storefront::Catalog::SHELF_SIZE %>
+      <%= link_to more, class: "sec-link" do %>
+        See all <i class="fa-solid fa-chevron-right t-2xs" aria-hidden="true"></i>
+      <% end %>
+    <% end %>
   </div>
-  <div class="rail"><%= yield %></div>
+  <div class="rail"><%= yield items.first(Storefront::Catalog::SHELF_SIZE) %></div>
 </section>

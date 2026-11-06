@@ -21,6 +21,8 @@ module Public
       get root_path
 
       assert_select ".brand-name", /Nashville Angels/
+      assert_select ".brand-name span", "Holiday Gift Guide"
+      assert_select "title", "Holiday Gift Guide | Nashville Angels"
       assert_not_includes response.body, "Maya"
     end
 

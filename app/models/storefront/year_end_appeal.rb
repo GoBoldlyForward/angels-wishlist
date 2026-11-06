@@ -6,15 +6,13 @@ module Storefront
   # Staff edit it under Setup; a field they have never saved falls back to this.
   class YearEndAppeal
     Stat = Data.define(:figure, :label)
-    Tier = Data.define(:dollars, :title, :teaser, :body, :open_ended) do
+    Tier = Data.define(:dollars, :title, :teaser, :body) do
       def cents
         dollars * 100
       end
 
-      # The top tier reads as a floor, not a price.
       def amount_label
-        label = ActiveSupport::NumberHelper.number_to_currency(dollars, precision: 0)
-        open_ended ? "#{label}+" : label
+        ActiveSupport::NumberHelper.number_to_currency(dollars, precision: 0)
       end
     end
 
@@ -69,12 +67,11 @@ module Storefront
       Array(@settings["stats"]).map { |stat| Stat.new(figure: stat["figure"].to_s, label: stat["label"].to_s) }
     end
 
-    # Smallest first. The largest reads as a floor.
+    # Smallest first.
     def tiers
-      rows = Array(@settings["tiers"]).sort_by { |tier| tier["dollars"].to_i }
-      rows.map.with_index do |tier, index|
+      Array(@settings["tiers"]).sort_by { |tier| tier["dollars"].to_i }.map do |tier|
         Tier.new(dollars: tier["dollars"].to_i, title: tier["title"].to_s, teaser: tier["teaser"].to_s,
-                 body: tier["body"].to_s, open_ended: index == rows.size - 1)
+                 body: tier["body"].to_s)
       end
     end
 

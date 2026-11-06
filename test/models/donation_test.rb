@@ -111,6 +111,21 @@ class DonationTest < ActiveSupport::TestCase
     assert_equal 0, donation.general_gift_in_cents
   end
 
+  test "a second copy of the donation, settling right after the first, changes nothing" do
+    event = build_event
+    line = build_line_item(wishlist: build_wishlist(event: event), price_in_cents: 4_800)
+    donation = build_donation(event: event, status: "pending", gift_in_cents: 4_800,
+                              cart: { "line_item_ids" => [ line.id ] })
+    copy = Donation.find(donation.id)
+
+    assert donation.settle!
+    assert_not copy.settle!
+
+    assert copy.succeeded?
+    assert_equal [ 4_800, 0 ], [ copy.gift_in_cents, copy.general_gift_in_cents ]
+    assert_equal donation, line.reload.donation
+  end
+
   test "a refund returns its gifts to open and leaves the pool" do
     event = build_event
     line = build_line_item(wishlist: build_wishlist(event: event), price_in_cents: 4_800)

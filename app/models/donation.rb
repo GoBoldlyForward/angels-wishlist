@@ -98,10 +98,13 @@ class Donation < ApplicationRecord
 
   # Funds each chosen gift that is still open. One that somebody else funded
   # first stays in the pool as a general gift, so the amount given never changes.
+  # The donor's return page and Stripe's webhook can both call this at once, so
+  # the donation is locked and checked again under the lock: one call settles
+  # and answers true, the other finds it done and changes nothing.
   def settle!
-    return self if succeeded?
+    with_lock do
+      next false if succeeded?
 
-    transaction do
       chosen_line_items.lock.order(:id).each do |line|
         if line.funded? || !line.open_status?
           self.gift_in_cents -= line.price_in_cents
@@ -111,8 +114,8 @@ class Donation < ApplicationRecord
         end
       end
       update!(status: "succeeded")
+      true
     end
-    self
   end
 
   def refund!

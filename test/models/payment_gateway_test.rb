@@ -3,6 +3,8 @@
 require "test_helper"
 
 class PaymentGatewayTest < ActiveSupport::TestCase
+  include ActionMailer::TestHelper
+
   test "a live donation is charged straight into the chapter's account" do
     donation = build_donation(event: build_event, status: "pending", gift_in_cents: 0,
                               general_gift_in_cents: 10_000, fee_in_cents: 330, processing_fee_in_cents: 330)
@@ -48,6 +50,28 @@ class PaymentGatewayTest < ActiveSupport::TestCase
 
     assert_equal({ payment_intent: "pi_1" }, sent)
     assert donation.reload.refunded?
+  end
+
+  test "a payment confirmed by the return page and the webhook at once gets one receipt" do
+    event = build_event
+    line = build_line_item(wishlist: build_wishlist(event: event), price_in_cents: 4_800)
+    donation = build_donation(event: event, status: "pending", gift_in_cents: 4_800,
+                              cart: { "line_item_ids" => [ line.id ] })
+    copies = [ Donation.find(donation.id), Donation.find(donation.id) ]
+    paid = stripe_event("checkout.session.completed", client_reference_id: donation.uuid,
+                        payment_status: "paid", payment_intent: "pi_1")
+
+    swapping(Donation, :find_by, ->(*) { copies.shift }) do
+      assert_enqueued_emails 1 do
+        2.times { PaymentGateway.handle(paid) }
+      end
+    end
+
+    donation.reload
+    assert donation.succeeded?
+    assert_equal donation, line.reload.donation
+    assert_equal [ 4_800, 0, "pi_1" ],
+                 [ donation.gift_in_cents, donation.general_gift_in_cents, donation.stripe_payment_intent_id ]
   end
 
   test "a payout is one transfer from the chapter's balance to the caregiver" do

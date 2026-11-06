@@ -125,6 +125,9 @@ gem "geocoder", "~> 1.8", ">= 1.8.2"
 gem "meta-tags"
 gem "breadcrumbs_on_rails"
 
+# Dyno autoscaling from request queue time (Rails Autoscale add-on)
+gem "rails-autoscale-web"
+
 # Security
 gem "rack-attack"
 gem "rack-cors"

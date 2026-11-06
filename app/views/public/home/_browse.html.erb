@@ -37,7 +37,7 @@
         <% end %>
       </div>
       <div class="rail">
-        <%= render partial: "public/shared/product_tile", collection: products.sort_by { |product| product.open.any? ? 0 : 1 }, as: :product %>
+        <%= render partial: "public/shared/product_tile", collection: Storefront::Product.open_first(products), as: :product %>
       </div>
     </div>
   <% end %>
@@ -50,9 +50,14 @@
           <h2><i class="fa-solid fa-pen t-md sec-icon" aria-hidden="true"></i>Written in by a caregiver</h2>
           <p><%= custom.sum { |product| product.open.size } %> still needed · requests that are not in the catalog</p>
         </div>
+        <% if custom.size > Storefront::Catalog::SHELF_SIZE %>
+          <%= link_to root_path(tab: "unfunded", anchor: "shop"), class: "sec-link" do %>
+            See all <i class="fa-solid fa-chevron-right t-2xs" aria-hidden="true"></i>
+          <% end %>
+        <% end %>
       </div>
       <div class="rail">
-        <%= render partial: "public/shared/product_tile", collection: custom.sort_by { |product| product.open.any? ? 0 : 1 }, as: :product %>
+        <%= render partial: "public/shared/product_tile", collection: Storefront::Product.open_first(custom).first(Storefront::Catalog::SHELF_SIZE), as: :product %>
       </div>
     </div>
   <% end %>

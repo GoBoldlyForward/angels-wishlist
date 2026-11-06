@@ -27,7 +27,7 @@ module Public
       assert_select ".season-leg", /2\s*children with lists/
       assert_select ".season-leg", /0\s*lists finished/
       assert_select ".season-leg", /20%\s*of the way there/
-      assert_select "#faq .faq-item", 10
+      assert_select "#faq .faq-item", 12
       assert_select "#why .why-card", 4
     end
 

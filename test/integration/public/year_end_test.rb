@@ -19,6 +19,18 @@ module Public
       assert_select "button", text: "Continue"
       assert_select ".cart-btn", 0
       assert_select ".tile", 0
+      assert_select "#other-ways .yeg-way", text: /payable to Atlanta Angels and mail it to 2555 Northwinds Pkwy/
+      assert_select "#other-ways a[href=?]", "https://www.every.org/atlantaangels#/donate/card"
+      assert_select "#other-ways", text: /EIN 85-2051575/
+    end
+
+    test "a chapter that blanked its mailing address shows only the link" do
+      @chapter.update!(year_end_appeal: { "check_address" => "" })
+
+      visit year_end_path
+
+      assert_select "#other-ways .yeg-way", 1
+      assert_select "#other-ways .yeg-way", text: /Stock, crypto, donor-advised fund, or wire/
     end
 
     test "choosing a gift there leads straight to giving" do

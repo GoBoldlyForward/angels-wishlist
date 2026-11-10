@@ -1,7 +1,7 @@
 <% chapter = chapter_name %>
 <% total = cart.total_in_cents %>
 <% wishlist = cart.holds_wishlist? %>
-<% content_for :title, "#{wishlist ? "Review your cart" : "Your year-end gift"} | Wish List" %>
+<% content_for :title, "#{wishlist ? "Review your cart" : "Your year-end gift"} | Holiday Gift Guide" %>
 
 <main class="container checkout-page">
   <% if wishlist %>
@@ -160,11 +160,17 @@
       <% end %>
 
       <div class="disclosure checkout-disclosure">
-        <%= chapter %> is a 501(c)(3). Your gift is a tax-deductible donation, not a purchase of goods, and no
-        goods or services are provided to you in return.
+        <%= chapter %> is a 501(c)(3). Your gift is a donation, not a purchase of goods, and no goods or
+        services are provided to you in return. Contributions are deductible to the extent allowed by law.
         <% if wishlist %>The gifts above are designated to the holiday wish list program.<% end %>
         <% if cart.year_end_gift? %>Your year-end gift is an unrestricted donation to <%= chapter %>.<% end %>
       </div>
+      <% if year_end_appeal.other_ways? %>
+        <p class="tiny muted checkout-other-ways">
+          Giving by check, stock, or a donor-advised fund?
+          <%= link_to "Other ways to give", year_end_path(anchor: "other-ways"), class: "link" %>
+        </p>
+      <% end %>
     </div>
   </div>
 </main>

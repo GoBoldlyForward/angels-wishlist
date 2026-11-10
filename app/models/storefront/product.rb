@@ -78,5 +78,10 @@ module Storefront
     def self.most_needed_first(products)
       products.sort_by { |product| [ -product.left.size, product.name.downcase ] }
     end
+
+    # Fully funded tiles go to the back; the rest keep the order they were asked for in.
+    def self.open_first(products)
+      products.partition { |product| product.open.any? }.flatten
+    end
   end
 end

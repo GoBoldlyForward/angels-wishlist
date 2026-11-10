@@ -12,6 +12,9 @@
         <details class="faq-item">
           <summary><%= faq.question %></summary>
           <p><%= faq.answer %></p>
+          <% if faq.link %>
+            <p><%= link_to faq.link.label, faq.link.url, class: "link", target: "_blank", rel: "noopener" %></p>
+          <% end %>
         </details>
       <% end %>
     </div>

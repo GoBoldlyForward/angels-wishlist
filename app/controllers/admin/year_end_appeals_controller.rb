@@ -19,8 +19,7 @@ module Admin
     private
 
     def appeal_params
-      params.expect(year_end_appeal: [ :enabled, :headline, :lede, :period, :source_label, :source_url,
-                                       stats: {}, tiers: {} ])
+      params.expect(year_end_appeal: [ :enabled, *Storefront::YearEndAppeal::TEXT_FIELDS, stats: {}, tiers: {} ])
     end
   end
 end

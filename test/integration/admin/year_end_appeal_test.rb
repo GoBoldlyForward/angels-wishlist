@@ -32,9 +32,20 @@ module Admin
       assert appeal.enabled?
       assert_equal "This year, 300 kids.", appeal.headline
       assert_equal [ [ "300", "kids served" ] ], appeal.stats.map { |stat| [ stat.figure, stat.label ] }
-      assert_equal [ [ 75, "$75", "Shoes" ], [ 1_000, "$1,000+", "A year of mentoring" ] ],
+      assert_equal [ [ 75, "$75", "Shoes" ], [ 1_000, "$1,000", "A year of mentoring" ] ],
                    appeal.tiers.map { |tier| [ tier.dollars, tier.amount_label, tier.title ] }
       assert_equal "", appeal.source_url
+    end
+
+    test "saving the other ways to give" do
+      patch admin_year_end_appeal_path, params: { year_end_appeal: {
+        check_payee: "Atlanta Angels Inc.", check_address: "PO Box 1, Atlanta, GA 30301", tax_id: "",
+        other_ways_url: "https://example.org/give"
+      } }
+
+      appeal = Storefront::YearEndAppeal.new(chapter: @chapter.reload)
+      assert_equal [ "Atlanta Angels Inc.", "PO Box 1, Atlanta, GA 30301", "", "https://example.org/give" ],
+                   [ appeal.check_payee, appeal.check_address, appeal.tax_id, appeal.other_ways_url ]
     end
 
     test "switching the appeal off hides it at checkout" do

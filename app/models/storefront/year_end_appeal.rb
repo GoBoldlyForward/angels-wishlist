@@ -2,23 +2,22 @@
 
 module Storefront
   # The chapter's year-end appeal, shown once at checkout: what the year has
-  # looked like so far, and the gifts a donor can add on top of the lists.
+  # looked like so far, the gifts a donor can add on top of the lists, and how
+  # to give by check, stock, or donor-advised fund instead.
   # Staff edit it under Setup; a field they have never saved falls back to this.
   class YearEndAppeal
     Stat = Data.define(:figure, :label)
-    Tier = Data.define(:dollars, :title, :teaser, :body, :open_ended) do
+    Tier = Data.define(:dollars, :title, :teaser, :body) do
       def cents
         dollars * 100
       end
 
-      # The top tier reads as a floor, not a price.
       def amount_label
-        label = ActiveSupport::NumberHelper.number_to_currency(dollars, precision: 0)
-        open_ended ? "#{label}+" : label
+        ActiveSupport::NumberHelper.number_to_currency(dollars, precision: 0)
       end
     end
 
-    TEXT_FIELDS = %w[headline lede period source_label source_url].freeze
+    TEXT_FIELDS = %w[headline lede period source_label source_url check_payee check_address tax_id other_ways_url].freeze
 
     # Atlanta Angels' 2026 mid-year impact snapshot.
     STATS = [
@@ -60,6 +59,7 @@ module Storefront
 
     def initialize(chapter:)
       @name = chapter&.name || "Atlanta Angels"
+      @chapter = chapter
       @settings = defaults.merge((chapter&.year_end_appeal || {}).compact)
     end
 
@@ -69,12 +69,11 @@ module Storefront
       Array(@settings["stats"]).map { |stat| Stat.new(figure: stat["figure"].to_s, label: stat["label"].to_s) }
     end
 
-    # Smallest first. The largest reads as a floor.
+    # Smallest first.
     def tiers
-      rows = Array(@settings["tiers"]).sort_by { |tier| tier["dollars"].to_i }
-      rows.map.with_index do |tier, index|
+      Array(@settings["tiers"]).sort_by { |tier| tier["dollars"].to_i }.map do |tier|
         Tier.new(dollars: tier["dollars"].to_i, title: tier["title"].to_s, teaser: tier["teaser"].to_s,
-                 body: tier["body"].to_s, open_ended: index == rows.size - 1)
+                 body: tier["body"].to_s)
       end
     end
 
@@ -90,6 +89,10 @@ module Storefront
       ActiveModel::Type::Boolean.new.cast(@settings["enabled"]) != false
     end
 
+    def other_ways?
+      enabled? && (check_address.present? || other_ways_url.present?)
+    end
+
     private
 
     def defaults
@@ -103,7 +106,11 @@ module Storefront
         "source_label" => "#{@name}' mid-year impact snapshot",
         "source_url" => "https://heyzine.com/flip-book/7c3a3be980.html",
         "stats" => STATS,
-        "tiers" => TIERS
+        "tiers" => TIERS,
+        "check_payee" => @name,
+        "check_address" => @chapter&.mailing_address&.to_s.presence || "2555 Northwinds Pkwy, Alpharetta, GA 30009",
+        "tax_id" => @chapter&.ein.presence || "85-2051575",
+        "other_ways_url" => "https://www.every.org/atlantaangels#/donate/card"
       }
     end
   end

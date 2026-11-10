@@ -15,8 +15,8 @@ module Storefront
       @content = Content.new(chapter: @event.organization, event: @event)
     end
 
-    test "it carries the ten questions, four reasons, and five steps" do
-      assert_equal 10, @content.faqs.size
+    test "it carries the twelve questions, four reasons, and five steps" do
+      assert_equal 12, @content.faqs.size
       assert_equal 4, @content.reasons.size
       assert_equal 5, @content.steps.size
       assert_equal 3, @content.checkout_steps.size
@@ -37,11 +37,39 @@ module Storefront
       assert_match(/\AOn January 9 we total everything raised/, @content.steps.second.body)
     end
 
+    test "the year-end questions say how to give by check, stock, or donor-advised fund" do
+      year_end, other_ways = @content.faqs.select { |faq| faq.question.match?(/year-end|check, stock/) }
+
+      assert_match(/never joins the wish list pool/, year_end.answer)
+      assert_match(/payable to #{@event.organization.name} and mail it to 2555 Northwinds Pkwy/, other_ways.answer)
+      assert_equal "https://www.every.org/atlantaangels#/donate/card", other_ways.link.url
+    end
+
+    test "without the year-end appeal, or with nowhere to send a gift, those questions are left out" do
+      chapter = @event.organization
+      chapter.update!(year_end_appeal: { "check_address" => "", "other_ways_url" => "" })
+      assert_equal 11, Content.new(chapter:, event: @event).faqs.size
+
+      chapter.update!(year_end_appeal: { "enabled" => false })
+      assert_equal 10, Content.new(chapter:, event: @event).faqs.size
+    end
+
     test "with no event the closing step still reads as a sentence" do
       content = Content.new(chapter: nil, event: nil)
 
       assert_match(/\AWhen the lists close we total everything raised/, content.steps.second.body)
       assert_match(/charged by Wish List/, content.steps.first.body)
+    end
+
+    test "the money is the chapter's to direct, and no deduction is promised" do
+      name = Regexp.escape(@event.organization.name)
+      answers = @content.faqs.to_h { |faq| [ faq.question, faq.answer ] }
+
+      assert_match(/\AAfter the lists close, #{name} pays each household/, @content.steps.third.body)
+      assert_match(/\AThe household still receives a share, at the discretion of #{name}\./,
+                   answers["What happens if a list is not fully funded?"])
+      assert_match(/contributions are deductible to the extent allowed by law\. Consult your tax advisor\./,
+                   answers["Is my gift tax-deductible?"])
     end
   end
 end

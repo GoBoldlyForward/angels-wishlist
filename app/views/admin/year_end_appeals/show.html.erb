@@ -55,6 +55,33 @@
           </div>
           <div class="form-text">Shown in small print under the figures. Leave the link blank to show the source as plain text.</div>
         <% end %>
+
+        <%= detail_section "Other ways to give" do %>
+          <div class="row g-3 mb-3">
+            <div class="col-md-5">
+              <%= form.label :check_payee, "Make checks payable to", class: "form-label" %>
+              <%= form.text_field :check_payee, class: "form-control" %>
+            </div>
+            <div class="col-md-7">
+              <%= form.label :check_address, "Mail checks to", class: "form-label" %>
+              <%= form.text_field :check_address, class: "form-control" %>
+            </div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-5">
+              <%= form.label :tax_id, "EIN", class: "form-label" %>
+              <%= form.text_field :tax_id, class: "form-control", placeholder: "12-3456789" %>
+            </div>
+            <div class="col-md-7">
+              <%= form.label :other_ways_url, "Link for stock, crypto, donor-advised fund, and wire gifts", class: "form-label" %>
+              <%= form.url_field :other_ways_url, class: "form-control", placeholder: "https://" %>
+            </div>
+          </div>
+          <div class="form-text">
+            Shown under the tiers on the year-end page, and in the questions on the home page. Leave the mailing
+            address and the link blank to hide it.
+          </div>
+        <% end %>
       </div>
     </div>
 

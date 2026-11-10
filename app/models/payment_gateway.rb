@@ -59,8 +59,8 @@ module PaymentGateway
     end
   end
 
-  # Settles from the donor's return as well as the webhook, whichever
-  # arrives first. Donation#settle! makes the second one a no-op.
+  # Settles from the donor's return as well as the webhook, whichever arrives
+  # first, or both at once. Donation#settle! makes the second one a no-op.
   def confirm(donation, session_id)
     return donation unless live? && donation.pending? && session_id.present?
 
@@ -143,13 +143,13 @@ module PaymentGateway
     payout.mark_failed!(e.message)
   end
 
+  # The receipt goes out once, from whichever call settles the donation.
   def settle(session)
     donation = Donation.find_by(uuid: session.client_reference_id)
     return if donation.nil? || donation.succeeded?
 
     donation.update!(stripe_payment_intent_id: session.payment_intent, payment_method_label: "Card")
-    donation.settle!
-    DonorMailer.receipt(donation).deliver_later
+    DonorMailer.receipt(donation).deliver_later if donation.settle!
   end
 
   def description_of(donation)

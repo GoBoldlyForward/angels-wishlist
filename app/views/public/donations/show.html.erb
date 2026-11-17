@@ -101,11 +101,12 @@
             Your year-end gift goes to work across the programs at <%= chapter %> right away.
           <% elsif @closes_at %>
             <b class="ink">Next: <%= @closes_at.strftime("%B %-d") %>.</b>
-            The lists close, and everything raised is pooled and spread evenly across every child's list, so
-            every list is funded to the same share. Each household is paid its share that week.
+            The lists close, and everything raised for them is pooled and spread evenly across every child's
+            list, so every list is funded to the same share. Each household is paid its share that week.
           <% else %>
             <b class="ink">Next.</b>
-            When the lists close, everything raised is pooled and spread evenly across every child's list.
+            When the lists close, everything raised for them is pooled and spread evenly across every child's
+            list.
           <% end %>
           You receive a thank-you and an impact statement from <%= chapter %> in January.
         </div>

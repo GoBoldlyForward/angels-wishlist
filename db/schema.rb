@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_30_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_17_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -195,6 +195,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_30_130000) do
     t.datetime "spending_agreed_at"
     t.datetime "submitted_at"
     t.datetime "updated_at", null: false
+    t.datetime "payout_reminded_at"
     t.index ["deleted_at"], name: "index_enrollments_on_deleted_at"
     t.index ["event_id"], name: "index_enrollments_on_event_id"
     t.index ["household_id", "event_id"], name: "index_enrollments_on_household_id_and_event_id", unique: true

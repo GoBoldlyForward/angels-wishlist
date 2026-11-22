@@ -1,0 +1,16 @@
+Hi <%= @household.caregiver.first_name %>,
+
+We have your lists for <%= @enrollment.event.name %>. Before we can send your household's share, we still need this from you:
+
+<% @enrollment.payout_needs.each do |need| -%>
+- <%= need %>
+<% end -%>
+
+It takes about three minutes. Sign in and you will land on the right page:
+<%= caregiver_intake_payout_url %>
+
+<% if @enrollment.event.closes_at -%>
+Please do this before lists close on <%= l(@enrollment.event.closes_at.to_date, format: :long) %>. After that it cannot be changed online.
+
+<% end -%>
+<%= @household.organization.name %>

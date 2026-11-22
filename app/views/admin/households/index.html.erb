@@ -17,6 +17,8 @@
                 note: "cannot be paid as things stand" %>
 </div>
 
+<%= render "payout_reminder", reminder: @payout_reminder if @payout_reminder.recipient_count.positive? %>
+
 <%= render "admin/shared/table_controls", table: @table, placeholder: "Search households, caregivers, counties, agencies..." %>
 
 <div class="data-table-wrapper">

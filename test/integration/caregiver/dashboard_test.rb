@@ -71,5 +71,63 @@ module Caregiver
       assert_redirected_to caregiver_root_path
       assert_equal 2, @list.line_items.count
     end
+
+    test "approved notes from the donors who chose this household's gifts show, newest first" do
+      skateboard, art = @list.line_items.order(:id).to_a
+      give(skateboard, display_name: "The Hollis family", note_to_family: "Merry Christmas, Amelia!", created_at: 1.day.ago)
+      give(art, display_name: nil, anonymous: true, note_to_family: "Thinking of you all.")
+
+      get caregiver_root_path
+
+      assert_select "#donor-notes blockquote", 2
+      assert_select "#donor-notes blockquote", text: "“Merry Christmas, Amelia!”"
+      assert_equal [ "From Anonymous", "From The Hollis family" ], css_select("#donor-notes figcaption").map(&:text)
+    end
+
+    test "a note still waiting on staff does not show" do
+      give(@list.line_items.first, note_to_family: "Merry Christmas, Amelia!", approved: false)
+
+      get caregiver_root_path
+
+      assert_select "#donor-notes", count: 0
+    end
+
+    test "a note for another household's gifts does not show" do
+      elsewhere = build_wishlist(child: build_child(household: build_household(organization: @chapter)), event: @event)
+      give(build_line_item(wishlist: elsewhere), note_to_family: "Merry Christmas!")
+
+      get caregiver_root_path
+
+      assert_select "#donor-notes", count: 0
+    end
+
+    test "a general gift's note does not show" do
+      build_donation(event: @event, gift_in_cents: 0, general_gift_in_cents: 5_000,
+                     note_to_family: "Merry Christmas!").approve_note!
+
+      get caregiver_root_path
+
+      assert_select "#donor-notes", count: 0
+    end
+
+    test "refunding a gift takes its note off the dashboard" do
+      donation = give(@list.line_items.first, note_to_family: "Merry Christmas, Amelia!")
+      get caregiver_root_path
+      assert_select "#donor-notes blockquote", 1
+
+      donation.refund!
+      get caregiver_root_path
+
+      assert_select "#donor-notes", count: 0
+    end
+
+    private
+
+    def give(line, approved: true, **attrs)
+      donation = build_donation(event: @event, **attrs)
+      line.fund!(donation)
+      donation.approve_note! if approved
+      donation
+    end
   end
 end

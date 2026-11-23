@@ -1,0 +1,16 @@
+<%# locals: (notes:) %>
+<section class="panel" style="margin-bottom:16px" id="donor-notes">
+  <div class="list-head">
+    <span class="avatar" style="background:var(--brand)"><i class="fa-solid fa-envelope-open-text"></i></span>
+    <div>
+      <div class="kid-name t-md">Notes from donors</div>
+      <div class="tiny muted">From donors who chose your gifts</div>
+    </div>
+  </div>
+  <% notes.each do |donation| %>
+    <figure class="donor-note">
+      <blockquote>“<%= donation.note_to_family %>”</blockquote>
+      <figcaption class="tiny c-brand">From <%= donation.public_display_name %></figcaption>
+    </figure>
+  <% end %>
+</section>

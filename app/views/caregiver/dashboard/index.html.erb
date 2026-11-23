@@ -66,6 +66,8 @@
         </p>
       <% end %>
 
+      <% if @notes.any? %><%= render "donor_notes", notes: @notes %><% end %>
+
       <% if @box.groups.any? %><%= render "caregiver/shared/love_box", box: @box, editable: open_for_edits %><% end %>
     </div>
 

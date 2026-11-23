@@ -11,6 +11,7 @@ module Caregiver
 
       @lists = enrolled_lists
       @box = current_enrollment.love_box_selection
+      @notes = current_enrollment.donor_notes.to_a
     end
 
     private

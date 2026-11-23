@@ -24,6 +24,11 @@ class Enrollment < ApplicationRecord
     event.wishlists.joins(:child).where(children: { household_id: household_id })
   end
 
+  def donor_notes
+    event.donations.succeeded.with_approved_note
+         .where(id: LineItem.where(wishlist: wishlists).select(:donation_id)).recent
+  end
+
   # The steps this chapter asks a caregiver for, in order.
   def intake_steps
     self.class.intake_steps_for(event.organization)

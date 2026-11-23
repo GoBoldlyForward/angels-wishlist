@@ -68,6 +68,9 @@ legend.f{display:block; font-size:var(--fs-sm); font-weight:650; color:var(--ink
 .gift-row{margin-bottom:8px; padding:9px 11px}
 .gift-row .grow{flex:1; min-width:0}
 .blockers{margin:0; padding-left:18px}
+.donor-note{margin:0 0 10px; padding:14px 16px; background:var(--brand-wash); border:1px solid var(--brand-edge); border-radius:12px}
+.donor-note:last-child{margin-bottom:0}
+.donor-note blockquote{margin:0 0 6px; font-style:italic; line-height:1.55; white-space:pre-line; overflow-wrap:anywhere}
 
 .status{border-radius:50px; font-size:var(--fs-2xs); font-weight:700; letter-spacing:.04em; text-transform:uppercase; padding:4px 11px; background:var(--line-soft); color:var(--soft); white-space:nowrap}
 .status-live,.status-verified,.status-chosen{background:var(--green-bg); color:var(--green-d)}

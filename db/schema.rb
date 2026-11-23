@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_17_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_22_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -175,6 +175,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_120000) do
     t.datetime "updated_at", null: false
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.integer "year_end_gift_in_cents", default: 0, null: false
+    t.string "heard_about", limit: 120
     t.index ["ahoy_visit_id"], name: "index_donations_on_ahoy_visit_id"
     t.index ["deleted_at"], name: "index_donations_on_deleted_at"
     t.index ["donor_id"], name: "index_donations_on_donor_id"

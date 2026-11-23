@@ -29,6 +29,8 @@
     <% end %>
   </div>
 
+  <%= render "heard_about", receipt: @receipt if finished %>
+
   <div class="panel">
     <h2 class="t-md confirmation-title"><%= finished ? "You gave" : "You chose" %></h2>
 

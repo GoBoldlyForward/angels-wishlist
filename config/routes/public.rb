@@ -19,5 +19,5 @@ scope "(/with/:storefront)", module: "public" do
   end
   resource :checkout, only: %i[show create]
   get "year-end", to: "year_end#show", as: :year_end
-  resources :donations, only: :show, param: :uuid
+  resources :donations, only: %i[show update], param: :uuid
 end

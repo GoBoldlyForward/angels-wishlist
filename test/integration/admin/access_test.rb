@@ -47,6 +47,7 @@ module Admin
       patch withdraw_admin_wishlist_path(@wishlist)
       patch withdraw_admin_line_item_path(@line_item)
       patch approve_admin_donor_note_path(@donation)
+      patch admin_donor_note_path(@donation), params: { donor_note: { note_to_family: "Changed." } }
       post admin_households_path, params: { household: { first_name: "A", last_name: "B", email: "a@example.com" } }
 
       assert_redirected_to root_path
@@ -55,6 +56,7 @@ module Admin
       assert @wishlist.reload.in_review?
       assert @line_item.reload.needs_review_status?
       assert_nil @donation.reload.note_approved_at
+      assert_equal "Thinking of you.", @donation.note_to_family
       assert_not User.exists?(email: "a@example.com")
     end
 

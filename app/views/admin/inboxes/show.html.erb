@@ -135,7 +135,12 @@
                 <span class="item-name"><%= donation.public_display_name %></span>
                 <%= cell_sub donation.donor.full_name if donation.anonymous? || donation.public_display_name != donation.donor.full_name %>
               </td>
-              <td><div class="drawer-quote inbox-note"><%= donation.note_to_family %></div></td>
+              <td>
+                <div class="drawer-quote inbox-note"><%= donation.note_to_family %></div>
+                <div class="collapse inbox-note mt-2" id="<%= dom_id(donation, :note_form) %>">
+                  <%= render "admin/donor_notes/form", donation: donation %>
+                </div>
+              </td>
               <td>
                 <% if households.any? %>
                   <%= safe_join(households.map { |household| link_to(household.display_name, admin_household_path(household)) }, tag.br) %>
@@ -148,6 +153,10 @@
                 <%= button_to approve_admin_donor_note_path(donation), method: :patch, class: "btn btn-sm btn-outline-success" do %>
                   <i class="bi bi-check2 me-1"></i>Approve
                 <% end %>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse"
+                        data-bs-target="#<%= dom_id(donation, :note_form) %>" aria-expanded="false" aria-controls="<%= dom_id(donation, :note_form) %>">
+                  <i class="bi bi-pencil me-1"></i>Edit
+                </button>
                 <%= button_to discard_admin_donor_note_path(donation), method: :patch, class: "btn btn-sm btn-outline-danger",
                               form: { data: { turbo_confirm: "Discard this note? The family never sees it and it cannot be brought back." } } do %>
                   <i class="bi bi-trash me-1"></i>Discard

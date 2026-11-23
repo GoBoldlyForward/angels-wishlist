@@ -97,6 +97,7 @@ module Admin
       assert_select ".drawer-section h4", text: "What this is"
       assert_select ".drawer-quote", text: "Thinking of you."
       assert_select ".status-badge", text: /Awaiting approval/
+      assert_select "#note-form form[action=?] textarea", admin_donor_note_path(@mixed), text: "Thinking of you."
       assert_select "td", text: /Art supply set/
     end
 

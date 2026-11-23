@@ -2,7 +2,7 @@
 
 class Donation < ApplicationRecord
   acts_as_paranoid
-  has_paper_trail only: %i[status note_approved_at],
+  has_paper_trail only: %i[status note_approved_at note_to_family],
                   meta: { organization_id: ->(donation) { donation.event.organization_id } }
 
   # What Stripe charges for a card, the rate the donor's fee is estimated at.
@@ -26,6 +26,7 @@ class Donation < ApplicationRecord
 
   validates :gift_in_cents, :general_gift_in_cents, :year_end_gift_in_cents, :fee_in_cents, :processing_fee_in_cents,
             numericality: { greater_than_or_equal_to: 0 }
+  validates :note_to_family, presence: true, on: :note_revision
   validates :note_to_family, length: { maximum: 1000 }
   validate :carries_some_money
 
@@ -87,6 +88,11 @@ class Donation < ApplicationRecord
 
   def offline?
     stripe_payment_intent_id.blank?
+  end
+
+  def revise_note(text)
+    self.note_to_family = text.to_s.strip
+    save(context: :note_revision)
   end
 
   def approve_note!

@@ -31,6 +31,8 @@ module Admin
       assert_select "#donor-notes .drawer-quote", text: "We picked the art set because our daughter draws too."
       assert_select "#donor-notes .item-name", text: "Priya S."
       assert_select "#donor-notes a[href=?]", admin_household_path(@household), text: "The Brooks home"
+      assert_select "#donor-notes form[action=?] textarea", admin_donor_note_path(@donation),
+                    text: "We picked the art set because our daughter draws too."
     end
 
     test "a list whose household is verified can be approved from the inbox" do
@@ -67,12 +69,39 @@ module Admin
       assert_select "#donor-notes .drawer-quote", count: 0
     end
 
-    test "discarding a donor note removes it" do
+    test "discarding a donor note removes it and keeps its wording in the audit trail" do
       patch discard_admin_donor_note_path(@donation)
 
       assert_redirected_to admin_inbox_path
       assert_nil @donation.reload.note_to_family
       assert_nil @donation.note_approved_at
+      assert_recorded_by_staff @donation, "note_to_family", [ "We picked the art set because our daughter draws too.", nil ]
+    end
+
+    test "editing a donor note keeps it waiting and keeps the donor's wording in the audit trail" do
+      patch admin_donor_note_path(@donation), params: { donor_note: { note_to_family: " We picked the art set for her. " } }
+
+      assert_redirected_to admin_inbox_path
+      assert_equal "We picked the art set for her.", @donation.reload.note_to_family
+      assert @donation.note_pending_review?
+      assert_recorded_by_staff @donation, "note_to_family",
+                               [ "We picked the art set because our daughter draws too.", "We picked the art set for her." ]
+    end
+
+    test "a note cannot be edited down to nothing" do
+      patch admin_donor_note_path(@donation), params: { donor_note: { note_to_family: "   " } }
+
+      assert_equal "Note to family can't be blank", flash[:alert]
+      assert_equal "We picked the art set because our daughter draws too.", @donation.reload.note_to_family
+    end
+
+    test "an approved note can no longer be edited" do
+      @donation.approve_note!
+
+      patch admin_donor_note_path(@donation), params: { donor_note: { note_to_family: "Something else." } }
+
+      assert_equal "Only a note waiting for approval can be edited.", flash[:alert]
+      assert_equal "We picked the art set because our daughter draws too.", @donation.reload.note_to_family
     end
 
     test "a note on another event's donation is not found" do

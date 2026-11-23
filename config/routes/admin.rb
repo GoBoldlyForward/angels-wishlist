@@ -27,7 +27,7 @@ namespace :admin do
 
   # Inbox
   resource :inbox, only: :show
-  resources :donor_notes, only: [] do
+  resources :donor_notes, only: :update do
     member do
       patch :approve
       patch :discard

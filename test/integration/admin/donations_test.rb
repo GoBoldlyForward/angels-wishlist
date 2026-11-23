@@ -100,6 +100,22 @@ module Admin
       assert_select "td", text: /Art supply set/
     end
 
+    test "the donation page and the export show how the donor heard about us" do
+      @mixed.update!(heard_about: "News or TV (like Good Day Atlanta)")
+
+      get admin_donation_path(@mixed)
+      assert_select ".kv dt", text: "Heard about"
+      assert_select ".kv dd", text: "News or TV (like Good Day Atlanta)"
+
+      get admin_donation_path(@general)
+      assert_select ".kv dt", text: "Heard about", count: 0
+
+      get admin_donations_path(format: :csv)
+      assert_equal "Heard about", csv_rows.headers.last
+      mixed = csv_rows.find { |row| row["Reference"] == @mixed.uuid.first(8) }
+      assert_equal "News or TV (like Good Day Atlanta)", mixed["Heard about"]
+    end
+
     test "refunding takes the donation out of the pool and returns its gifts to open" do
       assert_changes -> { @event.reload.raised_in_cents }, from: 19_500, to: 5_000 do
         patch refund_admin_donation_path(@mixed)

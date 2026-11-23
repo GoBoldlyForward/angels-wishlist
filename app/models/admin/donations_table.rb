@@ -22,7 +22,8 @@ module Admin
       "Fee" => ->(row) { Dollars.from_cents(row.fee_in_cents) },
       "Charged" => ->(row) { Dollars.from_cents(row.charged_in_cents) },
       "Method" => ->(row) { row.payment_method_label },
-      "Status" => ->(row) { row.status }
+      "Status" => ->(row) { row.status },
+      "Heard about" => ->(row) { row.heard_about }
     }.freeze
 
     attr_reader :event

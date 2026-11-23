@@ -9,6 +9,7 @@ namespace :admin do
       patch :archive
     end
   end
+  resource :payout_reminder, only: :create
   resources :wishlists, only: %i[index show] do
     member do
       patch :approve

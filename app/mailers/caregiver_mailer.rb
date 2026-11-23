@@ -19,6 +19,13 @@ class CaregiverMailer < ApplicationMailer
     mail to: @household.caregiver.email, from: from_chapter(@household.organization), subject: "One of your lists needs a change"
   end
 
+  def payout_needed(enrollment)
+    @enrollment = enrollment
+    @household = enrollment.household
+    mail to: @household.caregiver.email, from: from_chapter(@household.organization),
+         subject: "Tell us how to send your household's share"
+  end
+
   def payout_sent(payout)
     @payout = payout
     @household = payout.household

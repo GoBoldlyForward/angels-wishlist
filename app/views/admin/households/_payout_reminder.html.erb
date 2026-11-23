@@ -1,0 +1,20 @@
+<%# locals: (reminder:) %>
+<% households = pluralize(reminder.recipient_count, "household") %>
+<%= family_callout icon: "envelope" do %>
+  <div class="d-flex flex-wrap align-items-center gap-2">
+    <span>
+      <b><%= households %></b> sent lists in without finishing the Getting paid step.
+      <% if reminder.sendable? %>
+        <%= reminder.last_sent_at ? "A reminder was last sent #{l(reminder.last_sent_at.to_date, format: :long)}." : "No reminder has been sent yet." %>
+      <% else %>
+        <%= reminder.refusal %>
+      <% end %>
+    </span>
+    <% if reminder.sendable? %>
+      <%= button_to "Email them a reminder", admin_payout_reminder_path, class: "btn btn-sm btn-primary",
+                    form: { data: { turbo_confirm: "Email #{households} asking them to finish the Getting paid step?" } } %>
+    <% elsif reminder.switched_off? %>
+      <%= link_to "Switch it on", edit_admin_organization_path(current_chapter), class: "btn btn-sm btn-outline-secondary" %>
+    <% end %>
+  </div>
+<% end %>

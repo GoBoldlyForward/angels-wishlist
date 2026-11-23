@@ -48,8 +48,11 @@ class Enrollment < ApplicationRecord
 
   # What the Getting paid step still needs, or nothing while the chapter has that step switched off.
   def payout_blockers
-    return [] unless event.organization.collects_payout_details?
+    event.organization.collects_payout_details? ? payout_needs : []
+  end
 
+  # What the Getting paid step asks for that this household has not given yet.
+  def payout_needs
     [
       ("Choose how you would like to be paid." if household.payout_via_none?),
       ("Finish connecting with Stripe." if household.payout_via_stripe? && !household.stripe_connected?),

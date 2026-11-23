@@ -344,6 +344,7 @@ with a Stripe test card, and receives one receipt.
 | Household verified, lists live | caregiver | staff approve |
 | List returned | caregiver | staff return a list with a reason |
 | Receipt | donor | the donation succeeds |
+| Payout reminder | every caregiver who sent lists in without finishing Getting paid | staff send it from Households, while lists are open and the step is on |
 | Payout sent | caregiver | the transfer or gift card goes out |
 | Thank-you and impact statement | every donor to the event | staff send it in January |
 

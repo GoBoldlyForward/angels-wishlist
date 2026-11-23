@@ -86,5 +86,22 @@ module Caregiver
       assert_equal users(:caregiver).email, @household.gift_card_email, "the account email unless another is given"
       assert @enrollment.reload.spending_agreed?
     end
+
+    test "the reminder's link lands a signed-out caregiver on the step once they sign in" do
+      @enrollment.update!(intake_step: "review")
+      post caregiver_intake_submission_path
+      @chapter.update!(collects_payout_details: true)
+      sign_out users(:caregiver)
+
+      get caregiver_intake_payout_path
+      assert_redirected_to new_user_session_path
+
+      post user_session_path, params: { user: { email: users(:caregiver).email, password: "password123" } }
+      assert_redirected_to caregiver_intake_payout_path
+
+      follow_redirect!
+      assert_response :success
+      assert_select "h1", /How should we get the money to you\?/
+    end
   end
 end

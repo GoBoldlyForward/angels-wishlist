@@ -8,7 +8,10 @@ module Admin
       @table = HouseholdsTable.new(current_chapter, current_event, params)
 
       respond_to do |format|
-        format.html { @pagy, @households = pagy(:offset, @table.rows) }
+        format.html do
+          @pagy, @households = pagy(:offset, @table.rows)
+          @payout_reminder = PayoutReminder.new(current_event)
+        end
         format.csv { send_csv(@table, @table.csv_columns, "households") }
       end
     end

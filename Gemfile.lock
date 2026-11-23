@@ -121,7 +121,7 @@ GEM
       msgpack (~> 1.5)
     bootstrap (5.3.8)
       popper_js (>= 2.11.8, < 3)
-    brakeman (8.1.0)
+    brakeman (8.1.1)
       racc
     breadcrumbs_on_rails (4.1.0)
       railties (>= 5.0)
@@ -295,7 +295,7 @@ GEM
       net-ssh (>= 5.0.0, < 8.0.0)
     net-smtp (0.5.2)
       net-protocol
-    net-ssh (7.3.8)
+    net-ssh (7.3.10)
       logger
     nio4r (2.7.5)
     nokogiri (1.19.7-aarch64-linux-gnu)

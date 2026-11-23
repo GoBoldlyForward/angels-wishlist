@@ -136,5 +136,47 @@ module Admin
       assert @cleats.reload.withdrawn_status?
       assert_recorded_by_staff @cleats, "status", %w[open withdrawn]
     end
+
+    test "the split form offers only counts that keep each part at $5 or more" do
+      get admin_line_item_path(@cleats)
+
+      assert_select "#split-form select[name=count] option", count: 9
+      assert_select "#split-form option[value='2']", text: "2 gifts of $27 to $28"
+      assert_select "#split-form option[value='10']", text: "10 gifts of $5 to $6"
+
+      [ @art, build_line_item(wishlist: @wishlist, name: "Stickers", price_in_cents: 900) ].each do |line|
+        get admin_line_item_path(line)
+        assert_select "#split-form", count: 0
+      end
+    end
+
+    test "splitting a gift opens its parts to donors and records who did it" do
+      post split_admin_line_item_path(@cleats), params: { count: 2 }
+
+      assert_redirected_to admin_wishlist_path(@wishlist)
+      assert_equal "Soccer cleats is split into 2 gifts that add up to $55.", flash[:notice]
+      assert_recorded_by_staff @cleats, "status", %w[open withdrawn]
+      parts = @wishlist.line_items.where("name LIKE ?", "Soccer cleats (part %").oldest_first
+      assert_equal [ 2_800, 2_700 ], parts.map(&:price_in_cents)
+      parts.each { |part| assert_equal [ @staff, "create" ], [ part.versions.last.actor, part.versions.last.event ] }
+
+      gifts = Storefront::Catalog.new(event: @event).child(@wishlist.slug).gifts.map(&:name)
+      assert_includes gifts, "Soccer cleats (part 1 of 2)"
+      assert_includes gifts, "Soccer cleats (part 2 of 2)"
+      assert_not_includes gifts, "Soccer cleats"
+    end
+
+    test "a funded or withdrawn gift is not split" do
+      post split_admin_line_item_path(@art), params: { count: 2 }
+      assert_redirected_to admin_line_item_path(@art)
+      assert_equal "A donor has chosen this gift, so it cannot be split.", flash[:alert]
+
+      @cleats.withdraw!
+      post split_admin_line_item_path(@cleats), params: { count: 2 }
+      assert_redirected_to admin_line_item_path(@cleats)
+      assert_equal "This gift is withdrawn, so it cannot be split.", flash[:alert]
+
+      assert_equal 3, @wishlist.line_items.count
+    end
   end
 end

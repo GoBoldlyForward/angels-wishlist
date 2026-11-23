@@ -46,6 +46,7 @@ module Admin
       patch approve_admin_wishlist_path(@wishlist)
       patch withdraw_admin_wishlist_path(@wishlist)
       patch withdraw_admin_line_item_path(@line_item)
+      post split_admin_line_item_path(@line_item), params: { count: 2 }
       patch approve_admin_donor_note_path(@donation)
       post admin_households_path, params: { household: { first_name: "A", last_name: "B", email: "a@example.com" } }
 

@@ -43,6 +43,13 @@ module Admin
       status_badge(Admin::LineItemsTable.state_of(line_item))
     end
 
+    def split_choices(line_item)
+      line_item.split_counts.map do |count|
+        prices = line_item.split_prices(count).minmax.map { |cents| money(cents) }.uniq
+        [ "#{count} gifts of #{prices.join(' to ')}", count ]
+      end
+    end
+
     def payout_badge(status, event)
       return status_badge(status) unless status.to_s == "scheduled" && event&.payout_at
 

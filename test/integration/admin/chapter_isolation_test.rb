@@ -64,7 +64,11 @@ module Admin
         patch path
         assert_response :not_found, "#{path} reached the other chapter"
       end
+      sign_in @organizer
+      post split_admin_line_item_path(other[:line_item]), params: { count: 2 }
+      assert_response :not_found, "splitting reached the other chapter"
 
+      assert other[:line_item].reload.open_status?
       assert other[:household].reload.verification_pending?
       assert other[:donation].reload.succeeded?
       assert other[:payout].reload.scheduled?

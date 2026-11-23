@@ -21,6 +21,7 @@ namespace :admin do
     member do
       patch :approve
       patch :withdraw
+      post :split
     end
   end
   resource :love_box, only: :show

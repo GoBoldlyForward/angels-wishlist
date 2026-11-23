@@ -2,7 +2,7 @@
 
 module Admin
   class LineItemsController < BaseController
-    before_action :set_line_item, only: %i[show edit update approve withdraw]
+    before_action :set_line_item, only: %i[show edit update approve withdraw split]
     before_action :refuse_if_funded, only: %i[edit update withdraw]
 
     def index
@@ -43,6 +43,15 @@ module Admin
     def withdraw
       @line_item.withdraw!
       redirect_to admin_line_item_path(@line_item), notice: "#{@line_item.name} is withdrawn."
+    end
+
+    def split
+      parts = @line_item.split!(params.expect(:count).to_i)
+      redirect_to admin_wishlist_path(@line_item.wishlist),
+                  notice: "#{@line_item.name} is split into #{parts.size} gifts that add up to " \
+                          "#{helpers.money(@line_item.price_in_cents)}."
+    rescue ActiveRecord::RecordInvalid => invalid
+      redirect_to admin_line_item_path(@line_item), alert: invalid.record.errors.full_messages.to_sentence
     end
 
     private

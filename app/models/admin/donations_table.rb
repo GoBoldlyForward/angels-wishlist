@@ -15,6 +15,7 @@ module Admin
       "Donor" => ->(row) { row.donor.full_name },
       "Email" => ->(row) { row.donor.email },
       "Shown as" => ->(row) { row.public_display_name },
+      "Came through" => ->(row) { row.storefront_organization&.display_name },
       "What they chose" => ->(row) { DonationChoice.new(row).to_s },
       "Chosen gifts" => ->(row) { Dollars.from_cents(row.gift_in_cents) },
       "General gift" => ->(row) { Dollars.from_cents(row.general_gift_in_cents) },
@@ -88,6 +89,10 @@ module Admin
       event.donations.joins(:donor).preload(:donor, line_items: { wishlist: :child })
     end
 
+    def rows_for_export
+      rows.preload(:storefront_organization)
+    end
+
     def totals
       @totals ||= event.donations.group(:status)
                        .pluck(:status, Arel.sql("COUNT(*)"), Arel.sql("SUM(gift_in_cents)"),
@@ -121,6 +126,8 @@ module Admin
                    scope: ->(rows, value) { rows.where("donations.fee_in_cents #{value == 'covered' ? '>' : '='} 0") }),
         Filter.new(key: "shown", label: "Shown as", options: { "Their name" => "named", "Anonymous" => "anonymous" },
                    scope: ->(rows, value) { rows.where(anonymous: value == "anonymous") }),
+        Filter.new(key: "through", label: "Came through", options: partners.to_h { |partner| [ partner.display_name, partner.id ] },
+                   scope: ->(rows, value) { rows.where(storefront_organization_id: value) }),
         Filter.new(key: "note", label: "Note to the family",
                    options: { "Awaiting approval" => "waiting", "Approved" => "approved" },
                    scope: ->(rows, value) { value == "waiting" ? rows.with_unapproved_note : rows.where.not(note_approved_at: nil) })

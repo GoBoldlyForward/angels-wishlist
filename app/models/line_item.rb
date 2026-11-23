@@ -7,6 +7,7 @@ class LineItem < ApplicationRecord
 
   MINIMUM_PRICE_IN_CENTS = 500
   LOCKED_ONCE_FUNDED = %w[name price_in_cents spec link_url catalog_item_id].freeze
+  SPLIT_COUNTS = (2..10)
 
   belongs_to :wishlist
   belongs_to :catalog_item, optional: true
@@ -93,6 +94,35 @@ class LineItem < ApplicationRecord
     update!(status: "withdrawn")
   end
 
+  def splittable?
+    !funded? && !withdrawn_status? && split_counts.any?
+  end
+
+  def split_counts
+    SPLIT_COUNTS.select { |count| price_in_cents >= count * MINIMUM_PRICE_IN_CENTS }
+  end
+
+  # Whole dollars, because the site shows prices in whole dollars; leftover cents go on the first part.
+  def split_prices(count)
+    dollars, cents = price_in_cents.divmod(100)
+    share, extra = dollars.divmod(count)
+    Array.new(count) { |index| ((share + (index < extra ? 1 : 0)) * 100) + (index.zero? ? cents : 0) }
+  end
+
+  # Donation#settle! must still find the original for a checkout already holding it, so it is withdrawn.
+  # The parts keep its created_at, which is the child's place in line for pooled gifts.
+  def split!(count)
+    with_lock do
+      refuse_split(count)
+      withdraw!
+      split_prices(count).map.with_index(1) do |cents, part|
+        wishlist.line_items.create!(name: "#{name} (part #{part} of #{count})", price_in_cents: cents, spec: spec,
+                                    link_url: link_url, catalog_item: catalog_item, status: "open",
+                                    created_at: created_at)
+      end
+    end
+  end
+
   private
 
   def counts_against_the_cap?
@@ -112,6 +142,22 @@ class LineItem < ApplicationRecord
     return if donation_id_was.blank? || (changed & LOCKED_ONCE_FUNDED).empty?
 
     errors.add(:base, "A funded gift cannot be changed")
+  end
+
+  def refuse_split(count)
+    reason = split_refusal(count)
+    return unless reason
+
+    errors.add(:base, reason)
+    raise ActiveRecord::RecordInvalid, self
+  end
+
+  def split_refusal(count)
+    return "A donor has chosen this gift, so it cannot be split." if funded?
+    return "This gift is withdrawn, so it cannot be split." if withdrawn_status?
+    return "A gift under $10 cannot be split into gifts of $5 or more." if split_counts.empty?
+
+    "This gift splits into at most #{split_counts.last} gifts of $5 or more." if split_counts.exclude?(count)
   end
 
   def keep_if_funded

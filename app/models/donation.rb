@@ -21,6 +21,7 @@ class Donation < ApplicationRecord
 
   scope :recent, -> { order(created_at: :desc) }
   scope :with_unapproved_note, -> { where.not(note_to_family: [ nil, "" ]).where(note_approved_at: nil) }
+  scope :with_approved_note, -> { where.not(note_to_family: [ nil, "" ]).where.not(note_approved_at: nil) }
   scope :offline, -> { where(stripe_payment_intent_id: nil) }
 
   validates :gift_in_cents, :general_gift_in_cents, :year_end_gift_in_cents, :fee_in_cents, :processing_fee_in_cents,

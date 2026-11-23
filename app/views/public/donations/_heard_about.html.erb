@@ -1,0 +1,28 @@
+<% if receipt.heard_about %>
+  <div class="panel heard-about">
+    <div class="note">
+      <i class="fa-solid fa-circle-check c-green" aria-hidden="true"></i>
+      <div>Thank you for telling us how you found us.</div>
+    </div>
+  </div>
+<% else %>
+  <section class="panel heard-about" aria-labelledby="heard-about-title">
+    <h2 class="t-md" id="heard-about-title">How did you hear about us?</h2>
+    <p class="tiny muted heard-about-lede">Optional. It helps us know where to share the lists next year.</p>
+
+    <%= form_with url: donation_path(uuid: receipt.key), method: :patch, scope: :donation, class: "heard-about-choices" do |form| %>
+      <% Donation::HEARD_ABOUT_CHOICES.each do |choice| %>
+        <%= form.button choice, name: "donation[heard_about]", value: choice, class: "chip" %>
+      <% end %>
+    <% end %>
+
+    <%= form_with url: donation_path(uuid: receipt.key), method: :patch, scope: :donation do |form| %>
+      <%= form.label :heard_about_other, Donation::HEARD_ABOUT_OTHER, class: "f" %>
+      <div class="heard-about-other">
+        <%= form.text_field :heard_about_other, class: "i", maxlength: 100, required: true,
+                                                placeholder: "Tell us in a few words" %>
+        <%= form.button "Send", class: "btn btn-ghost" %>
+      </div>
+    <% end %>
+  </section>
+<% end %>

@@ -295,7 +295,8 @@ module Public
       assert_select ".confirmation-next", /#{@event.closes_at.strftime("%B %-d")}/
       assert_select ".confirmation-next", /pooled and spread evenly across every child's list/
       assert_select ".confirmation-next", /a thank-you and an impact statement from Atlanta Angels in January/
-      assert_no_match(/\/donations\/\d+/, response.body)
+      # A uuid can start with digits too; an id is digits alone.
+      assert_no_match(%r{/donations/\d+(?![\h-])}, response.body)
     end
 
     test "a gift funded by someone else first is shown as going into the pool" do

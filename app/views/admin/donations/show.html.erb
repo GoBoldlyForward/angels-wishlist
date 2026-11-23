@@ -92,7 +92,8 @@
           [ "Name", link_to(@donation.donor.full_name, admin_donor_path(@donation.donor)) ],
           [ "Email", mail_to(@donation.donor.email) ],
           [ "Type", Admin::DonorType.of(@donation.donor).label ],
-          [ "Shown as", @donation.public_display_name ]
+          [ "Shown as", @donation.public_display_name ],
+          [ "Heard about", @donation.heard_about ]
         ] %>
         <% if @donation.anonymous? %>
           <div class="privacy-note mt-3">

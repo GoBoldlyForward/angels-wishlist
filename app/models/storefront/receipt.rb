@@ -6,7 +6,7 @@ module Storefront
     # chosen: gifts this donation funded, or will once the payment settles.
     # pooled: gifts somebody else funded first, whose amount stayed in the pool.
     attr_reader :key, :status, :given_in_cents, :wishlist_in_cents, :year_end_gift_in_cents, :fee_in_cents,
-                :charged_in_cents, :note, :display_name, :chosen, :pooled
+                :charged_in_cents, :note, :display_name, :heard_about, :chosen, :pooled
 
     def initialize(donation)
       @key = donation.uuid
@@ -19,6 +19,7 @@ module Storefront
       @general_gift_in_cents = donation.general_gift_in_cents
       @note = donation.note_to_family.presence
       @display_name = Gift.public_name(donation)
+      @heard_about = donation.heard_about
       @chosen, @pooled = split(donation)
     end
 

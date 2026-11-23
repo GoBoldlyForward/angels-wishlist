@@ -135,6 +135,11 @@ input.step-n:focus-visible { box-shadow: var(--ring); border-radius: 8px; outlin
 .confirmation-note { margin-top: 14px; padding: 14px 16px; }
 .confirmation-next { margin-top: 20px; }
 .confirmation-back { margin-top: 30px; text-align: center; }
+.heard-about { margin-bottom: 20px; }
+.heard-about-lede { margin: 4px 0 14px; }
+.heard-about-choices { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 18px; }
+.heard-about-other { display: flex; gap: 10px; }
+.heard-about-other .i { flex: 1; min-width: 0; }
 
 @media (max-width: 820px) {
   .checkout-grid { grid-template-columns: 1fr; }

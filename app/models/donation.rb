@@ -10,6 +10,16 @@ class Donation < ApplicationRecord
   PROCESSING_FIXED_IN_CENTS = 30
   MINIMUM_GENERAL_GIFT_IN_CENTS = 500
 
+  HEARD_ABOUT_CHOICES = [
+    "Facebook or Instagram",
+    "A friend or family member",
+    "My church or group",
+    "News or TV (like Good Day Atlanta)",
+    "An Atlanta Angels email",
+    "Passion"
+  ].freeze
+  HEARD_ABOUT_OTHER = "Something else"
+
   belongs_to :donor, class_name: "User"
   belongs_to :event
   belongs_to :storefront_organization, class_name: "Organization", optional: true
@@ -26,7 +36,10 @@ class Donation < ApplicationRecord
   validates :gift_in_cents, :general_gift_in_cents, :year_end_gift_in_cents, :fee_in_cents, :processing_fee_in_cents,
             numericality: { greater_than_or_equal_to: 0 }
   validates :note_to_family, length: { maximum: 1000 }
+  validates :heard_about, length: { maximum: 120 }
   validate :carries_some_money
+  # Checked only when it changes, so a retired choice never blocks saving an older donation.
+  validate :heard_about_is_a_choice, if: :heard_about_changed?
 
   before_create :assign_uuid
 
@@ -62,6 +75,10 @@ class Donation < ApplicationRecord
 
   def public_display_name
     anonymous? ? "Anonymous" : display_name.presence || donor.full_name
+  end
+
+  def heard_about_other=(words)
+    self.heard_about = "#{HEARD_ABOUT_OTHER}: #{words.squish}" if words.present?
   end
 
   def to_param
@@ -155,5 +172,11 @@ class Donation < ApplicationRecord
     return if [ gift_in_cents, general_gift_in_cents, year_end_gift_in_cents ].any? { |cents| cents.to_i.positive? }
 
     errors.add(:base, "A donation has to carry a gift or a general amount, or a year-end gift")
+  end
+
+  def heard_about_is_a_choice
+    return if heard_about.nil? || heard_about.in?(HEARD_ABOUT_CHOICES) || heard_about.start_with?("#{HEARD_ABOUT_OTHER}: ")
+
+    errors.add(:heard_about, "is not one of the choices")
   end
 end

@@ -138,6 +138,15 @@ class DonationTest < ActiveSupport::TestCase
     assert_equal 0, event.raised_in_cents
   end
 
+  test "an answer that is no longer one of the choices never blocks a refund" do
+    donation = build_donation(event: build_event)
+    donation.update_column(:heard_about, "A radio ad")
+
+    donation.refund!
+
+    assert donation.reload.refunded?
+  end
+
   test "the fee is what lets the whole gift through card processing" do
     fee = Donation.fee_for(8_500)
 

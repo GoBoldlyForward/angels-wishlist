@@ -71,6 +71,20 @@ module Admin
       end
     end
 
+    test "a partner's card opens the donations that came through its page" do
+      passion = build_organization(name: "Passion City Church", short_name: "Passion", kind: "partner", parent: @chapter)
+      through_passion = build_donation(event: @event, storefront_organization: passion)
+      build_donation(event: @event, storefront_organization: passion, status: "pending")
+      @mixed.update!(storefront_organization: @chapter)
+
+      get admin_donations_path
+      get css_select(".stat-cards a").sole["href"]
+
+      assert_select "tbody tr", 1
+      assert_select "td", text: /#{through_passion.uuid.first(8)}/
+      assert_select "#f_through option[selected]", "Passion"
+    end
+
     test "search finds a donation by reference or donor" do
       get admin_donations_path(q: @general.uuid.first(8))
       assert_select "tbody tr", 1
@@ -87,6 +101,22 @@ module Admin
       mixed = csv_rows.find { |row| row["Reference"] == @mixed.uuid.first(8) }
       assert_equal "149.35", mixed["Charged"]
       assert_equal "1 gift for #{@wishlist.child.display_name} + Where it is needed most", mixed["What they chose"]
+    end
+
+    test "the export says which page each donation came through" do
+      passion = build_organization(name: "Passion City Church", short_name: "Passion", kind: "partner", parent: @chapter)
+      @mixed.update!(storefront_organization: @chapter)
+      @general.update!(storefront_organization: passion)
+      offline = build_donation(event: @event)
+
+      get admin_donations_path(format: :csv)
+
+      rows = csv_rows
+      assert_equal "Came through", rows.headers[rows.headers.index("Shown as") + 1]
+      came_through = rows.to_h { |row| [ row["Reference"], row["Came through"] ] }
+      assert_equal "Atlanta Angels", came_through[@mixed.uuid.first(8)]
+      assert_equal "Passion", came_through[@general.uuid.first(8)]
+      assert_nil came_through[offline.uuid.first(8)]
     end
 
     test "the donation page shows the charge, the donor, and the note awaiting approval" do

@@ -78,11 +78,16 @@ module Admin
     def to_csv(columns)
       CSV.generate do |csv|
         csv << columns.keys
-        rows.find_each { |row| csv << columns.values.map { |value| value.call(row) } }
+        rows_for_export.find_each { |row| csv << columns.values.map { |value| value.call(row) } }
       end
     end
 
     private
+
+    # A table whose export reads more of each row than its page shows preloads that here.
+    def rows_for_export
+      rows
+    end
 
     def order(rows)
       return rows.reorder(Arel.sql("#{sort.order} #{direction} NULLS LAST")) if sort

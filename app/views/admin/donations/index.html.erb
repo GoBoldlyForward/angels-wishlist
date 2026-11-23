@@ -27,8 +27,10 @@
                     note: "unrestricted, outside the pool" %>
     <% end %>
     <% @table.partner_totals.each do |total| %>
-      <%= stat_card "Gifts through #{total.partner.display_name}", total.gifts, icon: "people", color: "blue",
-                    note: "#{money(total.given_in_cents)} given in #{pluralize(total.donations, 'donation')}" %>
+      <%= link_to admin_donations_path(tab: "succeeded", f: { through: total.partner.id }), class: "text-reset text-decoration-none" do %>
+        <%= stat_card "Gifts through #{total.partner.display_name}", total.gifts, icon: "people", color: "blue",
+                      note: "#{money(total.given_in_cents)} given in #{pluralize(total.donations, 'donation')}" %>
+      <% end %>
     <% end %>
   </div>
 <% end %>

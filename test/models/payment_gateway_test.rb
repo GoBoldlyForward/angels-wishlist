@@ -101,6 +101,21 @@ class PaymentGatewayTest < ActiveSupport::TestCase
     assert payout.reload.sent?
   end
 
+  test "the chapter's balance is read from Stripe with the secret key, in dollars only" do
+    sent = nil
+    retrieve = lambda do |params = {}, options = {}|
+      sent = [ params, options ]
+      Stripe::Balance.construct_from(available: [ { amount: 25_000, currency: "usd" }, { amount: 900, currency: "eur" } ])
+    end
+
+    balance = with_secret_key("sk_test_chapter") do
+      swapping(Stripe::Balance, :retrieve, retrieve) { PaymentGateway.balance_in_cents }
+    end
+
+    assert_equal 25_000, balance
+    assert_equal [ {}, { api_key: "sk_test_chapter" } ], sent
+  end
+
   test "a caregiver's account.updated event marks the household onboarded once Stripe has its details" do
     household = build_household(stripe_account_id: "acct_caregiver", stripe_onboarded_at: nil)
 
@@ -137,6 +152,14 @@ class PaymentGatewayTest < ActiveSupport::TestCase
     swapping(PaymentGateway, :live?, -> { true }) do
       swapping(Stripe::Transfer, :create, transfer) { yield }
     end
+  end
+
+  def with_secret_key(key)
+    original = ENV["STRIPE_SECRET_KEY"]
+    ENV["STRIPE_SECRET_KEY"] = key
+    yield
+  ensure
+    ENV["STRIPE_SECRET_KEY"] = original
   end
 
   def stripe_event(type, **object)

@@ -117,7 +117,8 @@ module PaymentGateway
   def balance_in_cents
     return nil unless live?
 
-    balance = Stripe::Balance.retrieve({ api_key: ENV["STRIPE_SECRET_KEY"] })
+    # Balance has no id, so retrieve takes params first and the key goes in the second hash.
+    balance = Stripe::Balance.retrieve({}, { api_key: ENV["STRIPE_SECRET_KEY"] })
     balance.available.select { |funds| funds.currency == "usd" }.sum(&:amount)
   end
 
